@@ -1092,73 +1092,131 @@ Gracias.`;
     }
 
     /* ====== Exportar ====== */
-    async function exportarExcel(){
-      if(currentProject !== 'operatividad'){ return; }
-      hideState();
-      const moduleLabel = projectLabels[currentProject] || currentProject;
-      try{
-        const btn = $('#btnExportar');
-        const lbl = btn.querySelector('.lbl');
+    /* ====== Exportar ====== */
+async function exportarExcel(){
+  if(currentProject !== 'operatividad'){ return; }
+  hideState();
+  const moduleLabel = projectLabels[currentProject] || currentProject;
 
-        btn.disabled = true;
-        lbl.textContent = 'Exportando…';
+  // --- Utilidad: convertir JS Date (solo fecha) a serial Excel en UTC ---
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const toExcelSerialUTC = (y,m,d) => (Date.UTC(y, m, d) / MS_PER_DAY) + 25569;
 
-        // === Usar backend del proyecto seleccionado ===
-        const API = (BACKENDS[currentProject] || API_BASE).replace(/\/+$/,'');
-        const res = await fetch(`${API}/api/aoa`, {
-          method:'GET', mode:'cors', headers:{ 'Accept':'application/json' }
-        });
-        const j = await res.json().catch(()=>null);
-        const aoa = Array.isArray(j?.aoa) ? j.aoa : [];
-        if(!aoa.length){
-          showState('No hay datos para exportar.');
-          setGlobalLog('Exportación vacía', moduleLabel, '');
-          return;
+  // --- Intentar obtener un serial Excel desde distintos formatos ---
+  function parseToExcelSerial(raw){
+    if (raw === null || raw === undefined || raw === '') return null;
+
+    // 1) Ya es número o string numérico
+    if (typeof raw === 'number' || (typeof raw === 'string' && /^\d+(\.\d+)?$/.test(raw.trim()))) {
+      const num = Number(raw);
+      if (!Number.isNaN(num)) {
+        // Heurística:
+        // - si es un número grande (>= 1e10), probablemente epoch ms -> convertir
+        // - si es razonable (entre 10 y 100000), probablemente serial de Excel
+        if (num >= 1e10) {
+          // epoch ms -> serial
+          return (num / MS_PER_DAY) + 25569;
+        } else {
+          // tratar como serial Excel directamente
+          return num;
         }
+      }
+      return null;
+    }
 
-        // === CORRECCIÓN: asegurar que la primera columna (fechas) sea Date y se vea en Excel ===
-        const fechaCol = 0; // primera columna
-        const aoaCorr = aoa.map(row => Array.isArray(row) ? [...row] : row);
+    if (typeof raw === 'string') {
+      const s = raw.trim();
 
-        for (let r = 1; r < aoaCorr.length; r++) {         // saltar encabezado
-          if (!Array.isArray(aoaCorr[r])) continue;
-          const v = aoaCorr[r][fechaCol];
-          const d = parsearFechaFlexible(v);
-          if (d) aoaCorr[r][fechaCol] = d;                 // convertir a Date real
+      // 2) dd/mm/yyyy (con o sin hora) -> tomar solo fecha
+      let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (m) {
+        const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
+        if (!Number.isNaN(dd) && !Number.isNaN(mm) && !Number.isNaN(yyyy)) {
+          return toExcelSerialUTC(yyyy, mm - 1, dd);
         }
+      }
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(aoaCorr);
-
-        // Aplicar tipo y formato a la columna de fechas (dd/mm/yyyy)
-        for (let r = 1; r < aoaCorr.length; r++) {
-          const addr = XLSX.utils.encode_cell({ r, c: fechaCol });
-          const val = aoaCorr[r]?.[fechaCol];
-          if (ws[addr] && val instanceof Date && !isNaN(val)) {
-            ws[addr].t = 'd';
-            ws[addr].z = 'dd/mm/yyyy';
-          }
-        }
-
-        XLSX.utils.book_append_sheet(wb, ws, 'Exclusiones');
-        const nombre = `exclusiones_export_${new Date().toISOString().slice(0,10)}.xlsx`;
-        XLSX.writeFile(wb, nombre, { cellDates: true }); // importante para conservar tipo Date
-
-        const filas = Math.max(0,(aoa.length-1));
-        showState(`Exportación completada (${filas} filas sin encabezados).`);
-        setGlobalLog('Exportación completada', moduleLabel, `Filas: ${filas}`);
-      }catch(err){
-        console.error(err);
-        showState('Error al exportar: ' + (err?.message ?? err), true);
-        setGlobalLog('Error de exportación', moduleLabel, err?.message ?? String(err));
-      }finally{
-        const btn = $('#btnExportar');
-        const lbl = btn.querySelector('.lbl');
-        lbl.textContent = 'Exportar datos';
-        btn.disabled = false;
+      // 3) yyyy-mm-dd (o yyyy/mm/dd, ISO, etc.) -> usar Date nativa y tomar solo fecha UTC
+      //    Permitimos que incluya hora/Z/T, etc.
+      const d = new Date(s);
+      if (!Number.isNaN(d)) {
+        return toExcelSerialUTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
       }
     }
 
+    // 4) Date objeto (por si llega)
+    if (raw instanceof Date && !Number.isNaN(raw)) {
+      return toExcelSerialUTC(raw.getUTCFullYear(), raw.getUTCMonth(), raw.getUTCDate());
+    }
+
+    return null;
+  }
+
+  try{
+    const btn = $('#btnExportar');
+    const lbl = btn.querySelector('.lbl');
+
+    btn.disabled = true;
+    lbl.textContent = 'Exportando…';
+
+    // === Usar backend del proyecto seleccionado ===
+    const API = (BACKENDS[currentProject] || API_BASE).replace(/\/+$/,'');
+    const res = await fetch(`${API}/api/aoa`, {
+      method:'GET', mode:'cors', headers:{ 'Accept':'application/json' }
+    });
+    const j = await res.json().catch(()=>null);
+    const aoa = Array.isArray(j?.aoa) ? j.aoa : [];
+
+    if(!aoa.length){
+      showState('No hay datos para exportar.');
+      setGlobalLog('Exportación vacía', moduleLabel, '');
+      return;
+    }
+
+    // Construir el libro con los datos tal cual
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    // === FORZAR que la PRIMERA COLUMNA sea fecha REAL en Excel ===
+    const fechaCol = 0; // primera columna
+    for (let r = 1; r < aoa.length; r++) { // saltar encabezado (fila 0)
+      const addr = XLSX.utils.encode_cell({ r, c: fechaCol });
+      const raw = (Array.isArray(aoa[r]) ? aoa[r][fechaCol] : null);
+
+      if (raw === null || raw === undefined || raw === '') continue;
+
+      const serial = parseToExcelSerial(raw);
+      if (serial !== null) {
+        // Escribir como número con formato de fecha
+        ws[addr] = { t:'n', v: serial, z:'dd/mm/yyyy' };
+      } else {
+        // Si no se pudo parsear, lo dejamos como estaba (texto)
+        if (!ws[addr]) {
+          ws[addr] = { t:'s', v: String(raw) };
+        }
+      }
+    }
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Exclusiones');
+
+    // Guardar
+    const nombre = `exclusiones_export_${new Date().toISOString().slice(0,10)}.xlsx`;
+    XLSX.writeFile(wb, nombre); // no hace falta cellDates aquí; ya pusimos serial numérico
+
+    const filas = Math.max(0, aoa.length - 1);
+    showState(`Exportación completada (${filas} filas sin encabezados).`);
+    setGlobalLog('Exportación completada', moduleLabel, `Filas: ${filas}`);
+
+  }catch(err){
+    console.error(err);
+    showState('Error al exportar: ' + (err?.message ?? err), true);
+    setGlobalLog('Error de exportación', moduleLabel, err?.message ?? String(err));
+  }finally{
+    const btn = $('#btnExportar');
+    const lbl = btn.querySelector('.lbl');
+    lbl.textContent = 'Exportar datos';
+    btn.disabled = false;
+  }
     /* ====== Outlook & Teams ====== */
     function openMailOutlook(toList = [], ccList = [], subject = DEFAULT_SUBJECT, body = DEFAULT_BODY){
       const to = encodeURIComponent(toList.join(','));
