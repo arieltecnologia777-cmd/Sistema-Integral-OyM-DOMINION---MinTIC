@@ -162,9 +162,15 @@ body{
   background:#f9fbff; color:#6b7893; border-color:#e1eaff; cursor:not-allowed;
 }
 .btn-pill:focus-visible{ outline:2px solid #94b8ff; outline-offset:2px; }
-/* Íconos planos */
-.btn-pill .icon{ width:16px; height:16px; display:inline-block; }
-.btn-pill .icon svg{ width:16px; height:16px; display:block; }
+/* Íconos planos (ajuste fino, 16×16 consistentes) */
+.btn-pill .icon{
+  width:16px; height:16px; display:inline-block;
+  flex-shrink:0;
+  vertical-align:middle;
+}
+.btn-pill .icon svg{
+  width:16px; height:16px; display:block;
+}
 /* Hover de fila: realce general (excepto enviar/success/eliminar) */
 .tabla tbody tr:hover .btn-pill:not(:disabled):not([data-mode="enviar"]):not(.success):not(.btn-eliminar){
   background:var(--chip-bg-strong);
@@ -375,6 +381,7 @@ body{
 
 <!-- ===== Toast host ===== -->
 <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
 <script>
 /* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
 /* >>> PROYECTO p1: base con prefijo /p1 para todos los endpoints <<< */
@@ -569,7 +576,7 @@ function updateEstadosOT(ot){
     }
 
     if(pendientes === 0){
-      btnPrim.innerHTML = `✅ OT gestionada`;
+      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
       btnPrim.classList.add('success');
       btnPrim.disabled = true;
       btnPrim.setAttribute('data-mode','done');
@@ -626,6 +633,28 @@ function svgEye(){
     </svg>
   </span>`;
 }
+/* NUEVO: check (16×16) para "OT gestionada" */
+function svgCheck(){
+  return `
+  <span class="icon icon-check" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" fill="#ffffff" opacity="0.18"></circle>
+      <path d="M7 12.5l3 3 7-7" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </span>`;
+}
+/* NUEVO: trash (16×16) para botón Eliminar */
+function svgTrash(){
+  return `
+  <span class="icon icon-trash" aria-hidden="true">
+    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+      <path d="M3 6h18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+      <rect x="5" y="6" width="14" height="14" rx="2" ry="2" fill="none" stroke="currentColor" stroke-width="1.8"></rect>
+      <path d="M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+    </svg>
+  </span>`;
+}
 
 /* ======= Render (tabla por OT + acciones) ======= */
 function render(){
@@ -668,7 +697,9 @@ function render(){
         <button class="btn-pill btn-preview" id="${idPreview}" data-ot="${esc(otClave)}" title="Ver registros (solo lectura)">
           ${svgEye()}Vista previa
         </button>
-        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-ot="${esc(otClave)}" title="Eliminar todos los registros" disabled>🗑️ Eliminar</button>
+        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-ot="${esc(otClave)}" title="Eliminar todos los registros" disabled>
+          ${svgTrash()}Eliminar
+        </button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -677,7 +708,7 @@ function render(){
     const btnDel = tr.querySelector(`#${idEliminar}`);
 
     if(yaCompleta){
-      btnPrim.innerHTML = `✅ OT gestionada`;
+      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
       btnPrim.classList.add('success');
       btnPrim.disabled = true;
       btnPrim.setAttribute('data-mode','done');
@@ -800,7 +831,7 @@ function cerrarModal(){
     if(pendientes === 0){
       otsEnEdicion.delete(otModalActual);
       if(btnPrim){
-        btnPrim.innerHTML = `✅ OT gestionada`;
+        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
         btnPrim.disabled = true;
         btnPrim.classList.add('success');
         btnPrim.setAttribute('data-mode','done');
@@ -850,7 +881,7 @@ async function enviarRegistrosOT(ot){
       otsEnviadas.add(ot);
       // En Opción B ya estaba verde por pendientes=0; reafirmamos estado visual
       if(btn){
-        btn.innerHTML = `✅ OT gestionada`;
+        btn.innerHTML = `${svgCheck()}OT gestionada`;
         btn.classList.add('success');
         btn.disabled = true;
         btn.setAttribute('data-mode','done');
@@ -868,7 +899,7 @@ async function enviarRegistrosOT(ot){
       // Volvemos al estado que corresponda por pendientes
       const { pendientes } = contarCompletados(ot);
       if(pendientes === 0){
-        btn.innerHTML = `✅ OT gestionada`;
+        btn.innerHTML = `${svgCheck()}OT gestionada`;
         btn.setAttribute('data-mode','done');
         btn.classList.add('success');
         btn.disabled = true;
@@ -977,28 +1008,28 @@ function syncInputsFromVars(){
   const vDom  = getCSSVar('--dom-blue') || '#0e4aa8';
   const vLine = getCSSVar('--line') || '#e4ebf6';
   const vPill = getCSSVar('--pill') || '#cfe0ff';
-  colorHead.value = vHead.startsWith('#') ? vHead : '#ffffff';
-  colorDom.value  = vDom.startsWith('#') ? vDom : '#0e4aa8';
-  colorLine.value = vLine.startsWith('#') ? vLine : '#e4ebf6';
-  colorPill.value = vPill.startsWith('#') ? vPill : '#cfe0ff';
+  if(colorHead) colorHead.value = vHead.startsWith('#') ? vHead : '#ffffff';
+  if(colorDom)  colorDom.value  = vDom.startsWith('#') ? vDom : '#0e4aa8';
+  if(colorLine) colorLine.value = vLine.startsWith('#') ? vLine : '#e4ebf6';
+  if(colorPill) colorPill.value = vPill.startsWith('#') ? vPill : '#cfe0ff';
 }
-function openPalette(){ palette.classList.add('show'); palette.setAttribute('aria-hidden','false'); syncInputsFromVars(); }
-function closePalette(){ palette.classList.remove('show'); palette.setAttribute('aria-hidden','true'); }
+function openPalette(){ if(palette){ palette.classList.add('show'); palette.setAttribute('aria-hidden','false'); syncInputsFromVars(); } }
+function closePalette(){ if(palette){ palette.classList.remove('show'); palette.setAttribute('aria-hidden','true'); } }
 
 if(paletteFab){
   paletteFab.addEventListener('click', () => { if(palette.classList.contains('show')) closePalette(); else openPalette(); });
-  document.getElementById('btnClosePalette').addEventListener('click', closePalette);
-  document.getElementById('btnResetPalette').addEventListener('click', ()=>{
+  document.getElementById('btnClosePalette')?.addEventListener('click', closePalette);
+  document.getElementById('btnResetPalette')?.addEventListener('click', ()=>{
     setCSSVar('--head', '#ffffff');
     setCSSVar('--dom-blue', '#0e4aa8');
     setCSSVar('--line', '#e4ebf6');
     setCSSVar('--pill', '#cfe0ff');
     savePalette(); syncInputsFromVars();
   });
-  colorHead.addEventListener('input', e => { setCSSVar('--head', e.target.value); savePalette(); });
-  colorDom .addEventListener('input', e => { setCSSVar('--dom-blue', e.target.value); savePalette(); });
-  colorLine.addEventListener('input', e => { setCSSVar('--line', e.target.value); savePalette(); });
-  colorPill.addEventListener('input', e => { setCSSVar('--pill', e.target.value); savePalette(); });
+  colorHead?.addEventListener('input', e => { setCSSVar('--head', e.target.value); savePalette(); });
+  colorDom ?.addEventListener('input', e => { setCSSVar('--dom-blue', e.target.value); savePalette(); });
+  colorLine?.addEventListener('input', e => { setCSSVar('--line', e.target.value); savePalette(); });
+  colorPill?.addEventListener('input', e => { setCSSVar('--pill', e.target.value); savePalette(); });
 }
 
 /* ======= Arranque ======= */
