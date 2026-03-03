@@ -37,7 +37,7 @@ html[data-theme="dark"]  #welcomeUser { color: var(--primary); }
     0 0 22px rgba(0, 102, 255, 0.28),
     0 0 44px rgba(0, 102, 255, 0.18);
 }
-/* ===== Modo oscuro (variables) ===== */
+/* ===== Modo oscuro robusto (solo variables) ===== */
 html[data-theme="dark"],
 body.theme-dark{
   --bg:#0e1320; --panel:#151a2e; --text:#e5eaf5; --muted:#9fb0c9;
@@ -57,7 +57,7 @@ body{
 }
 a{color:var(--text); text-decoration:none}
 img{display:block; max-width:100%; height:auto}
-/* ===== SIDEBAR ===== */
+/* ===== SIDEBAR — Tarjeta flotante ===== */
 .sidebar{
   position: fixed; inset: 0 auto 0 0; width: var(--sb-w);
   background: color-mix(in srgb, var(--sb-bg) 50%, transparent);
@@ -90,7 +90,7 @@ img{display:block; max-width:100%; height:auto}
 .sb-item svg path, .sb-item svg circle, .sb-item svg rect, .sb-item svg line, .sb-item svg polyline, .sb-item svg polygon{ stroke: currentColor; stroke-width:2; fill:none; }
 .sb-item:hover svg{ color: var(--primary); }
 .sb-footer{ display:flex; flex-direction:column; gap:10px; padding:0 4px }
-/* Footer buttons */
+/* Botones footer */
 .btn-logout, .btn-theme{
   display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px;
   background: var(--panel); border:1px solid var(--line); color: var(--text); cursor:pointer; box-shadow: var(--shadow);
@@ -106,7 +106,7 @@ img{display:block; max-width:100%; height:auto}
   border-radius:10px; padding:10px; display:none; box-shadow:var(--shadow); cursor:pointer;
 }
 .menu-toggle svg{ width:20px; height:20px; stroke: currentColor; stroke-width:2; fill:none }
-/* ===== HERO ===== */
+/* ===== HERO FULLSCREEN ===== */
 .hero{
   position:fixed; inset:0 0 0 var(--sb-w);
   width: calc(100svw - var(--sb-w)); height: 100svh; min-height:100vh;
@@ -145,7 +145,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
   padding: 6px 10px; border: none; border-radius:10px; box-shadow: var(--shadow);
   backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
 }
-/* Scrollbar columna derecha */
+/* Scrollbar lateral del texto */
 .text-side::-webkit-scrollbar{ width:10px }
 .text-side::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px }
 .text-side:hover::-webkit-scrollbar-thumb{ background:color-mix(in srgb, var(--muted) 40%, transparent) }
@@ -177,7 +177,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
 .btn{ display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--panel); color:var(--text); cursor:pointer; box-shadow: var(--shadow) }
 .btn.primary{ background: var(--primary); color: #fff; border-color: transparent }
 .btn svg{ width:16px; height:16px; stroke: currentColor; fill:none; stroke-width:2 }
-/* Frost (bienvenida) */
+/* Frosted Edge (bienvenida) */
 #welcomeModal.modal{
   position: relative; isolation: isolate;
   background: color-mix(in srgb, var(--panel) 94%, #ffffff 6%);
@@ -198,11 +198,11 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
     0 0 64px color-mix(in srgb, var(--primary) 38%, transparent);
   z-index:-1; pointer-events:none;
 }
-/* Carrusel (se mantiene igual) … */
+/* Carrusel — estilos ya presentes más abajo en el JS (sin cambios) */
   </style>
 </head>
 <body>
-  <!-- Botón men  (móvil) -->
+  <!-- Botón menú (móvil) -->
   <button class="menu-toggle" id="btnMenu" aria-label="Abrir menú">
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -303,7 +303,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
     </div>
   </aside>
 
-  <!-- ======= HERO ======= -->
+  <!-- ======= HERO FULLSCREEN ======= -->
   <section class="hero" aria-label="Héroe a pantalla completa">
     <!-- Columna imagen -->
     <div class="photo-side">
@@ -316,10 +316,8 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
       <div class="hero-copy">
         <div class="super-title"><span class="dot"></span> INGENIERÍA • CONECTIVIDAD • SERVICIO</div>
         <h1 class="title-main">Seguimiento O&M proyecto MinTIC</h1>
-        <p class="lead">
-          Sistema integral operativo, consulta detalles KPIs, backlog y
-          hoja de vida de cada Centro Digital.
-        </p>
+        <p class="lead">Sistema integral operativo, consulta detalles KPIs, backlog y hoja de vida de cada Centro Digital.</p>
+
         <div class="carousel-title">Acercamiento a la comunidad</div>
         <div class="carousel" id="cdCarousel" aria-label="Galería de imágenes">
           <button class="carousel-btn prev" id="cPrev" aria-label="Anterior">
@@ -331,6 +329,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
           </button>
         </div>
       </div>
+
       <div class="hero-legal" id="heroLegal">
         © 2026 DOMINION — Todos los derechos reservados — WEB desarrollada por Ariel Márquez Rada
       </div>
@@ -360,28 +359,21 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
       </div>
     </div>
   </div>
-<!-- ===== Modal Bienvenida (solo 1 vez por sesión) ===== -->
+
+  <!-- ===== Modal Bienvenida ===== -->
   <div class="modal-backdrop" id="welcomeBackdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" id="welcomeModal">
       <div class="modal-body" id="welcomeContent">
-        <h2 style="margin:0 0 12px 0; font-size:20px; font-weight:600;">¡Bienvenido(a)!</h2>
-        <p style="margin:0; font-size:16px; color:var(--muted)">
-          Hola <strong id="welcomeUser">usuario</strong>, estás ingresando al sistema de Seguimiento O&M.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn primary" id="welcomeContinue">Entrar</button>
+        <h2 styleprimary" id="welcomeContinue">Entrar</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== Modal Selector Módulo de exclusiones (Admin / Gestor) ===== -->
+  <!-- ===== Modal Selector Módulo de exclusiones ===== -->
   <div class="modal-backdrop" id="exclusionesBackdrop" aria-hidden="true">
     <div class="modal modal--xl" role="dialog" aria-modal="true" aria-labelledby="exclusionesTitle" id="exclusionesModal">
       <div class="modal-header">
-        <div class="modal-title" id="exclusionesTitle" tabindex="-1">
-          <span>Bienvenido</span>
-        </div>
+        <div class="modal-title" id="exclusionesTitle" tabindex="-1"><span>Bienvenido</span></div>
         <button class="btn" id="exclusionesClose" aria-label="Cerrar">Cerrar</button>
       </div>
       <div class="modal-body">
@@ -391,7 +383,6 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
           <div class="exclusiones-card" id="cardAdmin">
             <div class="card-head">
               <div class="icon" aria-hidden="true">
-                <!-- Icono: usuario con engranaje -->
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path>
                   <path d="M2 21a7 7 0 0 1 14 0"></path>
@@ -411,7 +402,6 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
           <div class="exclusiones-card" id="cardGestor">
             <div class="card-head">
               <div class="icon" aria-hidden="true">
-                <!-- Icono: usuario con check -->
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <path d="M9 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z"></path>
                   <path d="M2 21a7 7 0 0 1 14 0"></path>
@@ -463,8 +453,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
       </div>
     </div>
   </div>
-
-  <!-- ===== Scripts ===== -->
+<!-- ===== Scripts ===== -->
   <script>
   /* ========== Tema (Claro/Oscuro) ========== */
   (function(){
@@ -493,7 +482,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
     });
   })();
 
-  /* ========== Sidebar móvil ========== */
+  /* ========== Sidebar móvil (hamburguesa) ========== */
   (function(){
     const btnMenu = document.getElementById('btnMenu');
     btnMenu?.addEventListener('click', ()=>{
@@ -522,7 +511,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
   window.addEventListener('resize', fitLegal);
   window.addEventListener('orientationchange', () => setTimeout(fitLegal, 200));
 
-  /* ========== Controlador de modales (Ayuda / Selector / Pwd) ========== */
+  /* ========== Controlador genérico de modales (Ayuda / Selector / Pwd) ========== */
   function makeModal(backdropId, initialFocusId){
     const backdrop = document.getElementById(backdropId);
     if (!backdrop) return {open:()=>{}, close:()=>{}};
@@ -551,13 +540,13 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
     document.getElementById('helpBackdropClose')?.addEventListener('click', help.close);
   })();
 
-  // ===== Selector de Exclusiones: abre desde el botón del sidebar =====
+  // ===== Selector Módulo de exclusiones (abre desde el botón del sidebar) =====
   (function(){
     const selector = makeModal('exclusionesBackdrop', 'exclusionesTitle');
     const btnOpen = document.getElementById('btnModuloExclusiones');
     btnOpen?.addEventListener('click', (e)=>{
       e.preventDefault();
-      // Restaurar backdrops si quedaron ocultos tras acceso previo
+      // Restaurar backdrops si quedaron ocultos tras acceso anterior
       const pwdBack = document.getElementById('pwdBackdrop');
       const selBack = document.getElementById('exclusionesBackdrop');
       if (pwdBack) pwdBack.style.display = '';
@@ -618,13 +607,14 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
        ————> PUNTO OFICIAL PARA CAMBIAR CONTRASEÑAS POR REGIONAL <————
        ================================================================= */
     const ACCESS_PASSWORDS = {
+      // Admin (igual que antes)
       admin: 'adm1nroot#',
       // Gestor por regional:
       gestor_R1: 'R1admin#',   // ← contraseña para R1
       gestor_R2: 'R2-admin#'   // ← contraseña para R2
     };
 
-    // Destinos
+    // Destinos (sin cambios)
     const TARGET_URLS = {
       admin: 'admin_exclusiones.html',
       gestor: 'http://arieltecnologia777-cmd.github.io/Sistema-Integral-OyM-DOMINION-MinTIC/gestor_exclusiones.html'
@@ -642,9 +632,11 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
         }
         sessionStorage.setItem('last_module', 'admin');
         closePwd(); window.__closeSelectorIfOpen?.();
-        // Ocultar backdrops
-        document.getElementById('pwdBackdrop')?.style && (document.getElementById('pwdBackdrop').style.display = 'none');
-        document.getElementById('exclusionesBackdrop')?.style && (document.getElementById('exclusionesBackdrop').style.display = 'none');
+        // Ocultar backdrops del flujo
+        const pwdBack = document.getElementById('pwdBackdrop');
+        const selBack = document.getElementById('exclusionesBackdrop');
+        if (pwdBack) pwdBack.style.display = 'none';
+        if (selBack) selBack.style.display = 'none';
         window.open(TARGET_URLS.admin, '_blank', 'noopener,noreferrer');
         return;
       }
@@ -662,8 +654,10 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
 
         sessionStorage.setItem('last_module', 'gestor');
         closePwd(); window.__closeSelectorIfOpen?.();
-        document.getElementById('pwdBackdrop')?.style && (document.getElementById('pwdBackdrop').style.display = 'none');
-        document.getElementById('exclusionesBackdrop')?.style && (document.getElementById('exclusionesBackdrop').style.display = 'none');
+        const pwdBack = document.getElementById('pwdBackdrop');
+        const selBack = document.getElementById('exclusionesBackdrop');
+        if (pwdBack) pwdBack.style.display = 'none';
+        if (selBack) selBack.style.display = 'none';
 
         const url = `${TARGET_URLS.gestor}?scope=${encodeURIComponent(scope)}`;
         window.open(url, '_blank', 'noopener,noreferrer');
@@ -694,7 +688,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
     window.__openPwd = openPwd;
   })();
 
-  /* ========== Carrusel (idéntico) ========== */
+  /* ========== Carrusel: crossfade + blur, autoplay 7s ========== */
   (function(){
     const track = document.getElementById('cTrack');
     const prev  = document.getElementById('cPrev');
@@ -778,7 +772,7 @@ html[data-theme="dark"] .text-side{ box-shadow: -28px 0 56px rgba(0,0,0,.35), 0 
       }, {passive:true});
       // Autoplay
       let autoplayId = null;
-      const startAutoplay = () =>{ if (autoplayId || items.length<2) return; autoplayId = setInterval(goNext, 7000); };
+      const startAutoplay = () =>{ if (autoplayId || items.length<2) return; autoplayId = setInterval(goNext, AUTOPLAY_MS); };
       const stopAutoplay  = () =>{ if (!autoplayId) return; clearInterval(autoplayId); autoplayId=null; };
       startAutoplay();
       document.addEventListener('visibilitychange', () =>{ if (document.hidden) stopAutoplay(); else startAutoplay(); });
