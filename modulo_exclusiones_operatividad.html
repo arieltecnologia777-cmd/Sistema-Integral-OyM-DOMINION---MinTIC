@@ -456,12 +456,12 @@ body{
 /* =================== CONFIG BACKEND =================== */
 /* Base del worker SIN sufijo de proyecto */
 const API_BASE_ROOT = "https://exclusiones-worker.modulo-de-exclusiones.workers.dev";
-/* Mapa proyecto->módulo para lecturas */
+/* Mapa proyecto->módulo para lecturas y envíos */
 const PROJECTS = [
   { path: "p1", modulo: "operatividad" },
   { path: "p2", modulo: "backlog" },
   { path: "p3", modulo: "sla" }
-]; // Estas rutas existen en tu worker y exponen GET /pX/api/datos. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+]; // Worker expone GET /pX/api/datos y POST /pX/api/guardarOT. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
 
 /* ======= Estado (local) ======= */
 let datos = [];        // filas unificadas {id, fecha, ot, causa, regional, modulo}
@@ -471,7 +471,7 @@ let paginaActual = 1;
 const porPaginaGrupos = 6;
 const $ = sel => document.querySelector(sel);
 
-/* Conjuntos de estado (operatividad) */
+/* Conjuntos de estado (por grupo) */
 const otsEnviadas = new Set(); // tracking
 const otsEnEdicion = new Set(); // tracking
 let otModalActual = null;
@@ -689,9 +689,9 @@ function updateEstadosGrupo(ot, modulo){
   const btnPrim = document.getElementById(idPrim);
   const btnDel = document.getElementById(idEliminar);
 
-  // Modal: enviar habilitado/inhabilitado si es operatividad y no es soloVista
+  // Modal: Enviar habilitado/inhabilitado para TODOS los módulos (ya activo)
   if (document.getElementById('modalRegistros').classList.contains('show')
-      && otModalActual === keyFrom(ot,modulo) && !modalSoloVista && modulo==='operatividad'){
+      && otModalActual === keyFrom(ot,modulo) && !modalSoloVista){
     const modalEnviarBtn = document.getElementById('modalEnviar');
     if(modalEnviarBtn){
       modalEnviarBtn.textContent = 'Enviar registros';
@@ -708,28 +708,24 @@ function updateEstadosGrupo(ot, modulo){
   }
   if(btnDel){ btnDel.disabled = pendientes !== 0; }
 
-  // Primario solo para operatividad
+  // Primario ahora para TODOS los módulos
   if(btnPrim){
-    if(modulo!=='operatividad'){
-      btnPrim.remove(); // no hay botón primario para backlog/sla
+    if(pendientes === 0){
+      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+      btnPrim.classList.add('success');
+      btnPrim.disabled = true;
+      btnPrim.setAttribute('data-mode','done');
+      otsEnEdicion.delete(keyFrom(ot,modulo));
     }else{
-      if(pendientes === 0){
-        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
-        btnPrim.classList.add('success');
-        btnPrim.disabled = true;
-        btnPrim.setAttribute('data-mode','done');
-        otsEnEdicion.delete(keyFrom(ot,modulo));
+      btnPrim.classList.remove('success');
+      btnPrim.disabled = false;
+      const enEd = otsEnEdicion.has(keyFrom(ot,modulo));
+      if(enEd){
+        btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+        btnPrim.setAttribute('data-mode','continuar');
       }else{
-        btnPrim.classList.remove('success');
-        btnPrim.disabled = false;
-        const enEd = otsEnEdicion.has(keyFrom(ot,modulo));
-        if(enEd){
-          btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
-          btnPrim.setAttribute('data-mode','continuar');
-        }else{
-          btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
-          btnPrim.setAttribute('data-mode','gestionar');
-        }
+        btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
+        btnPrim.setAttribute('data-mode','gestionar');
       }
     }
   }
@@ -744,10 +740,10 @@ function svgGear(){
     <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
       <g transform="translate(-2,1) scale(0.95)">
         <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
-        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
+        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0  0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
       <g transform="translate(4,-4) scale(0.62)">
-        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0  0 1 0-7Z"/>
         <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
     </svg>
@@ -836,42 +832,31 @@ function render(){
       <td><span class="count-total">${total}</span></td>
       <td><span class="count-pend">${pendientes}</span></td>
       <td>
-        ${modulo==='operatividad' ? `<button class="btn-pill btn-primary" id="${idPrimario}" data-key="${esc(key)}" data-mode=""></button>` : ``}
+        <button class="btn-pill btn-primary" id="${idPrimario}" data-key="${esc(key)}" data-mode=""></button>
         <button class="btn-pill btn-preview" id="${idPreview}" data-key="${esc(key)}" title="Ver registros (solo lectura)">
           ${svgEye()}Vista previa
         </button>
-        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-key="${esc(key)}" title="Eliminar todos los registros" disabled>
+        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-key="${esc(key)}" title="Eliminar todos los registros" ${yaCompleta ? '' : 'disabled'}>
           ${svgTrash()}Eliminar
         </button>
       </td>
     `;
     tbody.appendChild(tr);
 
-    // Estado de botones según tipo
-    if(modulo==='operatividad'){
-      const btnPrim = tr.querySelector(`#${idPrimario}`);
-      const btnDel = tr.querySelector(`#${idEliminar}`);
-      if(yaCompleta){
-        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
-        btnPrim.classList.add('success');
-        btnPrim.disabled = true;
-        btnPrim.setAttribute('data-mode','done');
-        if(btnDel) btnDel.disabled = false;
-      }else if(enEdicion){
-        btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
-        btnPrim.disabled = false;
-        btnPrim.setAttribute('data-mode','continuar');
-        if(btnDel) btnDel.disabled = true;
-      }else{
-        btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
-        btnPrim.disabled = false;
-        btnPrim.setAttribute('data-mode','gestionar');
-        if(btnDel) btnDel.disabled = true;
-      }
+    const btnPrim = tr.querySelector(`#${idPrimario}`);
+    if(yaCompleta){
+      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+      btnPrim.classList.add('success');
+      btnPrim.disabled = true;
+      btnPrim.setAttribute('data-mode','done');
+    }else if(enEdicion){
+      btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+      btnPrim.disabled = false;
+      btnPrim.setAttribute('data-mode','continuar');
     }else{
-      // Backlog / SLA: eliminar queda habilitado si no hay pendientes (local)
-      const btnDel = tr.querySelector(`#${idEliminar}`);
-      if(btnDel) btnDel.disabled = !yaCompleta;
+      btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
+      btnPrim.disabled = false;
+      btnPrim.setAttribute('data-mode','gestionar');
     }
   }
 
@@ -900,7 +885,7 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
   const regs = itemsDeGrupo(ot, modulo);
   if(!regs.length){ showToast(`No hay registros para la OT ${ot}`, 'error'); return; }
   otModalActual = key; // clave compuesta
-  modalSoloVista = soloVista || (modulo!=='operatividad'); // backlog/sla siempre lectura
+  modalSoloVista = !!soloVista; // ahora backlog/sla también son editables
   modalTitle.textContent = `${modalSoloVista ? 'Vista previa' : 'Gestionar registros'} — OT ${ot} • ${modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA')}`;
   modalBody.innerHTML = "";
 
@@ -950,8 +935,8 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
     }
   }
 
-  // Enviar solo visible para operatividad en modo edición
-  modalEnviarBtn.style.display = (!modalSoloVista && parseKey(key).modulo==='operatividad') ? '' : 'none';
+  // Enviar visible para TODOS los módulos
+  modalEnviarBtn.style.display = modalSoloVista ? 'none' : '';
 
   const { pendientes } = contarCompletadosGrupo(parseKey(key).ot, parseKey(key).modulo);
   modalEnviarBtn.textContent = 'Enviar registros';
@@ -965,7 +950,6 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
     await enviarRegistrosGrupo(key);
   };
 
-  // Cuando abro para editar, saco del set de "edición pendiente"
   if(!modalSoloVista) otsEnEdicion.delete(key);
 
   modal.classList.add('show');
@@ -977,7 +961,7 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
 function cerrarModal(){
   if(otModalActual){
     const { ot, modulo } = parseKey(otModalActual);
-    if(modulo==='operatividad' && !modalSoloVista){
+    if(!modalSoloVista){
       const { pendientes } = contarCompletadosGrupo(ot, modulo);
       const idPrim = `btn_primary_${cssId(otModalActual)}`;
       const idEliminar = `btn_eliminar_${cssId(otModalActual)}`;
@@ -1014,10 +998,13 @@ function cerrarModal(){
 modal.addEventListener('click', (e)=>{ if(e.target?.dataset?.close) cerrarModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('show')) cerrarModal(); });
 
-/* ======= Enviar registros (POST backend) — solo Operatividad (p1) ======= */
+/* ======= Enviar registros (POST backend) — ahora para TODOS los módulos ======= */
+function projectPathByModulo(mod){
+  const found = PROJECTS.find(p => p.modulo === mod);
+  return found ? found.path : 'p1';
+}
 async function enviarRegistrosGrupo(key){
   const { ot, modulo } = parseKey(key);
-  if(modulo!=='operatividad'){ showToast('Solo se puede enviar Operatividad por ahora.', 'error'); return; }
   const { pendientes, total } = contarCompletadosGrupo(ot, modulo);
   if(total === 0){ showToast(`No hay registros para la OT ${ot}.`, 'error'); return; }
   if(pendientes > 0){ showToast('Aún hay registros pendientes por completar.', 'error'); return; }
@@ -1029,8 +1016,9 @@ async function enviarRegistrosGrupo(key){
   try{
     const items = itemsDeGrupo(ot, modulo);
     const registros = items.map(r => ({ fecha:r.fecha, ot:r.ot, causa:r.causa }));
-    // Envío a p1 (operatividad). Esta ruta existe en tu worker. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
-    const res = await fetch(`${API_BASE_ROOT}/p1/api/guardarOT`, {
+    // Envío a p1/p2/p3 según módulo. El Worker implementa /api/guardarOT por proyecto. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+    const path = projectPathByModulo(modulo);
+    const res = await fetch(`${API_BASE_ROOT}/${path}/api/guardarOT`, {
       method:'POST', mode:'cors',
       headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
       body: JSON.stringify({ ot, registros })
@@ -1046,7 +1034,7 @@ async function enviarRegistrosGrupo(key){
       }
       const btnDel = document.getElementById(`btn_eliminar_${cssId(key)}`);
       if(btnDel) btnDel.disabled = false;
-      showToast(`OT ${ot}: registros enviados y registrados.`, 'success');
+      showToast(`OT ${ot} (${modulo}): registros enviados y registrados.`, 'success');
     }else{
       throw new Error(j?.error || `HTTP ${res.status}`);
     }
@@ -1105,7 +1093,7 @@ async function eliminarRegistrosGlobal(){
 
 /* ======= Delegación de clic (tabla) ======= */
 $('#wrapGrupos').addEventListener('click', (e)=>{
-  // Primario (solo operatividad)
+  // Primario (ahora para todos los módulos)
   const btnPrim = e.target.closest('.btn-primary');
   if(btnPrim){
     e.preventDefault(); e.stopPropagation();
@@ -1116,7 +1104,7 @@ $('#wrapGrupos').addEventListener('click', (e)=>{
     if(mode === 'enviar'){ enviarRegistrosGrupo(key); return; }
     return;
   }
-  // Vista previa (siempre)
+  // Vista previa (siempre disponible)
   const btnPrev = e.target.closest('.btn-preview');
   if(btnPrev){
     e.preventDefault(); e.stopPropagation();
@@ -1265,7 +1253,7 @@ if(paletteFab){
 
 /* ======= Arranque ======= */
 loadPalette();
-cargarTodo(); // Llama a /p1|p2|p3/api/datos, como expone tu worker. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
-  </script>
+cargarTodo(); // Llama a /p1|p2|p3/api/datos (worker). [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+</script>
 </body>
 </html>
