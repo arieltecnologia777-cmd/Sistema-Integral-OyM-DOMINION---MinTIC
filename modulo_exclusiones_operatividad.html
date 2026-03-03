@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Exclusiones – Operatividad (tabla + backend)</title>
+<title>Exclusiones – Unificado (Operatividad / Backlog / SLA)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- Sello de build para diagnosticar versiones renderizadas -->
-<meta name="x-build" content="build-2026-03-02-merge-beta-ui+backend-p1+B-option+regional-filter+col-regional">
+<!-- Sello de build -->
+<meta name="x-build" content="build-2026-03-03-unificado-p1p2p3+filtro-regional+filtro-modulo">
+
 <style>
 :root{
   --dom-blue:#0e4aa8; /* Azul corporativo */
@@ -38,6 +39,7 @@ body{
   background:linear-gradient(180deg,#eef4ff,#fff);
   margin:0; color:#1a2333;
 }
+
 /* ===== Header / Controls ===== */
 .header{
   background:#ffffffcc; backdrop-filter: blur(12px);
@@ -54,6 +56,7 @@ body{
 .btn-blue{ background:#0e4aa8; color:#fff; }
 .btn-light{ background:#e8eef7; color:#0e4aa8; }
 .btn[disabled]{ opacity:.65; cursor:not-allowed; }
+
 .search-pill{
   display:flex; align-items:center; gap:8px; background:#fff;
   border:1px solid #d7e0f5; border-radius:10px; height:40px; padding:0 12px;
@@ -61,12 +64,14 @@ body{
 }
 .search-pill input{ border:none; outline:none; height:100%; font-size:14px; min-width:220px; max-width:360px; }
 .search-icon{ width:16px; height:16px; opacity:.55; }
+
 /* Píldora de última actualización */
 .badge-ts{
   background:#eef3ff; color:#0e3a82; border:1px solid #dbe6ff;
   padding:8px 12px; border-radius:10px; font-size:12px; display:inline-flex; align-items:center; gap:8px;
 }
 .badge-dot{ width:8px; height:8px; border-radius:999px; background:#10b981; }
+
 /* Píldora estadísticas header (base) */
 #headerStats{
   background:#f6f9ff;
@@ -93,8 +98,10 @@ body{
   box-shadow:0 2px 10px rgba(22,163,74,.18);
 }
 #headerStats.ok::before{ content:"✅"; display:inline-block; margin-right:4px; }
+
 /* ===== Contenedor ===== */
 .wrap{ width:92%; margin:18px auto 0; }
+
 /* ===== Tabla ===== */
 .tabla-box{
   background:#fff; border:1px solid rgba(199,215,243,.40);
@@ -117,6 +124,7 @@ body{
 }
 .tabla thead th:first-child{ text-align:left; }
 .tabla thead th:last-child{ border-right:none; }
+
 /* Celdas */
 .tabla tbody td{
   padding:14px 16px;
@@ -126,7 +134,7 @@ body{
 }
 .tabla tbody td:last-child{ border-right:none; }
 .col-ot{ font-weight:800; color:#0e2040; white-space:nowrap; }
-/* >>> NUEVO: estilo de la celda Regional (mismo look que OT) */
+/* >>> Estilo de la celda Regional en negrita */
 .col-regional{ font-weight:800; color:#0e2040; white-space:nowrap; }
 
 /* Hover fila (relieve) */
@@ -145,9 +153,11 @@ body{
   border-top-right-radius:var(--row-radius);
   border-bottom-right-radius:var(--row-radius);
 }
+
 /* Contadores */
 .count-total{ font-weight:800; color:#0e2040; }
 .count-pend{ font-weight:800; color:#0e4aa8; }
+
 /* ===== Botones (tabla) ===== */
 .btn-pill{
   appearance:none;
@@ -165,6 +175,7 @@ body{
   background:#f9fbff; color:#6b7893; border-color:#e1eaff; cursor:not-allowed;
 }
 .btn-pill:focus-visible{ outline:2px solid #94b8ff; outline-offset:2px; }
+
 /* Íconos planos (ajuste fino, 16×16 consistentes) */
 .btn-pill .icon{
   width:16px; height:16px; display:inline-block;
@@ -172,6 +183,7 @@ body{
   vertical-align:middle;
 }
 .btn-pill .icon svg{ width:16px; height:16px; display:block; }
+
 /* Hover de fila: realce general (excepto enviar/success/eliminar) */
 .tabla tbody tr:hover .btn-pill:not(:disabled):not([data-mode="enviar"]):not(.success):not(.btn-eliminar){
   background:var(--chip-bg-strong);
@@ -184,7 +196,8 @@ body{
 .tabla tbody tr:hover .btn-primary[data-mode="gestionar"] .icon svg{
   stroke:var(--dom-blue) !important; fill:none; stroke-width:1.8;
 }
-/* Botón principal ENVIAR (solo popup) y CONTINUAR (tabla) en azul sólido */
+
+/* Botón principal ENVIAR / CONTINUAR en azul sólido */
 .btn-primary[data-mode="enviar"],
 .btn-primary[data-mode="continuar"]{
   background:var(--dom-blue); color:#fff; border-color:var(--dom-blue);
@@ -208,6 +221,7 @@ body{
 .btn-primary[data-mode="gestionar"] .icon-gear svg{ stroke:#324a78; }
 .btn-primary .icon-pencil svg{ stroke:#324a78; fill:none; stroke-width:1.8; }
 .btn-primary[data-mode="continuar"] .icon-pencil svg{ stroke:#fff; }
+
 /* Eliminar (por OT) – local */
 .btn-eliminar{ display:inline-flex; align-items:center; gap:8px; }
 .btn-eliminar:not(:disabled){
@@ -218,8 +232,10 @@ body{
   background:var(--danger-bg-hover); border-color:var(--danger-border-hover);
   transform: translateY(-1px); filter: saturate(1.05);
 }
+
 /* Vista previa */
 .btn-preview .icon svg{ stroke:#324a78; fill:none; stroke-width:1.8; }
+
 /* Botón Eliminar registros (HEADER) – local */
 .btn-header-danger{
   display:inline-flex; align-items:center; gap:8px;
@@ -232,6 +248,7 @@ body{
 .btn-header-danger:disabled{
   background:#f6f7fb; color:#8d95a8; border-color:#e4e9f6; box-shadow:none; cursor:not-allowed;
 }
+
 /* Pie / paginación */
 .pie{ width:92%; margin: 14px auto 24px; display:flex; align-items:center; justify-content:flex-start; gap:8px; flex-wrap:wrap; }
 .paginacion{ display:flex; gap:6px; flex-wrap:wrap; }
@@ -239,6 +256,7 @@ body{
   padding:8px 12px; border-radius:10px; border:1px solid var(--pill); background:#fff; color:#0e4aa8; cursor:pointer;
 }
 .paginacion button[aria-current="page"]{ background:#0e4aa8; color:#fff; border-color:#0e4aa8; }
+
 /* Alertas inline */
 #alerta{ width:92%; margin:8px auto 0; color:#b00020; font-size:13px; display:none; }
 
@@ -312,7 +330,7 @@ body{
 .confirm .btn-cancel{ background:#f4f6fb; color:#34445f; border-color:#e3e9f6; }
 .confirm .btn-cancel:hover{ background:#ecf1fb; }
 
-/* ===== Filtro Regional (misma estética que la search-pill) ===== */
+/* ===== Filtro Regional (tu estilo actual) ===== */
 .filter-box{ position:relative; height:40px; display:flex; align-items:center; }
 .filter-trigger{
   display:inline-flex; align-items:center; gap:8px; height:40px;
@@ -337,6 +355,11 @@ body{
 .filter-menu button:hover{ background:#f3f7ff; color:#0e4aa8; }
 .filter-menu .sep{ height:1px; background:#edf2fb; margin:6px 4px; }
 
+/* ===== Filtro por Módulo (píldoras) ===== */
+.mod-pills { display:flex; gap:8px; align-items:center; }
+.mod-pill { user-select:none; }
+.mod-pill.on { background:#0e4aa8; color:#fff; border-color:#0e4aa8; }
+
 /* Mobile */
 @media (max-width: 900px){
   .controls{ gap:8px; }
@@ -344,114 +367,129 @@ body{
 }
 </style>
 </head>
+
 <body>
-<!-- HEADER -->
-<div class="header">
-  <div class="header-title">Exclusiones de Operatividad</div>
-  <div class="header-sub"><strong>¡Bienvenido al modulo de exclusiones!</strong></div>
-  <div class="controls">
-    <button id="btnCargar" class="btn btn-blue" type="button">Cargar / Actualizar</button>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">Exclusiones — Unificado</div>
+    <div class="header-sub"><strong>Operatividad, Backlog y SLA en una sola vista</strong></div>
 
-    <!-- === Filtro Regional (segunda posición; restaurado) === -->
-    <div class="filter-box" id="regionalBox">
-      <button id="btnRegional" class="filter-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" title="Filtrar por regional">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M3 6h18l-7 8v4l-4 2v-6L3 6z"/>
+    <div class="controls">
+      <button id="btnCargar" class="btn btn-blue" type="button">Cargar / Actualizar</button>
+
+      <!-- Filtro Regional (tu componente) -->
+      <div class="filter-box" id="regionalBox">
+        <button id="btnRegional" class="filter-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" title="Filtrar por regional">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 6h18l-7 8v4l-4 2v-6L3 6z"/>
+          </svg>
+          <span id="lblRegional">Regional: Todas</span>
+        </button>
+        <div id="menuRegional" class="filter-menu" role="listbox" aria-label="Regional">
+          <!-- Opciones dinámicas -->
+        </div>
+      </div>
+
+      <!-- Filtro por Módulo -->
+      <div class="mod-pills" aria-label="Filtrar por tipo de módulo">
+        <button class="btn-pill mod-pill on" data-mod="operatividad" type="button" title="Filtrar Operatividad">Operatividad</button>
+        <button class="btn-pill mod-pill on" data-mod="backlog" type="button" title="Filtrar Backlog">Backlog</button>
+        <button class="btn-pill mod-pill on" data-mod="sla" type="button" title="Filtrar SLA">SLA</button>
+      </div>
+
+      <!-- Eliminar registros (HEADER) - Local -->
+      <button id="btnEliminarGlobal" class="btn-header-danger" type="button" disabled>🗑️ Eliminar registros</button>
+
+      <div class="search-pill" title="Buscar por OT">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
         </svg>
-        <span id="lblRegional">Regional: Todas</span>
-      </button>
-      <div id="menuRegional" class="filter-menu" role="listbox" aria-label="Regional">
-        <!-- Opciones dinámicas -->
+        <input id="busqueda" type="text" placeholder="Buscar OTs…" autocomplete="off" />
       </div>
-    </div>
 
-    <!-- Eliminar registros (HEADER) - Local -->
-    <button id="btnEliminarGlobal" class="btn-header-danger" type="button" disabled>🗑️ Eliminar registros</button>
-
-    <div class="search-pill" title="Buscar por OT">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5 21.5 20 15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-      </svg>
-      <input id="busqueda" type="text" placeholder="Buscar OTs…" autocomplete="off" />
+      <span class="badge-ts" id="lastUpdate"><span class="badge-dot"></span>Última actualización: —</span>
+      <span id="headerStats">—</span>
     </div>
-    <span class="badge-ts" id="lastUpdate"><span class="badge-dot"></span>Última actualización: —</span>
-    <!-- Stats en header -->
-    <span id="headerStats">—</span>
   </div>
-</div>
 
-<!-- CONTENEDOR -->
-<div class="wrap" id="wrapGrupos"></div>
+  <!-- CONTENEDOR -->
+  <div class="wrap" id="wrapGrupos"></div>
 
-<!-- Pie (solo paginación) -->
-<div class="pie">
-  <div class="paginacion" id="paginacion"></div>
-</div>
+  <!-- Pie (solo paginación) -->
+  <div class="pie">
+    <div class="paginacion" id="paginacion"></div>
+  </div>
 
-<div id="alerta"></div>
+  <div id="alerta"></div>
 
-<!-- ===== Modal ===== -->
-<div class="modal" id="modalRegistros" aria-hidden="true">
-  <div class="backdrop" data-close="1"></div>
-  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <header>
-      <div class="title" id="modalTitle">Gestionar registros — OT —</div>
+  <!-- ===== Modal ===== -->
+  <div class="modal" id="modalRegistros" aria-hidden="true">
+    <div class="backdrop" data-close="1"></div>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <header>
+        <div class="title" id="modalTitle">Gestionar registros — OT —</div>
+        <div class="actions">
+          <button id="modalEnviar" class="btn-send" type="button" disabled>Enviar registros</button>
+          <button class="close" data-close="1" type="button">Cerrar</button>
+        </div>
+      </header>
+      <div class="body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== Confirm Modal ===== -->
+  <div id="appConfirm" class="confirm" aria-hidden="true">
+    <div class="backdrop"></div>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMsg">
+      <h3 id="confirmTitle" class="title">Confirmación</h3>
+      <p id="confirmMsg" class="msg">¿Confirmas esta acción?</p>
       <div class="actions">
-        <button id="modalEnviar" class="btn-send" type="button" disabled>Enviar registros</button>
-        <button class="close" data-close="1" type="button">Cerrar</button>
+        <button id="confirmCancel" class="btn btn-cancel" type="button">Cancelar</button>
+        <button id="confirmAccept" class="btn btn-accept" type="button">Aceptar</button>
       </div>
-    </header>
-    <div class="body" id="modalBody"></div>
-  </div>
-</div>
-
-<!-- ===== Confirm Modal ===== -->
-<div id="appConfirm" class="confirm" aria-hidden="true">
-  <div class="backdrop"></div>
-  <div class="card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMsg">
-    <h3 id="confirmTitle" class="title">Confirmación</h3>
-    <p id="confirmMsg" class="msg">¿Confirmas esta acción?</p>
-    <div class="actions">
-      <button id="confirmCancel" class="btn btn-cancel" type="button">Cancelar</button>
-      <button id="confirmAccept" class="btn btn-accept" type="button">Aceptar</button>
     </div>
   </div>
-</div>
 
-<!-- ===== Toast host ===== -->
-<div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+  <!-- ===== Toast host ===== -->
+  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
 <script>
-/* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
-/* >>> PROYECTO p1: base con prefijo /p1 para todos los endpoints <<< */
-const API_BASE = "https://exclusiones-worker.modulo-de-exclusiones.workers.dev/p1";
+/* =================== CONFIG BACKEND =================== */
+/* Base del worker SIN sufijo de proyecto */
+const API_BASE_ROOT = "https://exclusiones-worker.modulo-de-exclusiones.workers.dev";
+/* Mapa proyecto->módulo para lecturas */
+const PROJECTS = [
+  { path: "p1", modulo: "operatividad" },
+  { path: "p2", modulo: "backlog" },
+  { path: "p3", modulo: "sla" }
+]; // Estas rutas existen en tu worker y exponen GET /pX/api/datos. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
 
 /* ======= Estado (local) ======= */
-let datos = [];
+let datos = [];        // filas unificadas {id, fecha, ot, causa, regional, modulo}
 let filtrados = [];
-let grupos = [];
+let grupos = [];       // [{ clave: "<ot>||<modulo>", modulo, ot, items: [...] }]
 let paginaActual = 1;
 const porPaginaGrupos = 6;
 const $ = sel => document.querySelector(sel);
 
-/* Conjuntos de estado */
-const otsEnviadas = new Set(); // OTs ya enviadas al backend (solo tracking)
-const otsEnEdicion = new Set(); // OTs con edición pendiente (cerraron popup)
-let otModalActual = null;       // OT abierta en modal
-let modalSoloVista = false;     // Modal en modo vista previa
+/* Conjuntos de estado (operatividad) */
+const otsEnviadas = new Set(); // tracking
+const otsEnEdicion = new Set(); // tracking
+let otModalActual = null;
+let modalSoloVista = false;
 
-/* === Filtro Regional (estado) === */
+/* === Filtro Regional === */
 let regionalActual = 'Todas';
-let regionalesDisponibles = []; // se llena tras cargar datos
+let regionalesDisponibles = []; // se llena al cargar
+
+/* === Filtro por Módulo === */
+const moduloActivos = new Set(["operatividad","backlog","sla"]); // 3 activos por defecto
 
 /* ======= Utils ======= */
 function mostrarAlerta(msg){ const el=$('#alerta'); el.textContent=msg; el.style.display='block'; }
 function ocultarAlerta(){ const el=$('#alerta'); el.textContent=''; el.style.display='none'; }
 function debounce(fn, wait=250){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),wait); }; }
 function esc(s){
-  return (s??"").toString()
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;");
+  return (s??"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 function cssId(texto){ return btoa(unescape(encodeURIComponent(texto))).replace(/=/g,''); }
 function formatTs(d){ const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0');
@@ -504,23 +542,21 @@ function confirmModal(message='¿Confirmas esta acción?'){
   });
 }
 
-/* ======= Backend: carga de datos ======= */
-async function cargarDesdeServidor(){
-  const btn=$('#btnCargar');
-  try{
-    ocultarAlerta();
-    btn.disabled=true; btn.textContent='Cargando…';
-    const res = await fetch(`${API_BASE}/api/datos?ts=${Date.now()}`, {
-      method:'GET', mode:'cors', headers:{'Accept':'application/json'}
-    });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const j = await res.json();
-    const arr = Array.isArray(j?.data) ? j.data : [];
-    /* Normalizamos a estructura local usada por la UI (tolerante a casing en 'regional') */
-    datos = arr.map((r,i)=>({
-      id:i+1,
+/* ======= Backend: lecturas unificadas p1+p2+p3 ======= */
+async function fetchModulo(path, modulo){
+  const res = await fetch(`${API_BASE_ROOT}/${path}/api/datos?ts=${Date.now()}`, {
+    method:'GET', mode:'cors', headers:{'Accept':'application/json'}
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status} (${path})`);
+  const j = await res.json();
+  const arr = Array.isArray(j?.data) ? j.data : [];
+  // Normalizar estructura y etiquetar módulo
+  return arr
+    .filter(r => (r?.ot ?? '').toString().trim() !== '')
+    .map((r, i) => ({
+      id: `${modulo}-${i+1}`,
       fecha: r.fecha ?? '',
-      ot : (r.ot ?? '').toString(),
+      ot: (r.ot ?? '').toString(),
       causa: r.causa ?? '',
       regional: (
         r.regional ??
@@ -529,35 +565,39 @@ async function cargarDesdeServidor(){
         r.region ??
         r.Region ?? ''
       ).toString().trim(),
-      fotos: [] // adjuntos solo locales para UI
-    })).filter(x=>x.ot);
+      modulo
+    }));
+}
 
-    /* Armar lista de regionales detectadas */
+async function cargarTodo(){
+  const btn=$('#btnCargar');
+  try{
+    ocultarAlerta();
+    btn.disabled=true; btn.textContent='Cargando…';
+    const promesas = PROJECTS.map(p => fetchModulo(p.path, p.modulo));
+    const resultados = await Promise.all(promesas); // p1+p2+p3
+    datos = resultados.flat(); // unificado
+    // Regionales detectadas
     const setReg = new Set();
     for(const it of datos){ if((it.regional??'')!=='') setReg.add(it.regional); }
     regionalesDisponibles = Array.from(setReg).sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
-
-    /* Si el valor actual ya no existe, volver a Todas */
+    // Reubicar a 'Todas' si el valor actual ya no existe
     if(regionalActual!=='Todas' && !regionalesDisponibles.includes(regionalActual)){
       regionalActual = 'Todas';
     }
-
     filtrados=[...datos];
     paginaActual=1;
-    construirGruposPorOT();
-    buildRegionalMenu();    // poblar menú
-    updateRegionalLabel();  // actualizar etiqueta del botón
-
+    construirGruposPorClave();
+    buildRegionalMenu();
+    updateRegionalLabel();
     render();
     setLastUpdate(new Date());
-    // Reseteo tracking de edición (la regla verde depende de pendientes=0)
     otsEnEdicion.clear();
-    showToast('Datos cargados desde el servidor.', 'info');
+    showToast('Datos de Operatividad, Backlog y SLA cargados.', 'info');
   }catch(err){
     console.error(err);
-    mostrarAlerta('No se pudo cargar el dataset del servidor.');
+    mostrarAlerta('No se pudo cargar el dataset unificado del servidor.');
     showToast('Error al cargar datos del servidor.', 'error');
-    // Filtro vacío si falla
     regionalesDisponibles = [];
     regionalActual = 'Todas';
     buildRegionalMenu();
@@ -568,66 +608,90 @@ async function cargarDesdeServidor(){
   }
 }
 
-/* ======= Cómputos ======= */
-function contarCompletados(ot){
-  const items = datos.filter(r => (r.ot??"").trim() === (ot??"").trim());
+/* ======= Cómputos (por grupo OT+Módulo) ======= */
+function keyFrom(ot, modulo){ return `${(ot??'').toString().trim()}||${(modulo??'').toString().trim()}`; }
+function parseKey(k){ const i=k.indexOf('||'); return { ot:k.slice(0,i), modulo:k.slice(i+2) }; }
+
+function itemsDeGrupo(ot, modulo){
+  return datos.filter(r => (r.ot??'').trim() === (ot??'').trim() && (r.modulo??'') === (modulo??''));
+}
+
+function contarCompletadosGrupo(ot, modulo){
+  const items = itemsDeGrupo(ot, modulo);
   const total = items.length;
   const completos = items.filter(r => (r.causa??"").trim() !== "" && (r.fecha??"").trim() !== "").length;
   return { completos, total, pendientes: Math.max(0, total - completos) };
 }
+
 function calcularPendientesGlobal(){
-  const map = new Map();
-  for(const r of datos){ const k=(r.ot??'').toString().trim(); if(!map.has(k)) map.set(k, []); map.get(k).push(r); }
   let pendientesGlobales = 0;
-  for(const [k] of map){ const { pendientes } = contarCompletados(k); pendientesGlobales += pendientes; }
+  // Cada clave es un grupo OT+Módulo
+  for(const g of grupos){
+    const { pendientes } = contarCompletadosGrupo(g.ot, g.modulo);
+    pendientesGlobales += pendientes;
+  }
   return pendientesGlobales;
 }
 
 /* ======= Header stats ======= */
 function updateHeaderStats(){
   const totalItems = datos.length;
-  const map = new Map(); for(const r of datos){ const k=(r.ot??'').toString().trim(); if(!map.has(k)) map.set(k,1); }
-  const totalGrupos = map.size;
+  const totalGrupos = grupos.length;
   const pendientesGlobales = calcularPendientesGlobal();
   const statsEl = document.getElementById('headerStats');
   if(statsEl){
-    statsEl.textContent = `${totalItems} registros • ${totalGrupos} grupos (por OT) • ${pendientesGlobales} pendientes`;
+    statsEl.textContent = `${totalItems} registros • ${totalGrupos} grupos (OT + módulo) • ${pendientesGlobales} pendientes`;
     if(totalItems > 0 && pendientesGlobales === 0){ statsEl.classList.add('ok'); } else { statsEl.classList.remove('ok'); }
   }
   const btnGlobal = document.getElementById('btnEliminarGlobal');
   if(btnGlobal){ btnGlobal.disabled = !(totalItems>0 && pendientesGlobales===0); }
 }
 
-/* ======= Búsqueda + Filtro Regional ======= */
+/* ======= Búsqueda + Filtros (regional + módulo) ======= */
 function aplicarBusquedaYFiltro(){
   const q=($('#busqueda').value??"").toLowerCase().trim();
   filtrados = datos.filter(d => {
     const okSearch = q ? (d.ot??"").toLowerCase().includes(q) : true;
     const okReg = (regionalActual==='Todas') ? true : ((d.regional??'') === regionalActual);
-    return okSearch && okReg;
+    const okMod = moduloActivos.has(d.modulo ?? '');
+    return okSearch && okReg && okMod;
   });
-  paginaActual=1; construirGruposPorOT(); render();
+  paginaActual=1; construirGruposPorClave(); render();
 }
-/* Back-compat (si en algún sitio se invoca aplicarBusqueda()) */
+// Back-compat
 function aplicarBusqueda(){ aplicarBusquedaYFiltro(); }
 
-function construirGruposPorOT(){
+function construirGruposPorClave(){
   const map=new Map();
   for(const r of filtrados){
-    const k=(r.ot ?? '').toString().trim();
+    const k=keyFrom(r.ot, r.modulo);
     if(!map.has(k)) map.set(k, []);
     map.get(k).push(r);
   }
-  grupos = Array.from(map.entries()).map(([k,items])=>({clave:k,items}));
-  grupos.sort((a,b)=> a.clave.localeCompare(b.clave,'es',{numeric:true}));
+  grupos = Array.from(map.entries()).map(([k,items])=>{
+    const { ot, modulo } = parseKey(k);
+    return { clave:k, ot, modulo, items };
+  });
+  // Orden: por OT, luego por módulo (operatividad, backlog, sla)
+  const order = { operatividad:0, backlog:1, sla:2 };
+  grupos.sort((a,b)=>{
+    const s = a.ot.localeCompare(b.ot,'es',{numeric:true});
+    if(s!==0) return s;
+    return (order[a.modulo]??9) - (order[b.modulo]??9);
+  });
 }
 
-/* ======= Actualización ligera (estados por OT) ======= */
-function updateEstadosOT(ot){
-  const { pendientes } = contarCompletados(ot);
+/* ======= Actualización ligera (estados por grupo) ======= */
+function updateEstadosGrupo(ot, modulo){
+  const { pendientes } = contarCompletadosGrupo(ot, modulo);
+  const idPrim = `btn_primary_${cssId(keyFrom(ot,modulo))}`;
+  const idEliminar = `btn_eliminar_${cssId(keyFrom(ot,modulo))}`;
+  const btnPrim = document.getElementById(idPrim);
+  const btnDel = document.getElementById(idEliminar);
 
-  // Modal: enviar habilitado/inhabilitado (independiente de "OT gestionada")
-  if (document.getElementById('modalRegistros').classList.contains('show') && otModalActual === ot && !modalSoloVista){
+  // Modal: enviar habilitado/inhabilitado si es operatividad y no es soloVista
+  if (document.getElementById('modalRegistros').classList.contains('show')
+      && otModalActual === keyFrom(ot,modulo) && !modalSoloVista && modulo==='operatividad'){
     const modalEnviarBtn = document.getElementById('modalEnviar');
     if(modalEnviarBtn){
       modalEnviarBtn.textContent = 'Enviar registros';
@@ -635,35 +699,41 @@ function updateEstadosOT(ot){
     }
   }
 
-  // Tabla: contador y estado principal
-  const btnPrim = document.getElementById(`btn_primary_${cssId(ot)}`);
-  if(btnPrim){
-    const tr = btnPrim.closest('tr');
+  // Actualizar contadores en la fila
+  const rowBtn = document.getElementById(idPrim);
+  if(rowBtn){
+    const tr = rowBtn.closest('tr');
     const pendEl = tr?.querySelector('.count-pend');
     if(pendEl) pendEl.textContent = String(pendientes);
+  }
+  if(btnDel){ btnDel.disabled = pendientes !== 0; }
 
-    const btnDel = document.getElementById(`btn_eliminar_${cssId(ot)}`);
-    if(btnDel){ btnDel.disabled = pendientes !== 0; }
-
-    if(pendientes === 0){
-      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
-      btnPrim.classList.add('success');
-      btnPrim.disabled = true;
-      btnPrim.setAttribute('data-mode','done');
-      otsEnEdicion.delete(ot);
+  // Primario solo para operatividad
+  if(btnPrim){
+    if(modulo!=='operatividad'){
+      btnPrim.remove(); // no hay botón primario para backlog/sla
     }else{
-      btnPrim.classList.remove('success');
-      btnPrim.disabled = false;
-      const enEd = otsEnEdicion.has(ot);
-      if(enEd){
-        btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
-        btnPrim.setAttribute('data-mode','continuar');
+      if(pendientes === 0){
+        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+        btnPrim.classList.add('success');
+        btnPrim.disabled = true;
+        btnPrim.setAttribute('data-mode','done');
+        otsEnEdicion.delete(keyFrom(ot,modulo));
       }else{
-        btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
-        btnPrim.setAttribute('data-mode','gestionar');
+        btnPrim.classList.remove('success');
+        btnPrim.disabled = false;
+        const enEd = otsEnEdicion.has(keyFrom(ot,modulo));
+        if(enEd){
+          btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+          btnPrim.setAttribute('data-mode','continuar');
+        }else{
+          btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
+          btnPrim.setAttribute('data-mode','gestionar');
+        }
       }
     }
   }
+
   updateHeaderStats();
 }
 
@@ -674,11 +744,11 @@ function svgGear(){
     <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
       <g transform="translate(-2,1) scale(0.95)">
         <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
-        <path d="M4.7 12.9a7.8 7.8 0  0 1 0-1.8l1.6-.4a6 6 0  0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0  0 1-.6-1.4l-1.6-.4Z"/>
+        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
       <g transform="translate(4,-4) scale(0.62)">
-        <path d="M12 8.5a3.5 3.5 0  1 1 0 7 3.5 3.5 0  0 1 0-7Z"/>
-        <path d="M4.7 12.9a7.8 7.8 0  0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0  0 1-.6-1.4l-1.6-.4Z"/>
+        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
     </svg>
   </span>`;
@@ -722,83 +792,93 @@ function svgTrash(){
   </span>`;
 }
 
-/* ======= Render (tabla por OT + acciones) ======= */
+/* ======= Render (tabla por OT+Módulo + acciones) ======= */
 function render(){
   const wrap=$('#wrapGrupos'); wrap.innerHTML="";
   const totalGrupos=grupos.length;
   const ini=(paginaActual-1)*porPaginaGrupos, fin=ini+porPaginaGrupos, gruposPagina=grupos.slice(ini,fin);
-
   const box=document.createElement('div'); box.className='tabla-box';
   const tbl=document.createElement('table'); tbl.className='tabla';
   tbl.innerHTML=`
-    <thead>
-      <tr>
-        <th>Regional</th>
-        <th>OT</th>
-        <th>Total registros</th>
-        <th>Registros pendientes</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="tbodyOTs"></tbody>`;
+  <thead>
+    <tr>
+      <th>Regional</th>
+      <th>OT</th>
+      <th>Tipo</th>
+      <th>Total registros</th>
+      <th>Registros pendientes</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tbodyOTs"></tbody>`;
   box.appendChild(tbl);
   wrap.appendChild(box);
-
   const tbody = tbl.querySelector('#tbodyOTs');
+
   for(const g of gruposPagina){
-    const otClave = g.clave;
-    const { total, pendientes } = contarCompletados(otClave);
+    const otClave = g.ot;
+    const modulo = g.modulo;
+    const { total, pendientes } = contarCompletadosGrupo(otClave, modulo);
     const regsSet = new Set((g.items ?? []).map(x => (x.regional ?? '').toString().trim()).filter(Boolean));
     const regionalTexto = regsSet.size ? Array.from(regsSet).join(', ') : '—';
-
     const tr=document.createElement('tr');
-    const idPrimario = `btn_primary_${cssId(otClave)}`;
-    const idEliminar = `btn_eliminar_${cssId(otClave)}`;
-    const idPreview = `btn_preview_${cssId(otClave)}`;
+    const key = keyFrom(otClave, modulo);
+    const idPrimario = `btn_primary_${cssId(key)}`;
+    const idEliminar = `btn_eliminar_${cssId(key)}`;
+    const idPreview = `btn_preview_${cssId(key)}`;
     const yaCompleta = pendientes === 0;
-    const enEdicion = otsEnEdicion.has(otClave) && !yaCompleta;
+    const enEdicion = otsEnEdicion.has(key) && !yaCompleta;
 
     tr.innerHTML = `
       <td class="col-regional">${esc(regionalTexto)}</td>
       <td class="col-ot">${esc(otClave)}</td>
+      <td>${modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA')}</td>
       <td><span class="count-total">${total}</span></td>
       <td><span class="count-pend">${pendientes}</span></td>
       <td>
-        <button class="btn-pill btn-primary" id="${idPrimario}" data-ot="${esc(otClave)}" data-mode=""></button>
-        <button class="btn-pill btn-preview" id="${idPreview}" data-ot="${esc(otClave)}" title="Ver registros (solo lectura)">
+        ${modulo==='operatividad' ? `<button class="btn-pill btn-primary" id="${idPrimario}" data-key="${esc(key)}" data-mode=""></button>` : ``}
+        <button class="btn-pill btn-preview" id="${idPreview}" data-key="${esc(key)}" title="Ver registros (solo lectura)">
           ${svgEye()}Vista previa
         </button>
-        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-ot="${esc(otClave)}" title="Eliminar todos los registros" disabled>
+        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-key="${esc(key)}" title="Eliminar todos los registros" disabled>
           ${svgTrash()}Eliminar
         </button>
       </td>
     `;
     tbody.appendChild(tr);
 
-    const btnPrim = tr.querySelector(`#${idPrimario}`);
-    const btnDel = tr.querySelector(`#${idEliminar}`);
-
-    if(yaCompleta){
-      btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
-      btnPrim.classList.add('success');
-      btnPrim.disabled = true;
-      btnPrim.setAttribute('data-mode','done');
-      if(btnDel) btnDel.disabled = false;
-    }else if(enEdicion){
-      btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
-      btnPrim.disabled = false;
-      btnPrim.setAttribute('data-mode','continuar');
-      if(btnDel) btnDel.disabled = true;
+    // Estado de botones según tipo
+    if(modulo==='operatividad'){
+      const btnPrim = tr.querySelector(`#${idPrimario}`);
+      const btnDel = tr.querySelector(`#${idEliminar}`);
+      if(yaCompleta){
+        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+        btnPrim.classList.add('success');
+        btnPrim.disabled = true;
+        btnPrim.setAttribute('data-mode','done');
+        if(btnDel) btnDel.disabled = false;
+      }else if(enEdicion){
+        btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+        btnPrim.disabled = false;
+        btnPrim.setAttribute('data-mode','continuar');
+        if(btnDel) btnDel.disabled = true;
+      }else{
+        btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
+        btnPrim.disabled = false;
+        btnPrim.setAttribute('data-mode','gestionar');
+        if(btnDel) btnDel.disabled = true;
+      }
     }else{
-      btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
-      btnPrim.disabled = false;
-      btnPrim.setAttribute('data-mode','gestionar');
-      if(btnDel) btnDel.disabled = true;
+      // Backlog / SLA: eliminar queda habilitado si no hay pendientes (local)
+      const btnDel = tr.querySelector(`#${idEliminar}`);
+      if(btnDel) btnDel.disabled = !yaCompleta;
     }
   }
+
   renderPaginacion(totalGrupos);
   updateHeaderStats();
 }
+
 function renderPaginacion(totalGrupos){
   const cont=$('#paginacion'); cont.innerHTML="";
   const total=Math.max(1, Math.ceil(totalGrupos/porPaginaGrupos));
@@ -808,18 +888,20 @@ function renderPaginacion(totalGrupos){
     b.onclick=()=>{ paginaActual=i; render(); }; cont.appendChild(b);
   }
 }
+
 /* ======= Modal ======= */
 const modal = document.getElementById('modalRegistros');
 const modalBody = document.getElementById('modalBody');
 const modalTitle = document.getElementById('modalTitle');
 const modalEnviarBtn = document.getElementById('modalEnviar');
 
-function abrirModal(ot, {soloVista=false} = {}){
-  const regs = datos.filter(d => (d.ot??"").toString().trim() === (ot??"").toString().trim());
+function abrirModalPorKey(key, {soloVista=false} = {}){
+  const { ot, modulo } = parseKey(key);
+  const regs = itemsDeGrupo(ot, modulo);
   if(!regs.length){ showToast(`No hay registros para la OT ${ot}`, 'error'); return; }
-  otModalActual = ot;
-  modalSoloVista = soloVista;
-  modalTitle.textContent = `${soloVista ? 'Vista previa' : 'Gestionar registros'} — OT ${ot}`;
+  otModalActual = key; // clave compuesta
+  modalSoloVista = soloVista || (modulo!=='operatividad'); // backlog/sla siempre lectura
+  modalTitle.textContent = `${modalSoloVista ? 'Vista previa' : 'Gestionar registros'} — OT ${ot} • ${modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA')}`;
   modalBody.innerHTML = "";
 
   for(const item of regs){
@@ -833,55 +915,58 @@ function abrirModal(ot, {soloVista=false} = {}){
         </div>
         <div>
           <label>Justificación</label>
-          <textarea id="m_causa_${item.id}" placeholder="Motivo de exclusión…">${esc(item.causa ?? '')}</textarea>
+          <textarea id="m_causa_${cssId(key)}_${item.id}" placeholder="Motivo de exclusión…">${esc(item.causa ?? '')}</textarea>
         </div>
         <div>
           <label>Imágenes</label>
-          <input type="file" id="m_foto_${item.id}" multiple accept="image/*">
-          <div class="preview" id="m_prev_${item.id}"></div>
+          <input type="file" id="m_foto_${cssId(key)}_${item.id}" multiple accept="image/*">
+          <div class="preview" id="m_prev_${cssId(key)}_${item.id}"></div>
         </div>
       </div>
     `;
     modalBody.appendChild(wrap);
 
-    const txt = wrap.querySelector(`#m_causa_${item.id}`);
-    const inp = wrap.querySelector(`#m_foto_${item.id}`);
+    const txt = wrap.querySelector(`#m_causa_${cssId(key)}_${item.id}`);
+    const inp = wrap.querySelector(`#m_foto_${cssId(key)}_${item.id}`);
 
-    if(soloVista){
+    if(modalSoloVista){
       txt.setAttribute('readonly','readonly');
       txt.setAttribute('disabled','disabled');
       inp.setAttribute('disabled','disabled');
     }else{
-      const debouncedUpdate = debounce(()=>updateEstadosOT(item.ot), 150);
+      const debouncedUpdate = debounce(()=>updateEstadosGrupo(ot, modulo), 150);
       txt.addEventListener('input', e=>{
         item.causa = e.target.value;
-        const ref = datos.find(x=>x.id===item.id);
+        // reflejar en datos original
+        const ref = datos.find(x=>x.id===item.id && x.modulo===modulo && x.ot===item.ot);
         if(ref) ref.causa = item.causa;
         debouncedUpdate();
       });
       inp.addEventListener('change', e=>{
         const files = Array.from(e.target.files??[]);
-        item.fotos = files;
-        const ref=datos.find(x=>x.id===item.id); if(ref) ref.fotos=files;
+        item.fotos = files; // uso local
         debouncedUpdate();
       });
     }
   }
 
-  const { pendientes } = contarCompletados(ot);
+  // Enviar solo visible para operatividad en modo edición
+  modalEnviarBtn.style.display = (!modalSoloVista && parseKey(key).modulo==='operatividad') ? '' : 'none';
+
+  const { pendientes } = contarCompletadosGrupo(parseKey(key).ot, parseKey(key).modulo);
   modalEnviarBtn.textContent = 'Enviar registros';
   modalEnviarBtn.disabled = pendientes !== 0;
   modalEnviarBtn.onclick = async ()=>{
-    const ok = await confirmModal(`¿Confirmas el envío de los registros para la OT ${ot}?`);
+    const ok = await confirmModal(`¿Confirmas el envío de los registros para la OT ${parseKey(key).ot}?`);
     if(!ok) return;
     modalEnviarBtn.textContent = 'Enviando…';
     modalEnviarBtn.disabled = true;
     cerrarModal();
-    await enviarRegistrosOT(ot);
+    await enviarRegistrosGrupo(key);
   };
 
-  modalEnviarBtn.style.display = soloVista ? 'none' : '';
-  if(!soloVista) otsEnEdicion.delete(ot);
+  // Cuando abro para editar, saco del set de "edición pendiente"
+  if(!modalSoloVista) otsEnEdicion.delete(key);
 
   modal.classList.add('show');
   modal.setAttribute('aria-hidden', 'false');
@@ -890,29 +975,33 @@ function abrirModal(ot, {soloVista=false} = {}){
 }
 
 function cerrarModal(){
-  if(otModalActual && !modalSoloVista){
-    const { pendientes } = contarCompletados(otModalActual);
-    const btnPrim = document.getElementById(`btn_primary_${cssId(otModalActual)}`);
-    const btnDel = document.getElementById(`btn_eliminar_${cssId(otModalActual)}`);
-
-    if(pendientes === 0){
-      otsEnEdicion.delete(otModalActual);
-      if(btnPrim){
-        btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
-        btnPrim.disabled = true;
-        btnPrim.classList.add('success');
-        btnPrim.setAttribute('data-mode','done');
+  if(otModalActual){
+    const { ot, modulo } = parseKey(otModalActual);
+    if(modulo==='operatividad' && !modalSoloVista){
+      const { pendientes } = contarCompletadosGrupo(ot, modulo);
+      const idPrim = `btn_primary_${cssId(otModalActual)}`;
+      const idEliminar = `btn_eliminar_${cssId(otModalActual)}`;
+      const btnPrim = document.getElementById(idPrim);
+      const btnDel = document.getElementById(idEliminar);
+      if(pendientes === 0){
+        otsEnEdicion.delete(otModalActual);
+        if(btnPrim){
+          btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+          btnPrim.disabled = true;
+          btnPrim.classList.add('success');
+          btnPrim.setAttribute('data-mode','done');
+        }
+        if(btnDel){ btnDel.disabled = false; }
+      }else{
+        otsEnEdicion.add(otModalActual);
+        if(btnPrim){
+          btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+          btnPrim.disabled = false;
+          btnPrim.classList.remove('success');
+          btnPrim.setAttribute('data-mode','continuar');
+        }
+        if(btnDel) btnDel.disabled = true;
       }
-      if(btnDel){ btnDel.disabled = false; }
-    }else{
-      otsEnEdicion.add(otModalActual);
-      if(btnPrim){
-        btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
-        btnPrim.disabled = false;
-        btnPrim.classList.remove('success');
-        btnPrim.setAttribute('data-mode','continuar');
-      }
-      if(btnDel) btnDel.disabled = true;
     }
   }
   modal.classList.remove('show');
@@ -925,33 +1014,37 @@ function cerrarModal(){
 modal.addEventListener('click', (e)=>{ if(e.target?.dataset?.close) cerrarModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('show')) cerrarModal(); });
 
-/* ======= Enviar registros (POST backend) ======= */
-async function enviarRegistrosOT(ot){
-  const { pendientes, total } = contarCompletados(ot);
+/* ======= Enviar registros (POST backend) — solo Operatividad (p1) ======= */
+async function enviarRegistrosGrupo(key){
+  const { ot, modulo } = parseKey(key);
+  if(modulo!=='operatividad'){ showToast('Solo se puede enviar Operatividad por ahora.', 'error'); return; }
+  const { pendientes, total } = contarCompletadosGrupo(ot, modulo);
   if(total === 0){ showToast(`No hay registros para la OT ${ot}.`, 'error'); return; }
   if(pendientes > 0){ showToast('Aún hay registros pendientes por completar.', 'error'); return; }
 
-  const btn = document.getElementById(`btn_primary_${cssId(ot)}`);
+  const idPrim = `btn_primary_${cssId(key)}`;
+  const btn = document.getElementById(idPrim);
   if(btn){ btn.disabled = true; btn.textContent = 'Enviando…'; btn.classList.remove('success'); btn.setAttribute('data-mode',''); }
 
   try{
-    const items = datos.filter(d => (d.ot??"").toString().trim() === (ot??"").toString().trim());
+    const items = itemsDeGrupo(ot, modulo);
     const registros = items.map(r => ({ fecha:r.fecha, ot:r.ot, causa:r.causa }));
-    const res = await fetch(`${API_BASE}/api/guardarOT`, {
+    // Envío a p1 (operatividad). Esta ruta existe en tu worker. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+    const res = await fetch(`${API_BASE_ROOT}/p1/api/guardarOT`, {
       method:'POST', mode:'cors',
       headers:{ 'Content-Type':'application/json', 'Accept':'application/json' },
       body: JSON.stringify({ ot, registros })
     });
     const j = await res.json().catch(()=>null);
     if(res.ok && j && (j.ok === true || j.result === 'ok')){
-      otsEnviadas.add(ot);
+      otsEnviadas.add(key);
       if(btn){
         btn.innerHTML = `${svgCheck()}OT gestionada`;
         btn.classList.add('success');
         btn.disabled = true;
         btn.setAttribute('data-mode','done');
       }
-      const btnDel = document.getElementById(`btn_eliminar_${cssId(ot)}`);
+      const btnDel = document.getElementById(`btn_eliminar_${cssId(key)}`);
       if(btnDel) btnDel.disabled = false;
       showToast(`OT ${ot}: registros enviados y registrados.`, 'success');
     }else{
@@ -960,13 +1053,13 @@ async function enviarRegistrosOT(ot){
   }catch(err){
     console.error(err);
     if(btn){
-      const { pendientes } = contarCompletados(ot);
+      const { pendientes } = contarCompletadosGrupo(ot, modulo);
       if(pendientes === 0){
         btn.innerHTML = `${svgCheck()}OT gestionada`;
         btn.setAttribute('data-mode','done');
         btn.classList.add('success');
         btn.disabled = true;
-      }else if(otsEnEdicion.has(ot)){
+      }else if(otsEnEdicion.has(key)){
         btn.innerHTML = `${svgPencil()}Continuar editando`;
         btn.setAttribute('data-mode','continuar');
         btn.disabled = false;
@@ -982,15 +1075,17 @@ async function enviarRegistrosOT(ot){
   }
 }
 
-/* ======= Eliminar por OT (solo local) ======= */
-async function eliminarRegistrosOT(ot){
-  const ok = await confirmModal(`¿Eliminar TODOS los registros ingresados para la OT ${ot}? Esta acción no se puede deshacer (local).`);
+/* ======= Eliminar por grupo (solo local) ======= */
+async function eliminarRegistrosGrupo(key){
+  const { ot, modulo } = parseKey(key);
+  const ok = await confirmModal(`¿Eliminar TODOS los registros ingresados para la OT ${ot} (${modulo})? Esta acción no se puede deshacer (local).`);
   if(!ok) return;
-  const items = datos.filter(d => (d.ot??"").toString().trim() === (ot??"").toString().trim());
+  const items = itemsDeGrupo(ot, modulo);
   for(const it of items){ it.causa = ''; it.fotos = []; }
-  otsEnEdicion.delete(ot);
+  otsEnEdicion.delete(key);
+  construirGruposPorClave();
   render();
-  showToast(`OT ${ot}: registros eliminados (solo en memoria).`, 'info');
+  showToast(`OT ${ot} (${modulo}): registros eliminados (solo en memoria).`, 'info');
   updateHeaderStats();
 }
 
@@ -998,55 +1093,58 @@ async function eliminarRegistrosOT(ot){
 async function eliminarRegistrosGlobal(){
   const pend = calcularPendientesGlobal();
   if(pend !== 0){ showToast('Hay registros pendientes. Completa todos antes de eliminar globalmente.', 'error'); return; }
-  const ok = await confirmModal('¿Eliminar TODOS los registros ingresados de TODAS las OTs? (solo en memoria)');
+  const ok = await confirmModal('¿Eliminar TODOS los registros ingresados de TODOS los grupos (OT + módulo)? (solo en memoria)');
   if(!ok) return;
   for(const it of datos){ it.causa=''; it.fotos=[]; }
   otsEnEdicion.clear();
+  construirGruposPorClave();
   render();
-  showToast('Se eliminaron los registros de todas las OTs (local).', 'info');
+  showToast('Se eliminaron los registros de todos los grupos (local).', 'info');
   updateHeaderStats();
 }
 
 /* ======= Delegación de clic (tabla) ======= */
 $('#wrapGrupos').addEventListener('click', (e)=>{
+  // Primario (solo operatividad)
   const btnPrim = e.target.closest('.btn-primary');
   if(btnPrim){
     e.preventDefault(); e.stopPropagation();
-    const ot = btnPrim.getAttribute('data-ot') ?? '';
+    const key = btnPrim.getAttribute('data-key') ?? '';
     const mode = btnPrim.getAttribute('data-mode') ?? '';
-    if(!ot) return;
-    if(mode === 'gestionar' || mode === 'continuar'){ abrirModal(ot, {soloVista:false}); return; }
-    if(mode === 'enviar'){ enviarRegistrosOT(ot); return; }
+    if(!key) return;
+    if(mode === 'gestionar' || mode === 'continuar'){ abrirModalPorKey(key, {soloVista:false}); return; }
+    if(mode === 'enviar'){ enviarRegistrosGrupo(key); return; }
     return;
   }
+  // Vista previa (siempre)
   const btnPrev = e.target.closest('.btn-preview');
   if(btnPrev){
     e.preventDefault(); e.stopPropagation();
-    const ot = btnPrev.getAttribute('data-ot') ?? '';
-    if(ot) abrirModal(ot, {soloVista:true});
+    const key = btnPrev.getAttribute('data-key') ?? '';
+    if(key) abrirModalPorKey(key, {soloVista:true});
     return;
   }
+  // Eliminar (local)
   const btnDel = e.target.closest('.btn-eliminar');
   if(btnDel){
     e.preventDefault(); e.stopPropagation();
-    const ot = btnDel.getAttribute('data-ot') ?? '';
-    if(ot && !btnDel.disabled) eliminarRegistrosOT(ot);
+    const key = btnDel.getAttribute('data-key') ?? '';
+    if(key && !btnDel.disabled) eliminarRegistrosGrupo(key);
     return;
   }
 });
 
 /* ======= Acciones de UI ======= */
-$('#btnCargar').addEventListener('click', cargarDesdeServidor);
+$('#btnCargar').addEventListener('click', cargarTodo);
 document.getElementById('btnEliminarGlobal').addEventListener('click', eliminarRegistrosGlobal);
-/* La búsqueda ahora aplica junto con el filtro */
+/* La búsqueda trabaja junto al filtro */
 $('#busqueda').addEventListener('input', debounce(aplicarBusquedaYFiltro, 250));
 
-/* ======= Interacción del filtro Regional ======= */
+/* ======= Filtro Regional ======= */
 const btnRegional = document.getElementById('btnRegional');
 const menuRegional = document.getElementById('menuRegional');
 const lblRegional = document.getElementById('lblRegional');
 const regionalBox = document.getElementById('regionalBox');
-
 function updateRegionalLabel(){
   if(lblRegional){ lblRegional.textContent = `Regional: ${regionalActual}`; }
 }
@@ -1060,7 +1158,6 @@ function buildRegionalMenu(){
   bAll.textContent = 'Todas';
   bAll.onclick = ()=>{ regionalActual='Todas'; closeRegionalMenu(); updateRegionalLabel(); aplicarBusquedaYFiltro(); };
   menuRegional.appendChild(bAll);
-
   if(regionalesDisponibles.length){
     const sep = document.createElement('div'); sep.className='sep'; menuRegional.appendChild(sep);
   }
@@ -1093,14 +1190,34 @@ document.addEventListener('keydown', (e)=>{
   if(e.key==='Escape') closeRegionalMenu();
 });
 
-/* ======= Panel de colores (sin cambios funcionales) ======= */
+/* ======= Filtro por Módulo (píldoras) ======= */
+document.querySelectorAll('.mod-pill').forEach(p=>{
+  p.addEventListener('click', ()=>{
+    const mod = p.dataset.mod;
+    if(!mod) return;
+    if(p.classList.contains('on')){
+      p.classList.remove('on');
+      moduloActivos.delete(mod);
+    }else{
+      p.classList.add('on');
+      moduloActivos.add(mod);
+    }
+    // Si apagaste todo, vuelvo a prender todos (evitar vista vacía accidental)
+    if(moduloActivos.size === 0){
+      document.querySelectorAll('.mod-pill').forEach(x=>x.classList.add('on'));
+      moduloActivos.add('operatividad'); moduloActivos.add('backlog'); moduloActivos.add('sla');
+    }
+    aplicarBusquedaYFiltro();
+  });
+});
+
+/* ======= Paleta colores (persistencia local) — sin cambios funcionales ======= */
 const paletteFab = document.getElementById('paletteFab');
 const palette = document.getElementById('palette');
 const colorHead = document.getElementById('colorHead');
 const colorDom = document.getElementById('colorDom');
 const colorLine = document.getElementById('colorLine');
 const colorPill = document.getElementById('colorPill');
-
 function getCSSVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 function setCSSVar(name, val){ document.documentElement.style.setProperty(name, val); }
 function savePalette(){
@@ -1120,17 +1237,16 @@ function loadPalette(){
 }
 function syncInputsFromVars(){
   const vHead = getCSSVar('--head') || '#ffffff';
-  const vDom  = getCSSVar('--dom-blue') || '#0e4aa8';
+  const vDom = getCSSVar('--dom-blue') || '#0e4aa8';
   const vLine = getCSSVar('--line') || '#e4ebf6';
   const vPill = getCSSVar('--pill') || '#cfe0ff';
   if(colorHead) colorHead.value = vHead.startsWith('#') ? vHead : '#ffffff';
-  if(colorDom)  colorDom.value  = vDom.startsWith('#') ? vDom : '#0e4aa8';
+  if(colorDom) colorDom.value = vDom.startsWith('#') ? vDom : '#0e4aa8';
   if(colorLine) colorLine.value = vLine.startsWith('#') ? vLine : '#e4ebf6';
   if(colorPill) colorPill.value = vPill.startsWith('#') ? vPill : '#cfe0ff';
 }
 function openPalette(){ if(palette){ palette.classList.add('show'); palette.setAttribute('aria-hidden','false'); syncInputsFromVars(); } }
 function closePalette(){ if(palette){ palette.classList.remove('show'); palette.setAttribute('aria-hidden','true'); } }
-
 if(paletteFab){
   paletteFab.addEventListener('click', () => { if(palette.classList.contains('show')) closePalette(); else openPalette(); });
   document.getElementById('btnClosePalette')?.addEventListener('click', closePalette);
@@ -1149,7 +1265,7 @@ if(paletteFab){
 
 /* ======= Arranque ======= */
 loadPalette();
-cargarDesdeServidor();
-</script>
+cargarTodo(); // Llama a /p1|p2|p3/api/datos, como expone tu worker. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+  </script>
 </body>
 </html>
