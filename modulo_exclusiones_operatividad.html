@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>Exclusiones – Unificado (Operatividad / Backlog / SLA)</title>
+<title>Exclusiones — Unificado (Operatividad / Backlog / SLA)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- Sello de build -->
-<meta name="x-build" content="build-2026-03-03-unificado-p1p2p3+filtro-regional+filtro-modulo">
+<meta name="x-build" content="build-2026-03-03-unificado-rutas-etiqueta-tipo">
 
 <style>
 :root{
@@ -134,7 +133,7 @@ body{
 }
 .tabla tbody td:last-child{ border-right:none; }
 .col-ot{ font-weight:800; color:#0e2040; white-space:nowrap; }
-/* >>> Estilo de la celda Regional en negrita */
+/* Celda Regional en negrita */
 .col-regional{ font-weight:800; color:#0e2040; white-space:nowrap; }
 
 /* Hover fila (relieve) */
@@ -216,13 +215,13 @@ body{
   border-color:var(--success);
   color:#fff;
 }
-/* Iconos por estado (engranajes + lápiz) */
+/* Iconos por estado */
 .btn-primary .icon-gear svg{ stroke:#324a78; fill:none; stroke-width:1.8; }
 .btn-primary[data-mode="gestionar"] .icon-gear svg{ stroke:#324a78; }
 .btn-primary .icon-pencil svg{ stroke:#324a78; fill:none; stroke-width:1.8; }
 .btn-primary[data-mode="continuar"] .icon-pencil svg{ stroke:#fff; }
 
-/* Eliminar (por OT) – local */
+/* Eliminar (por grupo) – solo local */
 .btn-eliminar{ display:inline-flex; align-items:center; gap:8px; }
 .btn-eliminar:not(:disabled){
   background:var(--danger-bg); color:var(--danger); border-color:var(--danger-border);
@@ -330,7 +329,7 @@ body{
 .confirm .btn-cancel{ background:#f4f6fb; color:#34445f; border-color:#e3e9f6; }
 .confirm .btn-cancel:hover{ background:#ecf1fb; }
 
-/* ===== Filtro Regional (tu estilo actual) ===== */
+/* ===== Filtro Regional ===== */
 .filter-box{ position:relative; height:40px; display:flex; align-items:center; }
 .filter-trigger{
   display:inline-flex; align-items:center; gap:8px; height:40px;
@@ -377,13 +376,13 @@ body{
     <div class="controls">
       <button id="btnCargar" class="btn btn-blue" type="button">Cargar / Actualizar</button>
 
-      <!-- Filtro Regional (tu componente) -->
+      <!-- Filtro Regional -->
       <div class="filter-box" id="regionalBox">
         <button id="btnRegional" class="filter-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" title="Filtrar por regional">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M3 6h18l-7 8v4l-4 2v-6L3 6z"/>
           </svg>
-          <span id="lblRegional">Regional: Todas</span>
+        <span id="lblRegional">Regional: Todas</span>
         </button>
         <div id="menuRegional" class="filter-menu" role="listbox" aria-label="Regional">
           <!-- Opciones dinámicas -->
@@ -452,6 +451,7 @@ body{
 
   <!-- ===== Toast host ===== -->
   <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
 <script>
 /* =================== CONFIG BACKEND =================== */
 /* Base del worker SIN sufijo de proyecto */
@@ -461,7 +461,7 @@ const PROJECTS = [
   { path: "p1", modulo: "operatividad" },
   { path: "p2", modulo: "backlog" },
   { path: "p3", modulo: "sla" }
-]; // Worker expone GET /pX/api/datos y POST /pX/api/guardarOT. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+];
 
 /* ======= Estado (local) ======= */
 let datos = [];        // filas unificadas {id, fecha, ot, causa, regional, modulo}
@@ -565,7 +565,7 @@ async function fetchModulo(path, modulo){
         r.region ??
         r.Region ?? ''
       ).toString().trim(),
-      modulo
+      modulo // ← Etiqueta: 'operatividad' | 'backlog' | 'sla'
     }));
 }
 
@@ -574,14 +574,16 @@ async function cargarTodo(){
   try{
     ocultarAlerta();
     btn.disabled=true; btn.textContent='Cargando…';
+
     const promesas = PROJECTS.map(p => fetchModulo(p.path, p.modulo));
     const resultados = await Promise.all(promesas); // p1+p2+p3
     datos = resultados.flat(); // unificado
+
     // Regionales detectadas
     const setReg = new Set();
     for(const it of datos){ if((it.regional??'')!=='') setReg.add(it.regional); }
     regionalesDisponibles = Array.from(setReg).sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
-    // Reubicar a 'Todas' si el valor actual ya no existe
+
     if(regionalActual!=='Todas' && !regionalesDisponibles.includes(regionalActual)){
       regionalActual = 'Todas';
     }
@@ -603,7 +605,7 @@ async function cargarTodo(){
     buildRegionalMenu();
     updateRegionalLabel();
   }finally{
-    btn.disabled=false; btn.textContent='Actualizar';
+    btn.disabled=false; btn.textContent='Cargar / Actualizar';
     updateHeaderStats();
   }
 }
@@ -625,7 +627,6 @@ function contarCompletadosGrupo(ot, modulo){
 
 function calcularPendientesGlobal(){
   let pendientesGlobales = 0;
-  // Cada clave es un grupo OT+Módulo
   for(const g of grupos){
     const { pendientes } = contarCompletadosGrupo(g.ot, g.modulo);
     pendientesGlobales += pendientes;
@@ -689,7 +690,7 @@ function updateEstadosGrupo(ot, modulo){
   const btnPrim = document.getElementById(idPrim);
   const btnDel = document.getElementById(idEliminar);
 
-  // Modal: Enviar habilitado/inhabilitado para TODOS los módulos (ya activo)
+  // Modal: Enviar habilitado/inhabilitado cuando es edición
   if (document.getElementById('modalRegistros').classList.contains('show')
       && otModalActual === keyFrom(ot,modulo) && !modalSoloVista){
     const modalEnviarBtn = document.getElementById('modalEnviar');
@@ -708,7 +709,7 @@ function updateEstadosGrupo(ot, modulo){
   }
   if(btnDel){ btnDel.disabled = pendientes !== 0; }
 
-  // Primario ahora para TODOS los módulos
+  // Primario para todos los módulos
   if(btnPrim){
     if(pendientes === 0){
       btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
@@ -739,12 +740,12 @@ function svgGear(){
   <span class="icon icon-gear" aria-hidden="true">
     <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
       <g transform="translate(-2,1) scale(0.95)">
-        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
-        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0  0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
+        <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0  0 1 0-7Z"/>
+        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l-1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
       <g transform="translate(4,-4) scale(0.62)">
         <path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0  0 1 0-7Z"/>
-        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
+        <path d="M4.7 12.9a7.8 7.8 0 0 1 0-1.8l1.6-.4a6 6 0 0 1 .6-1.4l-1-1.3c.4-.6.9-1.1 1.5-1.5l1.3 1a6 6 0 0 1 1.4-.6l.4-1.6c.6-.1 1.2-.1 1.8 0l.4 1.6c.5.1 1 .3 1.4.6l1.3-1c.6.4 1.1.9 1.5 1.5l-1 1.3c.3.4.5.9.6 1.4l1.6.4c.1.6.1 1.2 0 1.8l-1.6.4c-.1.5-.3 1-.6 1.4l1 1.3c-.4.6-.9 1.1-1.5 1.5l-1.3-1c-.4.3-.9.5-1.4.6l-.4 1.6c-.6.1-1.2.1-1.8 0l-.4-1.6a6 6 0 0 1-1.4-.6l-1.3 1a6 6 0 0 1-1.5-1.5l-1-1.3a6 6 0 0 1-.6-1.4l-1.6-.4Z"/>
       </g>
     </svg>
   </span>`;
@@ -824,11 +825,12 @@ function render(){
     const idPreview = `btn_preview_${cssId(key)}`;
     const yaCompleta = pendientes === 0;
     const enEdicion = otsEnEdicion.has(key) && !yaCompleta;
+    const tipoLegible = (modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA'));
 
     tr.innerHTML = `
       <td class="col-regional">${esc(regionalTexto)}</td>
       <td class="col-ot">${esc(otClave)}</td>
-      <td>${modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA')}</td>
+      <td>${tipoLegible}</td>
       <td><span class="count-total">${total}</span></td>
       <td><span class="count-pend">${pendientes}</span></td>
       <td>
@@ -885,7 +887,7 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
   const regs = itemsDeGrupo(ot, modulo);
   if(!regs.length){ showToast(`No hay registros para la OT ${ot}`, 'error'); return; }
   otModalActual = key; // clave compuesta
-  modalSoloVista = !!soloVista; // ahora backlog/sla también son editables
+  modalSoloVista = !!soloVista; // los tres módulos son editables; soloVista=true si es vista previa
   modalTitle.textContent = `${modalSoloVista ? 'Vista previa' : 'Gestionar registros'} — OT ${ot} • ${modulo === 'operatividad' ? 'Operatividad' : (modulo === 'backlog' ? 'Backlog' : 'SLA')}`;
   modalBody.innerHTML = "";
 
@@ -935,7 +937,7 @@ function abrirModalPorKey(key, {soloVista=false} = {}){
     }
   }
 
-  // Enviar visible para TODOS los módulos
+  // Enviar visible cuando no es solo vista
   modalEnviarBtn.style.display = modalSoloVista ? 'none' : '';
 
   const { pendientes } = contarCompletadosGrupo(parseKey(key).ot, parseKey(key).modulo);
@@ -998,7 +1000,7 @@ function cerrarModal(){
 modal.addEventListener('click', (e)=>{ if(e.target?.dataset?.close) cerrarModal(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && modal.classList.contains('show')) cerrarModal(); });
 
-/* ======= Enviar registros (POST backend) — ahora para TODOS los módulos ======= */
+/* ======= Enviar registros (POST backend) ======= */
 function projectPathByModulo(mod){
   const found = PROJECTS.find(p => p.modulo === mod);
   return found ? found.path : 'p1';
@@ -1016,7 +1018,7 @@ async function enviarRegistrosGrupo(key){
   try{
     const items = itemsDeGrupo(ot, modulo);
     const registros = items.map(r => ({ fecha:r.fecha, ot:r.ot, causa:r.causa }));
-    // Envío a p1/p2/p3 según módulo. El Worker implementa /api/guardarOT por proyecto. [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+    // Envío al proyecto correspondiente (p1/p2/p3) por ruta
     const path = projectPathByModulo(modulo);
     const res = await fetch(`${API_BASE_ROOT}/${path}/api/guardarOT`, {
       method:'POST', mode:'cors',
@@ -1093,7 +1095,7 @@ async function eliminarRegistrosGlobal(){
 
 /* ======= Delegación de clic (tabla) ======= */
 $('#wrapGrupos').addEventListener('click', (e)=>{
-  // Primario (ahora para todos los módulos)
+  // Primario
   const btnPrim = e.target.closest('.btn-primary');
   if(btnPrim){
     e.preventDefault(); e.stopPropagation();
@@ -1104,7 +1106,7 @@ $('#wrapGrupos').addEventListener('click', (e)=>{
     if(mode === 'enviar'){ enviarRegistrosGrupo(key); return; }
     return;
   }
-  // Vista previa (siempre disponible)
+  // Vista previa
   const btnPrev = e.target.closest('.btn-preview');
   if(btnPrev){
     e.preventDefault(); e.stopPropagation();
@@ -1199,7 +1201,7 @@ document.querySelectorAll('.mod-pill').forEach(p=>{
   });
 });
 
-/* ======= Paleta colores (persistencia local) — sin cambios funcionales ======= */
+/* ======= Paleta colores (persistencia local) — opcional (no visible si no hay controles) ======= */
 const paletteFab = document.getElementById('paletteFab');
 const palette = document.getElementById('palette');
 const colorHead = document.getElementById('colorHead');
@@ -1253,7 +1255,7 @@ if(paletteFab){
 
 /* ======= Arranque ======= */
 loadPalette();
-cargarTodo(); // Llama a /p1|p2|p3/api/datos (worker). [1](https://dominionglobal-my.sharepoint.com/personal/ariel_marquez-ext_dominion-global_com/Documents/Archivos%20de%20Microsoft%C2%A0Copilot%20Chat/modulo_exclusiones_operatividad.html)
+cargarTodo();
 </script>
 </body>
 </html>
