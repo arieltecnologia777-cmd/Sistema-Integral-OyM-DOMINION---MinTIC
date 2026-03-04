@@ -677,7 +677,7 @@ const DEFAULT_DURATION_MIN = 45;
 const DEFAULT_LOCATION = 'Microsoft Teams';
 
 /* ====== Helpers ====== */
-const $ = s => document.querySelector(s);
+const $  = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1800); }
 function showState(msg, isErr=false){
@@ -704,7 +704,7 @@ function parsearFechaFlexible(v){
     if (/^\d+(\.\d+)?$/.test(s)) { const num = parseFloat(s); if (!Number.isNaN(num)) { const d = trySerial(num); if (d) return d; } }
     let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
     if (m) { const [_, dd, mm, yyyy, hh='0', mi='0', ss='0'] = m; const d = new Date(Number(yyyy), Number(mm)-1, Number(dd), Number(hh), Number(mi), Number(ss)); if (!isNaN(d)) return d; }
-    m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})(?:[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    m = s.match(/^(\d{4})\d{1,2}\d{1,2}(?:\d{1,2}:(\d{2})(?::(\d{2}))?)?$/);
     if (m) { const [_, yyyy, mm, dd, hh='0', mi='0', ss='0'] = m; const d = new Date(Number(yyyy), Number(mm)-1, Number(dd), Number(hh), Number(mi), Number(ss)); if (!isNaN(d)) return d; }
     const d = new Date(s); if (!isNaN(d)) return d;
   }
@@ -728,7 +728,7 @@ function healthUrlFor(key){
   if(!base) return 'about:blank#offline';
   return `${base.replace(/\/+$/,'')}/health`;
 }
-const ONLINE_STYLE = { bg:'#e8f7ec', border:'#b7ebc0', color:'#107c10', text:'Activo' };
+const ONLINE_STYLE  = { bg:'#e8f7ec', border:'#b7ebc0', color:'#107c10', text:'Activo' };
 const OFFLINE_STYLE = { bg:'#fee2e2', border:'#fecaca', color:'#991b1b', text:'Offline' };
 function applyBadgeStyle(badge, style){
   if(!badge) return;
@@ -844,10 +844,24 @@ $$('#tiles .tile').forEach(t=>{
 });
 selectProject('operatividad');
 
+/* ======= Helpers de UI: encontrar y resaltar tarjeta por módulo ======= */
+function getTileElByKey(key){
+  return document.querySelector(`.tiles .tile[data-key="${key}"]`);
+}
+/** Marca visualmente la tarjeta activa por unos segundos */
+function pulseActiveTile(key, {addRing=true} = {}){
+  const el = getTileElByKey(key);
+  if(!el) return;
+  // Estado base: aria-pressed ya lo setea selectProject(key)
+  el.classList.add('active-glow');
+  if(addRing) el.classList.add('pulse-ring');
+  // Quitar el realce extra después de ~2.2s
+  setTimeout(()=>{ el.classList.remove('active-glow','pulse-ring'); }, 2200);
+}
+
 /* ====== Modal confirm (reusable, con blur y labels) ====== */
 function abrirConfirm(){ $('#modalConfirm').style.display='flex'; }
 function cerrarConfirm(){ $('#modalConfirm').style.display='none'; }
-
 /** Abre el modal y devuelve true/false según el botón presionado */
 function abrirModalConfirm({ title='Confirmación', message='', acceptLabel='Aceptar', cancelLabel='Cancelar' } = {}){
   return new Promise(resolve=>{
@@ -872,7 +886,6 @@ function abrirModalConfirm({ title='Confirmación', message='', acceptLabel='Ace
     btnNo.addEventListener('click', onNo);
   });
 }
-
 /** Abre el mismo modal, pero permite inyectar HTML (para radios/listados) */
 function abrirModalHTML({ title='Confirmación', html='', acceptLabel='Aceptar', cancelLabel='Cancelar' } = {}){
   return new Promise(resolve=>{
@@ -934,7 +947,7 @@ async function seleccionarModuloParaVaciar(){
   return selected ? selected.value : null;
 }
 
-/** Llama /api/clear del módulo (clave: 'operatividad'|'backlog'|'sla') y devuelve { ok:boolean, error?:string } */
+/** Llama /api/clear del módulo y devuelve { ok:boolean, error?:string } */
 async function requestClear(modKey){
   const API = (BACKENDS[modKey] || API_BASE).replace(/\/+$/,'');
   try{
@@ -1216,26 +1229,59 @@ function createTeamsMeetingInOWA({title = DEFAULT_SUBJECT, body = DEFAULT_BODY, 
   window.open(href, '_blank', 'noopener');
 }
 
-/* ====== Eventos ====== */
+/* ================== LISTENERS (limpios + iluminación) ================== */
 $('#btnNotifyR1')?.addEventListener('click', () => openMailOutlook(TEAM1_TO, TEAM1_CC));
 $('#btnNotifyR2')?.addEventListener('click', () => openMailOutlook(TEAM2_TO, TEAM2_CC));
 $('#btnTeamsMeeting')?.addEventListener('click', () => createTeamsMeetingInOWA({ attendees: [...TEAM1_TO, ...TEAM1_CC] }));
-/* FIX DEFINITIVO — listeners correctos */
 
-// Operatividad
+// ---- Operatividad ----
 $('#btnImportar')?.addEventListener('click', async () => {
   selectProject('operatividad');
   sessionStorage.setItem('ex_mod','operatividad');
   localStorage.setItem('ex_mod','operatividad');
+  pulseActiveTile('operatividad');
   await importarExcel();
 });
-
 $('#btnExportar')?.addEventListener('click', async () => {
   selectProject('operatividad');
   sessionStorage.setItem('ex_mod','operatividad');
   localStorage.setItem('ex_mod','operatividad');
+  pulseActiveTile('operatividad');
   await exportarExcel();
 });
+
+// ---- Backlog ----
+$('#btnImportar_backlog')?.addEventListener('click', async () => {
+  selectProject('backlog');
+  sessionStorage.setItem('ex_mod','backlog');
+  localStorage.setItem('ex_mod','backlog');
+  pulseActiveTile('backlog');
+  await importarExcel();
+});
+$('#btnExportar_backlog')?.addEventListener('click', async () => {
+  selectProject('backlog');
+  sessionStorage.setItem('ex_mod','backlog');
+  localStorage.setItem('ex_mod','backlog');
+  pulseActiveTile('backlog');
+  await exportarExcel();
+});
+
+// ---- SLA ----
+$('#btnImportar_sla')?.addEventListener('click', async () => {
+  selectProject('sla');
+  sessionStorage.setItem('ex_mod','sla');
+  localStorage.setItem('ex_mod','sla');
+  pulseActiveTile('sla');
+  await importarExcel();
+});
+$('#btnExportar_sla')?.addEventListener('click', async () => {
+  selectProject('sla');
+  sessionStorage.setItem('ex_mod','sla');
+  localStorage.setItem('ex_mod','sla');
+  pulseActiveTile('sla');
+  await exportarExcel();
+});
+
 document.getElementById('btnVaciarModulo')?.addEventListener('click', vaciarModuloActual);
 $('#btnHome')?.addEventListener('click', () => { window.location.href = 'main_page.html'; });
 const temaChip = $('#temaChip');
@@ -1245,29 +1291,32 @@ temaChip?.addEventListener('click', () => {
   temaChip.textContent = isDark ? 'Tema claro' : 'Tema oscuro';
 });
 
-/* <<< NUEVO: listeners dedicados para Backlog y SLA >>> */
-$('#btnImportar_backlog')?.addEventListener('click', async () => {
-  selectProject('backlog');
-  await importarExcel();
-});
-$('#btnExportar_backlog')?.addEventListener('click', async () => {
-  selectProject('backlog');
-  await exportarExcel();
-});
-$('#btnImportar_sla')?.addEventListener('click', async () => {
-  selectProject('sla');
-  await importarExcel();
-});
-$('#btnExportar_sla')?.addEventListener('click', async () => {
-  selectProject('sla');
-  await exportarExcel();
-});
-
 /* Health-check al cargar y cada 60s */
 updateAllHealth();
 setInterval(updateAllHealth, 60000);
 
 }); // DOMContentLoaded
+/* ======= Realce de tarjeta activa al importar/exportar ======= */
+.tile[aria-pressed="true"] {
+  outline: 2px solid rgba(14,74,168,.25);
+  outline-offset: 2px;
+}
+.tile.active-glow {
+  box-shadow:
+    0 0 0 3px rgba(14,74,168,.18),
+    0 10px 24px rgba(14,42,94,.25),
+    0 1px 0 rgba(255,255,255,.90) inset;
+  transform: translateY(-4px) var(--tilt);
+  transition: box-shadow .18s ease, transform .18s ease;
+}
+@keyframes tile-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(14,74,168,.28); }
+  70%  { box-shadow: 0 0 0 10px rgba(14,74,168,0); }
+  100% { box-shadow: 0 0 0 0 rgba(14,74,168,0); }
+}
+.tile.pulse-ring {
+  animation: tile-pulse 1.1s ease-out 2;
+}
 </script>
 </body>
 </html>
