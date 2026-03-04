@@ -485,15 +485,15 @@ body{
 
           <!-- NUEVO: Vaciar módulo (movido al sidebar) -->
           <button type="button" class="btn" id="btnVaciarModulo" title="Vaciar datos del módulo actual">
-            <!-- Icono papelera (SVG limpio) -->
-            <svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6" fill="none"></path>
-              <rect x="5" y="6" width="14" height="14" rx="2.2" ry="2.2" fill="currentColor" opacity=".06"></rect>
-              <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"></path>
-            </svg>
-            Vaciar módulo
-          </button>
+  <!-- Icono papelera -->
+  <svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
+    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6" fill="none"></path>
+    <rect x="5" y="6" width="14" height="14" rx="2.2" ry="2.2" fill="currentColor" opacity=".06"></rect>
+    <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"></path>
+  </svg>
+  Vaciar módulos
+</button>
         </div>
       </div>
 
@@ -1037,46 +1037,73 @@ async function exportarExcel(){
 }
 
 /* ====== Vaciar módulo actual (usa el NUEVO modal con blur) ====== */
+/* ====== Vaciar módulo(s): selector + confirmación + ejecución ====== */
 async function vaciarModuloActual(){
   try{
-    const moduloLabel = projectLabels[currentProject] ?? currentProject;
+    // 1) Elegir módulo(s)
+    const eleccion = await seleccionarModuloParaVaciar();
+    if(!eleccion){ return; } // cancelado
+
+    // 2) Confirmar acción con resumen
+    const human =
+      eleccion === 'todos'
+        ? 'TODOS los módulos (operatividad, backlog y sla)'
+        : (projectLabels[eleccion] ?? eleccion);
+
     const ok = await abrirModalConfirm({
       title: 'Confirmación',
-      message: `¿Vaciar TODOS los registros del módulo "${moduloLabel}"? Esta acción requiere token de Admin y no se puede deshacer.`,
+      message: `¿Confirmas vaciar ${human}? Esta acción requiere token de Admin y no se puede deshacer.`,
       acceptLabel: 'Aceptar',
       cancelLabel: 'Cancelar'
     });
     if(!ok) return;
 
+    // 3) Deshabilitar botón mientras corre
     const btn = document.getElementById('btnVaciarModulo');
-    const lbl = btn?.querySelector('.lbl');
-    if(btn){ btn.disabled = true; if(lbl) lbl.textContent = 'Vaciando…'; }
+    const originalHTML = btn?.innerHTML;
+    if(btn){
+      btn.disabled = true;
+      // Pequeño spinner textual para feedback rápido
+      btn.innerHTML = `<svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2a10 10 0 1 1-7.07 2.93" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
+      </svg> Vaciando…`;
+    }
 
-    const API = (BACKENDS[currentProject] || API_BASE).replace(/\/+$/,'');
-    const res = await fetch(`${API}/api/clear`, {
-      method:'POST',
-      mode:'cors',
-      headers:{
-        'Content-Type':'application/json',
-        'Accept':'application/json',
-        'Authorization': `Bearer ${ADMIN_TOKEN}`
-      },
-      body: JSON.stringify({})
-    });
-    const j = await res.json().catch(()=>null);
-    if(!res.ok || !j?.ok){ throw new Error(j?.error || `HTTP ${res.status}`); }
-    showState(`Se vació el módulo "${currentProject}".`, false);
-    setGlobalLog('Vaciado completado', moduloLabel, '');
+    // 4) Calcular lista de claves a vaciar
+    const keys = eleccion === 'todos' ? ['operatividad','backlog','sla'] : [eleccion];
+
+    // 5) Ejecutar limpiezas en paralelo (más rápido) o en serie si prefieres trazabilidad
+    const results = await Promise.all(keys.map(async k => ({ k, ...(await requestClear(k)) })));
+
+    // 6) Armar resumen
+    const errores = results.filter(r => !r.ok);
+    if(errores.length === 0){
+      const modLabel = eleccion === 'todos' ? 'Todos' : (projectLabels[eleccion] ?? eleccion);
+      showState(`Vaciado completado en: ${modLabel}.`);
+      setGlobalLog('Vaciado completado', modLabel, '');
+    }else{
+      const okKeys = results.filter(r => r.ok).map(r => projectLabels[r.k] ?? r.k);
+      const errList = errores.map(r => `${projectLabels[r.k] ?? r.k}: ${r.error}`).join(' | ');
+      const extra = okKeys.length ? `OK en: ${okKeys.join(', ')}. ` : '';
+      showState(`Vaciado parcial. ${extra}Errores: ${errList}`, true);
+      setGlobalLog('Vaciado parcial', human, errList);
+    }
   }catch(err){
     console.error(err);
     showState('Error al vaciar: ' + (err?.message ?? err), true);
-    setGlobalLog('Error en vaciado', projectLabels[currentProject] ?? currentProject, err?.message ?? String(err));
+    setGlobalLog('Error en vaciado', '—', err?.message ?? String(err));
   }finally{
+    // 7) Rehabilitar botón y restaurar contenido
     const btn = document.getElementById('btnVaciarModulo');
-    if(btn) btn.disabled = false;
+    if(btn){
+      btn.disabled = false;
+      // Si guardamos el HTML original, lo restauramos; sino, fallback al texto
+      btn.innerHTML = btn.innerHTML?.includes('Vaciando…')
+        ? (typeof originalHTML === 'string' ? originalHTML : btn.innerHTML.replace('Vaciando…','Vaciar módulos'))
+        : btn.innerHTML;
+    }
   }
 }
-
 /* ====== Outlook & Teams ====== */
 function openMailOutlook(toList = [], ccList = [], subject = DEFAULT_SUBJECT, body = DEFAULT_BODY){
   const to = encodeURIComponent(toList.join(','));
