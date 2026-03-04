@@ -507,7 +507,6 @@ body{
       </div>
     </div>
   </aside>
-
   <!-- MAIN -->
   <main class="main">
     <!-- HERO -->
@@ -540,7 +539,7 @@ body{
         <span class="badge">Activo</span>
       </div>
 
-      <div class="tile soon" data-key="backlog" data-tooltip="Presiona aquí para ayuda" tabindex="0" role="button" aria-pressed="false">
+      <div class="tile" data-key="backlog" data-tooltip="Presiona aquí para ayuda" tabindex="0" role="button" aria-pressed="false">
         <div class="ico ico-amber">
           <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
         </div>
@@ -548,10 +547,10 @@ body{
           <div class="t-title">Exclusiones indicador backlog</div>
           <div class="t-sub">Estado del backend</div>
         </div>
-        <span class="badge">Beta</span>
+        <span class="badge">Activo</span>
       </div>
 
-      <div class="tile soon" data-key="sla" data-tooltip="Presiona aquí para ayuda" tabindex="0" role="button" aria-pressed="false">
+      <div class="tile" data-key="sla" data-tooltip="Presiona aquí para ayuda" tabindex="0" role="button" aria-pressed="false">
         <div class="ico ico-sky">
           <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" aria-hidden="true"><path d="M12 2a10 10 0 00-10 10 10 10 0 1010-10zm1 5v6l5 3-.75 1.23L11 13V7h2z"/></svg>
         </div>
@@ -559,7 +558,7 @@ body{
           <div class="t-title">Exclusiones SLA</div>
           <div class="t-sub">Estado del backend</div>
         </div>
-        <span class="badge">Beta</span>
+        <span class="badge">Activo</span>
       </div>
     </section>
 
@@ -582,15 +581,16 @@ body{
         </button>
       </div>
 
+      <!-- ACTIVADOS: Backlog -->
       <div class="pair">
-        <button id="btnImportar_backlog" class="btn btn-imp" type="button" title="Importar datos (Próximamente)" disabled>
+        <button id="btnImportar_backlog" class="btn btn-imp" type="button" title="Importar datos (Backlog)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 21V9m0 0l-4 4m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"></path>
             <path d="M4 3h16" stroke-linecap="round"></path>
           </svg>
           <span class="lbl">Importar datos</span>
         </button>
-        <button id="btnExportar_backlog" class="btn btn-exp" type="button" title="Exportar datos (Próximamente)" disabled>
+        <button id="btnExportar_backlog" class="btn btn-exp" type="button" title="Exportar datos (Backlog)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke-linecap="round" stroke-linejoin="round"></path>
             <path d="M4 21h16" stroke-linecap="round"></path>
@@ -599,15 +599,16 @@ body{
         </button>
       </div>
 
+      <!-- ACTIVADOS: SLA -->
       <div class="pair">
-        <button id="btnImportar_sla" class="btn btn-imp" type="button" title="Importar datos (Próximamente)" disabled>
+        <button id="btnImportar_sla" class="btn btn-imp" type="button" title="Importar datos (SLA)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 21V9m0 0l-4 4m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"></path>
             <path d="M4 3h16" stroke-linecap="round"></path>
           </svg>
           <span class="lbl">Importar datos</span>
         </button>
-        <button id="btnExportar_sla" class="btn btn-exp" type="button" title="Exportar datos (Próximamente)" disabled>
+        <button id="btnExportar_sla" class="btn btn-exp" type="button" title="Exportar datos (SLA)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke-linecap="round" stroke-linejoin="round"></path>
             <path d="M4 21h16" stroke-linecap="round"></path>
@@ -615,8 +616,6 @@ body{
           <span class="lbl">Exportar datos</span>
         </button>
       </div>
-
-      <!-- NOTA: Se eliminó el botón "Vaciar módulo" de aquí (fue movido al sidebar). -->
     </section>
 
     <!-- AYUDA -->
@@ -650,6 +649,7 @@ body{
 
   <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 /* ======================= CONFIG BACKEND (Cloudflare Workers) — multi-proyecto ======================= */
@@ -785,23 +785,20 @@ const helpByModule = {
     ]
   },
   backlog: {
-    title: 'Ayuda rápida — Indicador backlog (beta)',
-    intro: 'Módulo en preparación para gestionar exclusiones del indicador backlog.',
+    title: 'Ayuda rápida — Indicador backlog (activo)',
+    intro: 'Módulo para gestionar exclusiones del indicador backlog.',
     bullets: [
-      'Mientras está en “Próximamente”, puedes definir tu plantilla de columnas en Excel.',
-      'La idea es calcular pendientes y exclusiones por OT y periodos (ej. semanal).',
-      'Cuando se active, “Importar datos” actualizará la vista y métricas del backlog.',
-      'Consulta con el equipo qué campos mínimos serán obligatorios.'
+      'Importa y exporta como en Operatividad.',
+      'Plantéate columnas consistentes para un reporte limpio.',
+      'El backend responde en /p2/*.'
     ]
   },
   sla: {
-    title: 'Ayuda rápida — Exclusiones SLA (beta)',
-    intro: 'Módulo pensado para justificar exclusiones frente a métricas de SLA.',
+    title: 'Ayuda rápida — Exclusiones SLA (activo)',
+    intro: 'Módulo para justificar exclusiones frente a métricas de SLA.',
     bullets: [
-      'Estructura sugerida: OT, tramo temporal, causal, evidencia y estado de validación.',
-      'Se habilitarán reglas para validar causales y generar reportes para auditoría.',
-      'Habrá exportación a Excel con filtros por rango de fechas y causal.',
-      'Prepara tus archivos con encabezados consistentes para una activación sin fricción.'
+      'Importa/Exporta con la misma plantilla base.',
+      'El backend responde en /p3/*.'
     ]
   }
 };
@@ -876,7 +873,7 @@ function abrirModalConfirm({ title='Confirmación', message='', acceptLabel='Ace
   });
 }
 
-/* ====== NUEVO: Modal con HTML (para selector de módulos) ====== */
+/** Abre el mismo modal, pero permite inyectar HTML (para radios/listados) */
 function abrirModalHTML({ title='Confirmación', html='', acceptLabel='Aceptar', cancelLabel='Cancelar' } = {}){
   return new Promise(resolve=>{
     const titleEl = $('#mc_title');
@@ -884,7 +881,7 @@ function abrirModalHTML({ title='Confirmación', html='', acceptLabel='Aceptar',
     const btnYes = $('#mc_si');
     const btnNo = $('#mc_no');
     if(titleEl) titleEl.textContent = title;
-    if(msgEl) msgEl.innerHTML = html;  // HTML dinámico
+    if(msgEl) msgEl.innerHTML = html;
     if(btnYes) btnYes.textContent = acceptLabel;
     if(btnNo) btnNo.textContent = cancelLabel;
 
@@ -1123,13 +1120,10 @@ async function exportarExcel(){
 
 /* ====== Vaciar módulo(s): selector + confirmación + ejecución ====== */
 async function vaciarModuloActual(){
-  let originalHTML = null; // <- aseguramos alcance para finally
+  let originalHTML = null;
   try{
-    // 1) Elegir módulo(s)
     const eleccion = await seleccionarModuloParaVaciar();
-    if(!eleccion){ return; } // cancelado
-
-    // 2) Confirmar acción con resumen
+    if(!eleccion){ return; }
     const human =
       eleccion === 'todos'
         ? 'TODOS los módulos (operatividad, backlog y sla)'
@@ -1143,7 +1137,6 @@ async function vaciarModuloActual(){
     });
     if(!ok) return;
 
-    // 3) Deshabilitar botón mientras corre
     const btn = document.getElementById('btnVaciarModulo');
     if(btn){
       originalHTML = btn.innerHTML;
@@ -1153,13 +1146,9 @@ async function vaciarModuloActual(){
       </svg> Vaciando…`;
     }
 
-    // 4) Calcular lista de claves a vaciar
     const keys = eleccion === 'todos' ? ['operatividad','backlog','sla'] : [eleccion];
-
-    // 5) Ejecutar limpiezas en paralelo (rápido)
     const results = await Promise.all(keys.map(async k => ({ k, ...(await requestClear(k)) })));
 
-    // 6) Armar resumen
     const errores = results.filter(r => !r.ok);
     if(errores.length === 0){
       const modLabel = eleccion === 'todos' ? 'Todos' : (projectLabels[eleccion] ?? eleccion);
@@ -1177,7 +1166,6 @@ async function vaciarModuloActual(){
     showState('Error al vaciar: ' + (err?.message ?? err), true);
     setGlobalLog('Error en vaciado', '—', err?.message ?? String(err));
   }finally{
-    // 7) Rehabilitar botón y restaurar contenido
     const btn = document.getElementById('btnVaciarModulo');
     if(btn){
       btn.disabled = false;
@@ -1241,6 +1229,24 @@ temaChip?.addEventListener('click', () => {
   const root = document.documentElement;
   const isDark = root.classList.toggle('dark');
   temaChip.textContent = isDark ? 'Tema claro' : 'Tema oscuro';
+});
+
+/* <<< NUEVO: listeners dedicados para Backlog y SLA >>> */
+$('#btnImportar_backlog')?.addEventListener('click', async () => {
+  selectProject('backlog');
+  await importarExcel();
+});
+$('#btnExportar_backlog')?.addEventListener('click', async () => {
+  selectProject('backlog');
+  await exportarExcel();
+});
+$('#btnImportar_sla')?.addEventListener('click', async () => {
+  selectProject('sla');
+  await importarExcel();
+});
+$('#btnExportar_sla')?.addEventListener('click', async () => {
+  selectProject('sla');
+  await exportarExcel();
 });
 
 /* Health-check al cargar y cada 60s */
