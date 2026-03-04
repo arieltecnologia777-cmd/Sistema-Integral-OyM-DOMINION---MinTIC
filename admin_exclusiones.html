@@ -1220,8 +1220,22 @@ function createTeamsMeetingInOWA({title = DEFAULT_SUBJECT, body = DEFAULT_BODY, 
 $('#btnNotifyR1')?.addEventListener('click', () => openMailOutlook(TEAM1_TO, TEAM1_CC));
 $('#btnNotifyR2')?.addEventListener('click', () => openMailOutlook(TEAM2_TO, TEAM2_CC));
 $('#btnTeamsMeeting')?.addEventListener('click', () => createTeamsMeetingInOWA({ attendees: [...TEAM1_TO, ...TEAM1_CC] }));
-$('#btnImportar')?.addEventListener('click', importarExcel);
-$('#btnExportar')?.addEventListener('click', exportarExcel);
+/* FIX DEFINITIVO — listeners correctos */
+
+// Operatividad
+$('#btnImportar')?.addEventListener('click', async () => {
+  selectProject('operatividad');
+  sessionStorage.setItem('ex_mod','operatividad');
+  localStorage.setItem('ex_mod','operatividad');
+  await importarExcel();
+});
+
+$('#btnExportar')?.addEventListener('click', async () => {
+  selectProject('operatividad');
+  sessionStorage.setItem('ex_mod','operatividad');
+  localStorage.setItem('ex_mod','operatividad');
+  await exportarExcel();
+});
 document.getElementById('btnVaciarModulo')?.addEventListener('click', vaciarModuloActual);
 $('#btnHome')?.addEventListener('click', () => { window.location.href = 'main_page.html'; });
 const temaChip = $('#temaChip');
