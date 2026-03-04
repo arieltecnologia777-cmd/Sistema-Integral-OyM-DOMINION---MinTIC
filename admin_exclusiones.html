@@ -669,9 +669,13 @@ body{
 
       <!-- NUEVO: Vaciar módulo actual -->
       <div class="pair">
-        <!-- SOLO cambio aquí: icono Fluent MDL2 a la izquierda -->
         <button id="btnVaciarModulo" class="btn btn-exp" type="button" title="Vaciar datos del módulo actual">
-          <i class="ms-Icon ms-Icon--Delete" aria-hidden="true" style="font-size:18px;line-height:1;"></i>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 6h18" stroke-linecap="round"/>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M5 6v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6" />
+            <path d="M10 11v6M14 11v6" stroke-linecap="round"/>
+          </svg>
           <span class="lbl">Vaciar módulo</span>
         </button>
       </div>
@@ -736,7 +740,19 @@ const DEFAULT_DURATION_MIN = 45;
 const DEFAULT_LOCATION = 'Microsoft Teams';
 
 /* ====== Helpers ====== */
-const $ = s =>===== NUEVO HELPER (robusto) para parsear fechas desde strings / serial Excel ======
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1800); }
+function showState(msg, isErr=false){
+  const el=$('#estado'); el.textContent=msg; el.classList.toggle('error', !!isErr); el.style.display='block';
+  setGlobalLog(isErr ? 'Error' : 'Info', projectLabels[currentProject] ?? currentProject, msg);
+}
+function hideState(){ const el=$('#estado'); el.textContent=''; el.classList.remove('error'); el.style.display='none'; }
+function formatTs(d){
+  const pad = n => String(n).padStart(2,'0');
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+// ====== NUEVO HELPER (robusto) para parsear fechas desde strings / serial Excel ======
 function parsearFechaFlexible(v){
   if (v === null || v === undefined || v === '') return null;
   if (v instanceof Date && !isNaN(v)) return v;
@@ -898,34 +914,22 @@ selectProject('operatividad');
 /* ====== Modal confirm ====== */
 function abrirConfirm(){ $('#modalConfirm').style.display='flex'; }
 function cerrarConfirm(){ $('#modalConfirm').style.display='none'; }
-
-/* ====== NUEVO: confirmación personalizada reutilizable (sin alert/confirm nativo) ====== */
-function confirmCustom({ title = 'Confirmación', message = '', acceptText = 'Aceptar', cancelText = 'Cancelar' } = {}) {
-  return new Promise((resolve) => {
-    const backdrop = document.getElementById('modalConfirm');
-    const modalTitle = document.getElementById('mc_title');
-    const msgContainer = backdrop.querySelector('p');
-
-    if (modalTitle) modalTitle.textContent = title;
-    if (msgContainer) { msgContainer.innerHTML = message; }
-
-    const btnSi = document.getElementById('mc_si');
-    const btnNo = document.getElementById('mc_no');
-    if (btnSi) btnSi.textContent = acceptText || 'Aceptar';
-    if (btnNo) btnNo.textContent = cancelText || 'Cancelar';
-
-    const cleanup = () => {
-      btnSi?.removeEventListener('click', onYes);
-      btnNo?.removeEventListener('click', onNo);
-      backdrop.style.display = 'none';
+async function seleccionarArchivoYConfirmar(){
+  return new Promise((resolve)=>{
+    const finp = $('#fileInput');
+    finp.value = '';
+    const onChange = ()=>{
+      finp.removeEventListener('change', onChange);
+      if(!finp.files || !finp.files.length){ resolve(null); return; }
+      $('#projectName').textContent = (projectLabels[currentProject] ?? currentProject);
+      abrirConfirm();
+      const si = ()=>{ $('#mc_si').removeEventListener('click', si); $('#mc_no').removeEventListener('click', no); cerrarConfirm(); resolve(finp.files[0]); };
+      const no = ()=>{ $('#mc_si').removeEventListener('click', si); $('#mc_no').removeEventListener('click', no); cerrarConfirm(); resolve(null); };
+      $('#mc_si').addEventListener('click', si);
+      $('#mc_no').addEventListener('click', no);
     };
-    const onYes = () => { cleanup(); resolve(true); };
-    const onNo  = () => { cleanup(); resolve(false); };
-
-    btnSi?.addEventListener('click', onYes);
-    btnNo?.addEventListener('click', onNo);
-
-    backdrop.style.display = 'flex';
+    finp.addEventListener('change', onChange);
+    finp.click();
   });
 }
 
@@ -954,7 +958,6 @@ async function importarExcel(){
   hideState();
   const moduleLabel = projectLabels[currentProject] ?? currentProject;
   try{
-    // Reutiliza tu flujo original de selección + confirmación
     const file = await seleccionarArchivoYConfirmar();
     if(!file){ showState('Operación cancelada por el usuario.'); return; }
     const btn = $('#btnImportar');
@@ -1069,20 +1072,12 @@ async function exportarExcel(){
   }
 }
 
-/* ====== Vaciar módulo actual (p1/p2/p3) — USA MODAL PROPIO ====== */
+/* ====== Vaciar módulo actual (p1/p2/p3) ====== */
 async function vaciarModuloActual(){
   try{
     const moduloLabel = projectLabels[currentProject] ?? currentProject;
-
-    // Confirmación con modal propio (no confirm() nativo)
-    const aceptado = await confirmCustom({
-      title: 'Confirmación',
-      message: `¿Vaciar <b>TODOS</b> los registros del módulo <b>“${moduloLabel}”</b>?<br><small>Esta acción requiere token de Admin y <u>no se puede deshacer</u>.</small>`,
-      acceptText: 'Aceptar',
-      cancelText: 'Cancelar'
-    });
-    if(!aceptado) return;
-
+    const ok = confirm(`¿Vaciar TODOS los registros del módulo "${moduloLabel}"?\nEsta acción requiere token de Admin y no se puede deshacer.`);
+    if(!ok) return;
     const btn = document.getElementById('btnVaciarModulo');
     const lbl = btn?.querySelector('.lbl');
     if(btn){ btn.disabled = true; if(lbl) lbl.textContent = 'Vaciando…'; }
@@ -1158,26 +1153,6 @@ temaChip?.addEventListener('click', () => {
   const isDark = root.classList.toggle('dark');
   temaChip.textContent = isDark ? 'Tema claro' : 'Tema oscuro';
 });
-
-/* ====== Selección de archivo + confirmación existente (para importar) ====== */
-async function seleccionarArchivoYConfirmar(){
-  return new Promise((resolve)=>{
-    const finp = $('#fileInput');
-    finp.value = '';
-    const onChange = ()=>{
-      finp.removeEventListener('change', onChange);
-      if(!finp.files || !finp.files.length){ resolve(null); return; }
-      $('#projectName').textContent = (projectLabels[currentProject] ?? currentProject);
-      abrirConfirm();
-      const si = ()=>{ $('#mc_si').removeEventListener('click', si); $('#mc_no').removeEventListener('click', no); cerrarConfirm(); resolve(finp.files[0]); };
-      const no = ()=>{ $('#mc_si').removeEventListener('click', si); $('#mc_no').removeEventListener('click', no); cerrarConfirm(); resolve(null); };
-      $('#mc_si').addEventListener('click', si);
-      $('#mc_no').addEventListener('click', no);
-    };
-    finp.addEventListener('change', onChange);
-    finp.click();
-  });
-}
 
 /* Health-check al cargar y cada 60s */
 updateAllHealth();
