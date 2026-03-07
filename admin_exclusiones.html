@@ -1718,6 +1718,10 @@ if (/(vaciar|vacia|limpiar|borrar).*(operatividad|backlog|sla)/.test(s)) {
   if (mod) return { action: 'vaciar_mod', target: mod };
 }
 
+// --- NUEVO: reset (limpiar chat y tareas) ---
+if (/(^|\b)(reset|reinicia(r)?|limpiar\s+(chat|tareas)|borrar\s+(chat|tareas)|vaciar\s+(chat|tareas))(\b|$)/.test(s)) {
+  return { action: 'reset_ui' };
+}
   return null;
 }
 
@@ -1739,6 +1743,32 @@ async function runNLCommand(cmd){
       document.getElementById('btnShowCSV')?.click();
       return 'Abrí el panel para CSV.';
     }
+case 'reset_ui': {
+  try{
+    // Restablecer FAQ inicial en el chat
+    const msgsBox = document.getElementById('chatMsgs');
+    if (msgsBox) {
+      msgsBox.innerHTML = `
+        <div class="faq-block">
+          <div class="faq-a"><strong>Abrir ayuda:</strong> abre tu sección de ayuda.</div>
+          <div class="faq-a"><strong>Crear:</strong> carga tus datos.</div>
+          <div class="faq-a"><strong>Exportar:</strong> descarga tus datos.</div>
+          <div class="faq-a"><strong>Vaciar:</strong> deja tus módulos limpios.</div>
+        </div>
+      `;
+    }
+
+    // Limpiar Dock de tareas
+    const dockBox = document.getElementById('taskDock');
+    if (dockBox) dockBox.innerHTML = '';
+
+    try { say('Reiniciado.'); } catch(e) {}
+
+    return 'Entendido. Limpié el chat y las tareas.';
+  }catch(e){
+    return 'No pude reiniciar completamente.';
+  }
+}
     case 'open_export': {
       document.getElementById('btnShowExport')?.click();
       if (cmd.target){
@@ -1826,7 +1856,15 @@ case 'vaciar_mod': {
       id: 'modulos',
       q: ['que modulos hay','cuales son los modulos','operatividad backlog sla'],
       a: 'Los módulos activos son Operatividad (/p1), Backlog (/p2) y SLA (/p3). Puedes cambiar el destino desde “Subir a módulo(s)”.'
-    }
+    },
+// --- NUEVO: reset (KB) ---
+{
+  id: 'reset',
+  q: ['reset','reiniciar','limpiar chat','limpiar tareas','borrar chat','borrar tareas'],
+  a: 'Puedo resetear la interfaz: borro el chat y el Dock de tareas.',
+  cmd: () => {}
+}
+
   ];
 
   const STOP = new Set('de la los las del y o u para con por en el al un una que como cual cuales qué mas más a se si no es son soy esta este están está estan'.split(' '));
