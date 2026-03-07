@@ -1300,6 +1300,81 @@ async function exportViaAPI(mod){
 }
 // === FIN EXPORT HELPERS ===
 
+// === DIALOGO AVANZADO: elegir módulos a vaciar (con "Seleccionar todos") ===
+async function confirmClearDialog(){
+  return new Promise(resolve=>{
+    const modal = document.getElementById('modalConfirm');
+    const title = document.getElementById('mc_title');
+    const msg   = document.getElementById('mc_msg');
+    const yes   = document.getElementById('mc_si');
+    const no    = document.getElementById('mc_no');
+
+    // 1) Título del modal
+    title.textContent = 'Vaciar datos';
+
+    // 2) Cuerpo del modal con opciones (reemplazamos el mensaje por HTML)
+    msg.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:13px; color:#4e5d78;">
+          Selecciona los módulos a vaciar. Esta operación es <strong>irreversible</strong>.
+        </div>
+
+        <label style="display:flex; align-items:center; gap:8px; font-size:13.5px;">
+          <input id="clr_all" type="checkbox"> <strong>Seleccionar todos</strong>
+        </label>
+
+        <div id="clr_group" style="display:flex; gap:10px; flex-wrap:wrap;">
+          <label class="pill"><input class="clr_item" type="checkbox" value="operatividad" checked> Operatividad</label>
+          <label class="pill"><input class="clr_item" type="checkbox" value="backlog"> Backlog</label>
+          <label class="pill"><input class="clr_item" type="checkbox" value="sla"> SLA</label>
+        </div>
+      </div>
+    `;
+
+    // 3) Lógica "Seleccionar todos"
+    const all   = msg.querySelector('#clr_all');
+    const items = Array.from(msg.querySelectorAll('.clr_item'));
+
+    function syncAllCheckbox(){
+      const checked = items.filter(i => i.checked).length;
+      all.checked = (checked === items.length);
+      all.indeterminate = (checked > 0 && checked < items.length);
+    }
+    function setAll(v){
+      items.forEach(i => { i.checked = v; });
+      all.checked = v;
+      all.indeterminate = false;
+    }
+
+    all.addEventListener('change', () => setAll(all.checked));
+    items.forEach(i => i.addEventListener('change', syncAllCheckbox));
+    syncAllCheckbox();
+
+    // 4) Acciones
+    function cleanup(){
+      yes.removeEventListener('click', onYes);
+      no.removeEventListener('click', onNo);
+      modal.style.display = 'none';
+    }
+    function onYes(){
+      const selected = items.filter(i => i.checked).map(i => i.value);
+      cleanup();
+      resolve(selected);  // ← devolvemos array de módulos seleccionados (0..3)
+    }
+    function onNo(){
+      cleanup();
+      resolve(null);      // ← usuario canceló
+    }
+
+    yes.textContent = 'Vaciar';
+    no.textContent  = 'Cancelar';
+    yes.addEventListener('click', onYes);
+    no .addEventListener('click', onNo);
+
+    modal.style.display = 'flex';
+    setTimeout(()=> yes.focus(), 0); // accesibilidad
+  });
+}
   /* ===== Estados CSV ===== */
   let file = null;
   let outText = null;
@@ -1514,20 +1589,29 @@ async function exportViaAPI(mod){
   $('#btnShowExport').addEventListener('click', renderExportPanel);
 
   // Acción rápida “verde”: vaciar TODOS directamente
-  $('#btnQuickClear').addEventListener('click', async ()=>{
-    const ok = await confirmUploadDialog('Operatividad, Backlog y SLA');
-    if(!ok){ say('Operación cancelada.'); log('Vaciado cancelado por el usuario'); return; }
-    try{
-      say('Vaciando módulos…'); log('Vaciando Operatividad, Backlog y SLA…');
-      for(const k of ['operatividad','backlog','sla']){
-      await clearModule(k);   // usa headers en lugar de []
-    }
-      say('Módulos vaciados: Operatividad, Backlog y SLA. ✅'); log('Vaciado completado.');
-    }catch(err){
-      console.error(err);
-      say('Error al vaciar: ' + err.message); log('Error al vaciar: ' + err.message);
-    }
-  });
+// Botón verde: ahora abre el popup de selección (no borra directo)
+$('#btnQuickClear').addEventListener('click', async ()=>{
+  const sel = await confirmClearDialog();      // ← array de módulos o null
+  if(!sel || sel.length === 0){
+    say('Operación cancelada.');
+    log('Vaciado cancelado por el usuario');
+    return;
+  }
+  try{
+    const human = sel.length === 3
+      ? 'Operatividad, Backlog y SLA'
+      : sel.map(s => s.toUpperCase()).join(', ');
+    say(`Vaciando ${human}…`); log(`Vaciando: ${human}…`);
+    for(const k of sel){ await clearModule(k); }  // respeta headers
+    say(`Vaciado completado en ${human}. ✅`);
+    log(`Vaciado OK: ${human}`);
+  }catch(err){
+    console.error(err);
+    say('Error al vaciar: ' + err.message);
+    log('Error al vaciar: ' + err.message);
+  }
+});
+
 
   /* ===============================
      Post-proceso CSV (descargar / subir)
@@ -1714,7 +1798,7 @@ case 'vaciar_mod': {
     {
       id: 'vaciar',
       q: ['como vaciar','vaciar modulos','borrar datos','limpiar datos'],
-      a: '“Vaciar módulos 🗑️ (API)” vacía los arrays de Operatividad, Backlog y SLA.',
+      a: '“Vaciar módulos (API)” sobrescribe los arrays de Operatividad, Backlog y SLA con []. Se llama al endpoint /api/sobrescribir de cada proyecto.',
       cmd: ()=> { const b=document.getElementById('btnQuickClear'); if(b) b.click(); }
     },
     {
