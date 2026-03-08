@@ -1164,7 +1164,7 @@ height: auto;          /* permite crecer por contenido */
     const res = await fetch(`${API}/api/sobrescribir`,{
       method:'POST',
       headers:{
-        'Authorization':`Bearer ${ADMIN_TOKEN}`,
+        'Authorization':'Bearer '+ADMIN_TOKEN,
         'Content-Type':'application/json'
       },
       body:JSON.stringify({aoa})
@@ -1402,7 +1402,7 @@ async function confirmClearDialog(){
       <!-- Acciones posteriores -->
       <div id="asistActions2" class="btn-row" style="justify-content:space-between; display:none; margin-top:12px;">
         <fieldset class="pill-group" id="asistModSel" role="radiogroup" aria-label="Selecciona módulo">
-          <label class="pill"><input type="radio" name="ai_mod" value="operatividad" checked> Operatividad</label>
+          <label class="pill"><input type="radio" name="ai_mod" value="operatividad"> Operatividad</label>
           <label class="pill"><input type="radio" name="ai_mod" value="backlog"> Backlog</label>
           <label class="pill"><input type="radio" name="ai_mod" value="sla"> SLA</label>
           <label class="pill"><input type="radio" name="ai_mod" value="todos"> Todos</label>
@@ -1539,7 +1539,7 @@ async function confirmClearDialog(){
     panel.innerHTML = `
       <h4>Exportar últimos datos</h4>
       <div class="pill-group">
-        <label class="pill"><input type="radio" name="exp_mod" value="operatividad" checked> Operatividad</label>
+        <label class="pill"><input type="radio" name="exp_mod" value="operatividad"> Operatividad</label>
         <label class="pill"><input type="radio" name="exp_mod" value="backlog"> Backlog</label>
         <label class="pill"><input type="radio" name="exp_mod" value="sla"> SLA</label>
       </div>
