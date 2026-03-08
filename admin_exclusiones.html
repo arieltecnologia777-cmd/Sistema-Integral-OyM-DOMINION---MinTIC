@@ -1256,33 +1256,63 @@ async function exportViaAPI(mod){
   try{
     const api = BACKENDS[mod];
     if(!api) throw new Error('Módulo desconocido');
-    const res = await fetch(`${api}${EXPORT_ENDPOINT}`, { method:'GET' });
+
+    // Orden de prueba: el actual + alternativos
+    const endpoints = [
+      EXPORT_ENDPOINT || '/api/exportar', // por compatibilidad con tu constante
+      '/api/ultimos',
+      '/export'
+    ];
+
+    // Probar en cascada hasta obtener 2xx
+    let res = null, used = null;
+    for(const ep of endpoints){
+      try{
+        const r = await fetch(`${api}${ep}`, { method:'GET' });
+        if(r.ok){
+          res = r; used = ep; break;
+        }
+        // Si es 404, intentamos el siguiente
+        if(r.status === 404) continue;
+        // Si es otro error (401, 500…), nos quedamos con ese
+        res = r; used = ep; break;
+      }catch(_e){
+        // Ignorar fallo de red en este ep y seguir probando
+        continue;
+      }
+    }
+
+    if(!res){
+      throw new Error('No hubo respuesta del backend.');
+    }
+    if(!res.ok){
+      throw new Error(`HTTP ${res.status} (${used})`);
+    }
+
     // Soportar JSON o CSV plano
-    const ct = res.headers.get('content-type') || '';
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
     let csvText = null;
 
     if(ct.includes('application/json')){
       const j = await res.json();
-      // Casos aceptados: {aoa:[[]...]} o {csv:'...'} o {data:[...]} (array de objetos)
+      // Aceptar: {aoa:[[]...]}, {csv:'...'} o {data:[{...}]}
       if(Array.isArray(j.aoa)){
         csvText = toCSV(j.aoa, ';');
       }else if(typeof j.csv === 'string'){
         csvText = j.csv;
       }else if(Array.isArray(j.data)){
-        // Volcado simple de objetos a CSV (keys de la primera fila)
         const keys = Object.keys(j.data[0] || {});
         const rows = [keys, ...j.data.map(o => keys.map(k => o?.[k] ?? ''))];
         csvText = toCSV(rows, ';');
       }else{
-        throw new Error('Respuesta de exportación no reconocida');
+        throw new Error(`Respuesta de exportación no reconocida (${used})`);
       }
     }else{
-      // CSV plano
+      // CSV plano o texto
       csvText = await res.text();
     }
 
-    // Descargar
+    // Descargar archivo
     const blob = new Blob([csvText], {type:'text/csv;charset=utf-8;'});
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
@@ -1291,12 +1321,15 @@ async function exportViaAPI(mod){
     const fname= `export_${mod}_${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.csv`;
     a.href = url; a.download = fname; a.click();
     URL.revokeObjectURL(url);
-    say(`Exportado ${mod.toUpperCase()} correctamente.`); log(`Exportación OK: ${fname}`);
+
+    say(`Exportado ${mod.toUpperCase()} correctamente (via ${used}).`);
+    log(`Exportación OK (${used}): ${fname}`);
   }catch(err){
     console.error(err);
     say('No se pudo exportar: ' + err.message);
     log('Export error: ' + err.message);
   }
+
 }
 // === FIN EXPORT HELPERS ===
 
