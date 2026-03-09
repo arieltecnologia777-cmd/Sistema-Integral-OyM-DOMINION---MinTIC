@@ -1080,7 +1080,7 @@
         </div>
         <div>
           <div class="asist-title">¡Hola, soy tu asistente!</div>
-          <div class="asist-sub">Automatizo tareas, subo data a tus módulos y más 😊✌️.</div>
+          <div class="asist-sub">Automatizo tareas, subo data a tus módulos y más 😊.</div>
         </div>
       </div>
       <div class="ask"><span class="q">¿Qué deseas hacer hoy?</span></div>
@@ -1103,10 +1103,10 @@
       <div class="chat-head">Escríbeme y ejecuto al instante cualquier orden 🫡</div>
       <div id="chatMsgs" class="chat-msgs" aria-live="polite">
         <div class="faq-block">
-          <div class="faq-a"><strong>Abrir ayuda:</strong> abre tu sección de ayuda.</div>
-          <div class="faq-a"><strong>Crear:</strong> carga tus datos.</div>
-          <div class="faq-a"><strong>Exportar:</strong> descarga tus datos.</div>
-          <div class="faq-a"><strong>Vaciar:</strong> deja tus módulos limpios.</div>
+          <div class="faq-a"><strong>Operatividad:</strong> Procesa datos de Operatividad ✅ y organiza KPIs 📊.</div>
+          <div class="faq-a"><strong>Backlog:</strong> Procesa datos IND backlog 📑 y organiza KPIs 📊.</div>
+          <div class="faq-a"><strong>Exportar:</strong> Descarga tus datos ⬇️.</div>
+          <div class="faq-a"><strong>Vaciar:</strong> deja tus módulos limpios 🗑️.</div>
         </div>
       </div>
       <div class="chat-input">
@@ -1126,8 +1126,8 @@
   <!-- ===== NUEVA TARJETA: KPI (esqueleto) ===== -->
     <section id="kpi-card" class="kpi-wrap" aria-label="KPIs" style="display:none;">
       <div class="kpi-head">
-        <span>KPIs (beta)</span>
-        <span class="pill" style="margin-left:auto;">Vista preliminar</span>
+        <span>Control KPIs</span>
+      
       </div>
 
       <div class="kpi-summary">
@@ -1146,7 +1146,7 @@
         <canvas id="kpiChart" height="200" aria-label="Gráfica KPI"></canvas>
       </div>
 
-      <div class="kpi-note">Esqueleto inicial (1 gráfica). Luego conectamos reglas reales (SLA, Backlog, etc.).</div>
+      
     </section>
     <!-- ===== FIN TARJETA KPI ===== -->
 </div>
@@ -1406,6 +1406,68 @@
        KPI HELPERS (nuevo)
        =============================== */
     let kpiChartInstance = null;
+// --- Plugin para dibujar los valores en las barras (dentro o fuera) ---
+const valueLabelsPlugin = {
+  id: 'valueLabels',
+  afterDatasetsDraw(chart, _args, opts) {
+    const { ctx, chartArea, scales } = chart;
+    const yAxis = scales[opts?.yScaleID || 'y'];
+    const isDark =
+      document.documentElement.classList.contains('dark') ||
+      document.body.classList.contains('dark');
+
+    const insideThreshold = Number(opts?.insideThreshold ?? 22); // px mínimos de alto para pintar "dentro"
+    const font = opts?.font || '600 11px "Segoe UI", system-ui, Roboto, Arial, sans-serif';
+
+    ctx.save();
+    ctx.font = font;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (!meta?.data) return;
+
+      meta.data.forEach((barEl, i) => {
+        const v = ds.data?.[i];
+        if (v == null) return;
+
+        // Coordenadas del centro del rectángulo de la barra
+        const { x, y } = barEl.getProps(['x', 'y'], true);
+
+        // Altura de la barra respecto a la línea base (valor 0)
+        const baseY = yAxis.getPixelForValue(0);
+        const barH = Math.abs(baseY - y);
+
+        // ¿Dibujar dentro o fuera? (para positivos, y < baseY)
+        const drawInside = barH >= (insideThreshold + 8);
+        const padIn = 10;   // relleno al interior
+        const padOut = 6;   // separación por encima si va afuera
+        let tx = x, ty, color;
+
+        if (drawInside) {
+          // Para barras positivas (nuestro caso), el "tope" está en y
+          ty = y + padIn;              // un poco por debajo del tope
+          color = '#ffffff';           // texto blanco dentro
+        } else {
+          ty = y - padOut;             // justo por encima del tope
+          // Evitar cortar en la parte superior
+          if (ty < chartArea.top + 8) ty = y + padOut;
+          color = isDark ? '#eaf2ff' : '#0e2040'; // texto oscuro afuera
+        }
+
+        const label = opts?.formatter ? opts.formatter(v, { i, di, label: chart.data.labels?.[i] }) : String(v);
+        ctx.fillStyle = opts?.color || color;
+        ctx.fillText(label, tx, ty);
+      });
+    });
+
+    ctx.restore();
+  }
+};
+
+// Flag para registrar una única vez
+let __labelsPluginRegistered = false;
 
     function ensureKpiCard(show=true){
       const card = $('#kpi-card');
@@ -1466,39 +1528,62 @@
       });
     }
     async function buildKPI(aoa, dimIdx){
-      await ensureChartJs();
-      const ctx = $('#kpiChart');
-      if(!ctx) return;
-      const { labels, values } = aggCounts(aoa, dimIdx);
-      const colors = randomPalette(labels.length);
-      if(kpiChartInstance) { try { kpiChartInstance.destroy(); } catch(e){} }
-      kpiChartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Conteo',
-            data: values,
-            backgroundColor: colors,
-            borderColor: colors.map(c=>c),
-            borderWidth: 1
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { ticks: { color: '#0e2040' } },
-            y: { beginAtZero: true, ticks: { stepSize: 1 } }
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: (ctx)=> ` ${ctx.parsed.y} registros` } },
-            title: { display: true, text: 'Distribución por categoría', font: { weight: 'bold' } }
-          }
+  await ensureChartJs();
+
+  // Registrar el plugin personalizado 1 sola vez
+  if (!__labelsPluginRegistered) {
+    try { Chart.register(valueLabelsPlugin); } catch(_e){}
+    __labelsPluginRegistered = true;
+  }
+
+  const ctx = $('#kpiChart');
+  if(!ctx) return;
+
+  const { labels, values } = aggCounts(aoa, dimIdx);
+  const colors = randomPalette(labels.length);
+  if(kpiChartInstance) { try { kpiChartInstance.destroy(); } catch(e){} }
+
+  const isDark =
+    document.documentElement.classList.contains('dark') ||
+    document.body.classList.contains('dark');
+  const axisLabelColor = isDark ? '#eaf2ff' : '#0e2040';
+
+  kpiChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Conteo',
+        data: values,
+        backgroundColor: colors,
+        borderColor: colors.map(c => c),
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      // Un poco de espacio arriba para etiquetas "afuera"
+      layout: { padding: { top: 18, right: 8, left: 8, bottom: 8 } },
+      scales: {
+        x: { ticks: { color: axisLabelColor } },
+        y: { beginAtZero: true, ticks: { stepSize: 1, color: axisLabelColor } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: (ctx)=> ` ${ctx.parsed.y} registros` } },
+        title: { display: true, text: 'Distribución por categoría', font: { weight: 'bold' }, color: axisLabelColor },
+        // ← opciones del plugin de etiquetas
+        valueLabels: {
+          insideThreshold: 24,                 // px: si la barra supera esto, el número va "dentro"
+          formatter: (v) => String(v)          // si luego quieres formatear (miles), lo hacemos aquí
         }
-      });
+      },
+      animation: { duration: 280 }
     }
+  });
+}
     async function showKPIFromAOA(aoa){
       if(!Array.isArray(aoa) || aoa.length<=1){ ensureKpiCard(false); return; }
       ensureKpiCard(true);
@@ -2006,6 +2091,10 @@ if(e.target && e.target.id === 'asistUpload'){
     }
     function parseNLCommand(q){
       const s = normNL(q);
+      // --- Saludos directos ---
+if (/^(hola|holaa+|buenas( tardes| noches)?|hello|hi)\b/.test(s)) {
+  return { action: 'saludo' };
+}
       if (/(abre|abrir|mostrar|ir a|ve a|llevar).*(csv|importar|archivo|tarea)/.test(s)) { return { action:'open_csv' }; }
       if (/(abre|abrir|mostrar|ir a).*(exportar|export)/.test(s)) { return { action:'open_export' }; }
       if (/(exporta|exportar|descarga|descargar)/.test(s)) { return { action:'export', target: detectModulo(s) }; }
@@ -2125,6 +2214,10 @@ case 'open_operatividad': {
           try{ await clearModule(cmd.target); return `Módulo ${cmd.target.toUpperCase()} vaciado. ✅`; }
           catch(e){ return `Error al vaciar ${cmd.target.toUpperCase()}: ${e.message}`; }
         }
+// 👇 NUEVO: respuesta a saludos
+case 'saludo': {
+  return '¡Hola 👋! ¿Que tal va tu día?, un gusto tenerte por acá 😄, ¿Empezamos?, ya estoy listo 🛠️';
+}
       }
       return null;
     }
