@@ -687,6 +687,16 @@ function confirmModal(message='¿Confirmas esta acción?'){
   });
 }
 
+// ======================================================
+// APLICAR REGIONAL ELEGIDA POR EL GESTOR (persistencia)
+// ======================================================
+function aplicarRegionalGuardada() {
+    const reg = sessionStorage.getItem("gestor_regional");
+    if (!reg) return;   // si no hay selección previa, no hacemos nada
+
+    regionalActual = reg;     // fijar la regional elegida por el gestor
+}
+
 /* ======= Backend: carga de datos ======= */
 async function cargarDesdeServidor(){
   const btn=$('#btnCargar');
@@ -727,13 +737,18 @@ async function cargarDesdeServidor(){
       regionalActual = 'Todas';
     }
 
-    filtrados=[...datos];
-    paginaActual=1;
-    construirGruposPorOT();
-    buildRegionalMenu();    // poblar menú
-    updateRegionalLabel();  // actualizar etiqueta del botón
+    filtrados = [...datos];
+paginaActual = 1;
+construirGruposPorOT();
+buildRegionalMenu();
+updateRegionalLabel();
 
-    render();
+// =======================================
+// APLICAR REGIONAL GUARDADA POR EL GESTOR
+// =======================================
+aplicarRegionalGuardada();
+aplicarBusquedaYFiltro();  // vuelve a renderizar con el filtro aplicado
+
     setLastUpdate(new Date());
     // Reseteo tracking de edición (la regla verde depende de pendientes=0)
     otsEnEdicion.clear();
@@ -1236,26 +1251,68 @@ function updateRegionalLabel(){
   if(lblRegional){ lblRegional.textContent = `Regional: ${regionalActual}`; }
 }
 function buildRegionalMenu(){
-  if(!menuRegional) return;
-  menuRegional.innerHTML = '';
-  // Opción Todas
-  const bAll = document.createElement('button');
-  bAll.type='button';
-  bAll.setAttribute('role','option');
-  bAll.textContent = 'Todas';
-  bAll.onclick = ()=>{ regionalActual='Todas'; closeRegionalMenu(); updateRegionalLabel(); aplicarBusquedaYFiltro(); };
-  menuRegional.appendChild(bAll);
+    if(!menuRegional) return;
 
-  if(regionalesDisponibles.length){
-    const sep = document.createElement('div'); sep.className='sep'; menuRegional.appendChild(sep);
-  }
-  for(const r of regionalesDisponibles){
+    // Obtener la regional asignada al gestor (por IA)
+    const stored = sessionStorage.getItem("gestor_regional");
+
+    menuRegional.innerHTML = '';
+
+    // Si NO hay regional guardada, menú normal
+    if (!stored) {
+
+        // Opción Todas
+        const bAll = document.createElement('button');
+        bAll.type='button';
+        bAll.setAttribute('role','option');
+        bAll.textContent = 'Todas';
+        bAll.onclick = () => { 
+            regionalActual='Todas'; 
+            closeRegionalMenu(); 
+            updateRegionalLabel(); 
+            aplicarBusquedaYFiltro(); 
+        };
+        menuRegional.appendChild(bAll);
+
+        if(regionalesDisponibles.length){
+            const sep = document.createElement('div'); 
+            sep.className='sep'; 
+            menuRegional.appendChild(sep);
+        }
+
+        for(const r of regionalesDisponibles){
+            const b = document.createElement('button');
+            b.type='button'; 
+            b.setAttribute('role','option');
+            b.textContent = r;
+            b.onclick = () => { 
+                regionalActual=r; 
+                closeRegionalMenu(); 
+                updateRegionalLabel(); 
+                aplicarBusquedaYFiltro(); 
+            };
+            menuRegional.appendChild(b);
+        }
+
+        return;
+    }
+
+    // ---------------------------------------------------
+    // SI EL GESTOR TIENE UNA REGIONAL (R1 o R2)
+    // SOLO MOSTRAR ESA OPCIÓN EN EL MENÚ
+    // ---------------------------------------------------
     const b = document.createElement('button');
-    b.type='button'; b.setAttribute('role','option');
-    b.textContent = r;
-    b.onclick = ()=>{ regionalActual=r; closeRegionalMenu(); updateRegionalLabel(); aplicarBusquedaYFiltro(); };
+    b.type='button';
+    b.setAttribute('role','option');
+    b.textContent = stored;
+    b.onclick = () => { 
+        regionalActual = stored; 
+        closeRegionalMenu(); 
+        updateRegionalLabel(); 
+        aplicarBusquedaYFiltro(); 
+    };
+
     menuRegional.appendChild(b);
-  }
 }
 function openRegionalMenu(){
   if(!menuRegional) return;
@@ -1341,9 +1398,22 @@ cargarDesdeServidor();
 // ======================================================
 setTimeout(() => {
 
-    // si ya viene con ?regional=R1/R2 no preguntar
+    // Si ya viene con ?regional=R1/R2 no preguntar
+    let stored = sessionStorage.getItem("gestor_regional");
     const regParam = new URLSearchParams(location.search).get("regional");
-    if (regParam) return;
+
+    // Si viene por URL -> guardar y no preguntar
+    if (regParam) {
+        sessionStorage.setItem("gestor_regional", regParam.toUpperCase());
+        return;
+    }
+
+    // Si ya está guardada -> no preguntar
+    if (stored) {
+        regionalActual = stored;
+        aplicarBusquedaYFiltro();
+        return;
+    }
 
     const choice = prompt(
         "Hola 👋 Soy tu asistente IA.\n\n¿Qué REGIONAL deseas ver?\n\n - Escribe R1\n - Escribe R2\n"
@@ -1354,9 +1424,14 @@ setTimeout(() => {
     const reg = choice.trim().toUpperCase();
 
     if (reg === "R1" || reg === "R2") {
+
+        // Guardar elección del gestor
+        sessionStorage.setItem("gestor_regional", reg);
+
         regionalActual = reg;
         aplicarBusquedaYFiltro();
         alert("Perfecto 👌 Mostrando datos de " + reg);
+
     } else {
         alert("No entendí la opción. Puedes elegir la regional manualmente.");
     }
