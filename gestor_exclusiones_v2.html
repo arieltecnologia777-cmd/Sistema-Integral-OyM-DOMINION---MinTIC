@@ -1335,6 +1335,33 @@ if(paletteFab){
 /* ======= Arranque ======= */
 loadPalette();
 cargarDesdeServidor();
+
+// ======================================================
+// IA: Preguntar al gestor qué regional desea ver (R1/R2)
+// ======================================================
+setTimeout(() => {
+
+    // si ya viene con ?regional=R1/R2 no preguntar
+    const regParam = new URLSearchParams(location.search).get("regional");
+    if (regParam) return;
+
+    const choice = prompt(
+        "Hola 👋 Soy tu asistente IA.\n\n¿Qué REGIONAL deseas ver?\n\n - Escribe R1\n - Escribe R2\n"
+    );
+
+    if (!choice) return;
+
+    const reg = choice.trim().toUpperCase();
+
+    if (reg === "R1" || reg === "R2") {
+        regionalActual = reg;
+        aplicarBusquedaYFiltro();
+        alert("Perfecto 👌 Mostrando datos de " + reg);
+    } else {
+        alert("No entendí la opción. Puedes elegir la regional manualmente.");
+    }
+
+}, 1200);
 /* ======================
    SIDEBAR NAV + HAMBURGER
 ====================== */
