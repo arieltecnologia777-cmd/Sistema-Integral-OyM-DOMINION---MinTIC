@@ -857,16 +857,72 @@ function construirGruposPorOT(){
 
 /* ======= Actualización ligera (estados por OT) ======= */
 function updateEstadosOT(ot){
-  const { pendientes } = contarCompletados(ot);
+    // Regional activa del gestor
+    const regActiva = sessionStorage.getItem("gestor_regional") || "Todas";
 
-  // Modal: enviar habilitado/inhabilitado (independiente de "OT gestionada")
-  if (document.getElementById('modalRegistros').classList.contains('show') && otModalActual === ot && !modalSoloVista){
-    const modalEnviarBtn = document.getElementById('modalEnviar');
-    if(modalEnviarBtn){
-      modalEnviarBtn.textContent = 'Enviar registros';
-      modalEnviarBtn.disabled = pendientes !== 0;
+    // Obtener métricas por regional (la función ya filtra por regional)
+    const { pendientes, total } = contarCompletados(ot);
+
+    // Obtener elementos del DOM
+    const btnPrim = document.getElementById(`btn_primary_${cssId(ot)}`);
+    const tr = btnPrim ? btnPrim.closest('tr') : null;
+    const pendEl = tr ? tr.querySelector('.count-pend') : null;
+    const btnDel = document.getElementById(`btn_eliminar_${cssId(ot)}`);
+
+    // Actualizar contador local
+    if (pendEl) pendEl.textContent = String(pendientes);
+
+    // ADMIN mantiene comportamiento global
+    if (regActiva === "Todas") {
+        if (pendientes === 0) {
+            btnPrim.innerHTML = `${svgCheck()}OT gestionada`;
+            btnPrim.classList.add('success');
+            btnPrim.disabled = true;
+            btnPrim.setAttribute('data-mode','done');
+            if(btnDel) btnDel.disabled = false;
+        } else {
+            btnPrim.classList.remove('success');
+            btnPrim.disabled = false;
+            if (otsEnEdicion.has(ot)) {
+                btnPrim.innerHTML = `${svgPencil()}Continuar editando`;
+                btnPrim.setAttribute('data-mode','continuar');
+            } else {
+                btnPrim.innerHTML = `${svgGear()}Gestionar registros`;
+                btnPrim.setAttribute('data-mode','gestionar');
+            }
+            if(btnDel) btnDel.disabled = true;
+        }
+        updateHeaderStats();
+        return;
     }
-  }
+
+    // ==== GESTOR REGIONAL (R1 o R2) ====
+
+    // Eliminar o desactivar comportamiento global de eliminar
+    if (btnDel) btnDel.disabled = true;
+
+    // Si completó TODOS sus registros regionales
+    if (pendientes === 0) {
+        btnPrim.innerHTML = `${svgCheck()}${regActiva} gestionada`;
+        btnPrim.classList.add('success');
+        btnPrim.disabled = true;
+        btnPrim.setAttribute('data-mode','done');
+        otsEnEdicion.delete(ot);
+    } else {
+        btnPrim.classList.remove('success');
+        btnPrim.disabled = false;
+
+        if (otsEnEdicion.has(ot)) {
+            btnPrim.innerHTML = `${svgPencil()}Continuar ${regActiva}`;
+            btnPrim.setAttribute('data-mode','continuar');
+        } else {
+            btnPrim.innerHTML = `${svgGear()}Gestionar ${regActiva}`;
+            btnPrim.setAttribute('data-mode','gestionar');
+        }
+    }
+
+    updateHeaderStats();
+}
 
   // Tabla: contador y estado principal
   const btnPrim = document.getElementById(`btn_primary_${cssId(ot)}`);
