@@ -1101,15 +1101,7 @@
     <!-- Chat -->
     <section id="ai-chat" class="chat-wrap" aria-label="Chat del módulo Exclusiones">
       <div class="chat-head">Escríbeme y ejecuto al instante cualquier orden 🫡</div>
-      <div id="chatMsgs" class="chat-msgs" aria-live="polite">
-        <div class="faq-block">
-          <div class="faq-a"><strong>Operatividad:</strong> Procesa datos de Operatividad ✅ y organiza KPIs 📊.</div>
-          <div class="faq-a"><strong>Backlog:</strong> Procesa datos IND backlog 📑 y organiza KPIs 📊.</div>
-          <div class="faq-a"><strong>Exportar:</strong> Descarga tus datos ⬇️.</div>
-          <div class="faq-a"><strong>Vaciar:</strong> deja tus módulos limpios 🗑️.</div>
-        </div>
-      </div>
-      <div class="chat-input">
+      <div id="chatMsgs" class="chat-msgs" aria-live="polite"></div>      <div class="chat-input">
         <input id="chatQ" type="text" placeholder="'Escribe tu pregunta sobre Ex..." />
         <button id="chatSend" type="button" class="cta cta--primary">Preguntar</button>
       </div>
@@ -2063,7 +2055,7 @@ if(e.target && e.target.id === 'asistUpload'){
     }
   })();
 }
-``
+
     });
 
   })();
@@ -2077,7 +2069,17 @@ if(e.target && e.target.id === 'asistUpload'){
     const inp  = document.getElementById('chatQ');
     const btn  = document.getElementById('chatSend');
     const sgBox= box.querySelector('.chat-suggest');
-
+// ===== HTML inicial de FAQ (única fuente de verdad) =====
+const INITIAL_FAQ_HTML = `
+  <div class="faq-block">
+    <div class="faq-a"><strong>Operatividad:</strong> Procesa datos de Operatividad ✅ y organiza KPIs 📊.</div>
+    <div class="faq-a"><strong>Backlog:</strong> Procesa datos IND backlog 📑 y organiza KPIs 📊.</div>
+    <div class="faq-a"><strong>Exportar:</strong> Descarga tus datos ⬇️.</div>
+    <div class="faq-a"><strong>Vaciar:</strong> Deja tus módulos limpios 🗑️.</div>
+  </div>
+`;
+msgs.innerHTML = INITIAL_FAQ_HTML; // << mantener esta línea
+// Pintar el FAQ al cargar
     // === INTÉRPRETE NL (comandos) ===
     const normNL = s => (s||'').toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -2129,99 +2131,102 @@ if (/\boperatividad\b/.test(s)) {
       });
     }
     async function runNLCommand(cmd){
-      switch(cmd.action){
-        case 'open_csv': {
-          document.getElementById('btnShowCSV')?.click();
-          return 'Abrí el panel para CSV.';
-        }
-case 'open_operatividad': {
-  if (window.openOperatividadFlow) {
-    window.openOperatividadFlow();
-  } else {
-    // Fallback por si algo impidió montar el flujo específico:
-    const b = document.getElementById('btnShowCSV');
-    if (b) b.click();
-  }
-  return 'Abrí el DOC de tareas para adjuntar tu CSV de Operatividad; luego de procesar podrás subir al módulo Operatividad 🔋y adiciona verás indicadores en el tablero KPI 📊';
-}
-       case 'reset_ui': {
-  try{
-    // 1) Resetear chat a FAQ
-    const msgsBox = document.getElementById('chatMsgs');
-    if (msgsBox) {
-      msgsBox.innerHTML = `
-        <div class="faq-block">
-          <div class="faq-a"><strong>Abrir ayuda:</strong> abre tu sección de ayuda.</div>
-          <div class="faq-a"><strong>Crear:</strong> carga tus datos.</div>
-          <div class="faq-a"><strong>Exportar:</strong> descarga tus datos.</div>
-          <div class="faq-a"><strong>Vaciar:</strong> deja tus módulos limpios.</div>
-        </div>
-      `;
+  switch(cmd.action){
+
+    case 'open_csv': {
+      document.getElementById('btnShowCSV')?.click();
+      return 'Abrí el panel para CSV.';
     }
 
-    // 2) Vaciar Dock de tareas
-    const dockBox = document.getElementById('taskDock'); 
-    if (dockBox) dockBox.innerHTML = '';
-
-    // 3) Reiniciar estado del asistente
-    try { const s = document.getElementById('asistStatus'); if(s) s.textContent='Reiniciado.'; } catch(e) {}
-
-    // 4) NUEVO: Reiniciar KPI (expuesta por el asistente)
-    try { if (window.resetKPI) window.resetKPI(); } catch(e){}
-
-    return 'Entendido. Limpié el chat, las tareas y el KPI.';
-  }catch(e){
-    return 'No pude reiniciar completamente.';
-  }
-}
-        case 'open_export': {
-          document.getElementById('btnShowExport')?.click();
-          if (cmd.target){
-            await waitForSelector('input[name="exp_mod"]');
-            const r = document.querySelector(`input[name="exp_mod"][value="${cmd.target}"]`);
-            if (r){ r.checked = true; r.dispatchEvent(new Event('change',{bubbles:true})); }
-          }
-          return 'Abrí la vista de exportación.';
-        }
-        case 'export': {
-          document.getElementById('btnShowExport')?.click();
-          await waitForSelector('#aiExport');
-          if (cmd.target){
-            const r = document.querySelector(`input[name="exp_mod"][value="${cmd.target}"]`);
-            if (r){ r.checked = true; r.dispatchEvent(new Event('change',{bubbles:true})); }
-          }
-          document.querySelector('#aiExport')?.click();
-          return `¡Entendido!, abrí en "Tareas" el botón de exportar 📥 ${cmd.target ? cmd.target.toUpperCase() : 'selecciona el módulo a la derecha'}.`;
-        }
-        case 'vaciar_todos': {
-          document.getElementById('btnQuickClear')?.click();
-          return 'Lancé el vaciado de Operatividad, Backlog y SLA.';
-        }
-        case 'vaciar_mod': {
-          const ok = await new Promise(resolve=>{
-            const title = document.getElementById('mc_title');
-            const msg   = document.getElementById('mc_msg');
-            const yes   = document.getElementById('mc_si');
-            const no    = document.getElementById('mc_no');
-            title.textContent = 'Confirmación';
-            msg.textContent   = `¿Vaciar el módulo ${cmd.target.toUpperCase()}? Esta operación es irreversible.`;
-            function done(x){ yes.removeEventListener('click', y); no.removeEventListener('click', n); document.getElementById('modalConfirm').style.display='none'; resolve(x); }
-            function y(){ done(true); } function n(){ done(false); }
-            yes.addEventListener('click', y); no.addEventListener('click', n);
-            document.getElementById('modalConfirm').style.display='flex';
-          });
-          if(!ok) return 'Operación cancelada.';
-          try{ await clearModule(cmd.target); return `Módulo ${cmd.target.toUpperCase()} vaciado. ✅`; }
-          catch(e){ return `Error al vaciar ${cmd.target.toUpperCase()}: ${e.message}`; }
-        }
-// 👇 NUEVO: respuesta a saludos
-case 'saludo': {
-  return '¡Hola 👋! ¿Que tal va tu día?, un gusto tenerte por acá 😄, ¿Empezamos?, ya estoy listo 🛠️';
-}
+    case 'open_operatividad': {
+      if (window.openOperatividadFlow) {
+        window.openOperatividadFlow();
+      } else {
+        const b = document.getElementById('btnShowCSV');
+        if (b) b.click();
       }
-      return null;
+      return 'Abrí el DOC de tareas para adjuntar tu CSV de Operatividad; luego de procesar podrás subir al módulo Operatividad 🔋 y verás indicadores en el KPI 📊';
     }
 
+    case 'reset_ui': {
+      try{
+        // 1) Resetear chat a FAQ (única fuente de verdad)
+        const msgsBox = document.getElementById('chatMsgs');
+        if (msgsBox) msgsBox.innerHTML = INITIAL_FAQ_HTML;
+
+        // 2) Vaciar Dock de tareas
+        const dockBox = document.getElementById('taskDock'); 
+        if (dockBox) dockBox.innerHTML = '';
+
+        // 3) Reiniciar estado del asistente
+        try { const s = document.getElementById('asistStatus'); if(s) s.textContent='Reiniciado.'; } catch(_e) {}
+
+        // 4) Reiniciar KPI
+        try { if (window.resetKPI) window.resetKPI(); } catch(_e){}
+
+        return 'Entendido. Limpié el chat, las tareas y el KPI.';
+      }catch(_e){
+        return 'No pude reiniciar completamente.';
+      }
+    }
+
+    case 'open_export': {
+      document.getElementById('btnShowExport')?.click();
+      if (cmd.target){
+        await waitForSelector('input[name="exp_mod"]');
+        const r = document.querySelector(`input[name="exp_mod"][value="${cmd.target}"]`);
+        if (r){ r.checked = true; r.dispatchEvent(new Event('change',{bubbles:true})); }
+      }
+      return 'Abrí la vista de exportación.';
+    }
+
+    case 'export': {
+      document.getElementById('btnShowExport')?.click();
+      await waitForSelector('#aiExport');
+      if (cmd.target){
+        const r = document.querySelector(`input[name="exp_mod"][value="${cmd.target}"]`);
+        if (r){ r.checked = true; r.dispatchEvent(new Event('change',{bubbles:true})); }
+      }
+      document.querySelector('#aiExport')?.click();
+      return `¡Entendido!, abrí en "Tareas" el botón de exportar 📥 ${cmd.target ? cmd.target.toUpperCase() : 'selecciona el módulo a la derecha'}.`;
+    }
+
+    case 'vaciar_todos': {
+      document.getElementById('btnQuickClear')?.click();
+      return 'Lancé el vaciado de Operatividad, Backlog y SLA.';
+    }
+
+    case 'vaciar_mod': {
+      const ok = await new Promise(resolve=>{
+        const title = document.getElementById('mc_title');
+        const msg   = document.getElementById('mc_msg');
+        const yes   = document.getElementById('mc_si');
+        const no    = document.getElementById('mc_no');
+        title.textContent = 'Confirmación';
+        msg.textContent   = `¿Vaciar el módulo ${cmd.target.toUpperCase()}? Esta operación es irreversible.`;
+        function done(x){ yes.removeEventListener('click', y); no.removeEventListener('click', n); document.getElementById('modalConfirm').style.display='none'; resolve(x); }
+        function y(){ done(true); } function n(){ done(false); }
+        yes.addEventListener('click', y); no.addEventListener('click', n);
+        document.getElementById('modalConfirm').style.display='flex';
+      });
+      if(!ok) return 'Operación cancelada.';
+      try{
+        await clearModule(cmd.target);
+        return `Módulo ${cmd.target.toUpperCase()} vaciado. ✅`;
+      }catch(e){
+        return `Error al vaciar ${cmd.target.toUpperCase()}: ${e.message}`;
+      }
+    }
+
+    // 👇 Respuesta a saludos
+    case 'saludo': {
+      return '¡Hola 👋! ¿Qué tal va tu día? Ya estoy listo para ayudarte con Exclusiones 🛠️';
+    }
+  }
+
+  // Si ningún case coincidió:
+  return null;
+}
     // ====== KB ======
     const KB = [
       {
@@ -2348,7 +2353,7 @@ case 'saludo': {
         pushMsg('bot', item.a + (item.cmd ? ' (Estoy para ayudarte👍 )' : ''));
         try{ if(item.cmd) item.cmd(); }catch(e){}
       }else{
-        pushMsg('bot', '¡Ups 🥺! Verifica el texto. Por ahora solo estoy habilitado para tareas específicas en este entorno.');
+        pushMsg('bot', '¡Ups! Verifica el texto. Por ahora estoy habilitado para tareas específicas en este entorno. 🫶');
       }
     }
 
