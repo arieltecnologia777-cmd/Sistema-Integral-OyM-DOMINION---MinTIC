@@ -732,37 +732,38 @@ async function cargarDesdeServidor(){
     construirGruposPorOT();
     buildRegionalMenu();    // poblar menú
     updateRegionalLabel();  // actualizar etiqueta del botón
-// ===============================
-// FILTRO AUTOMÁTICO POR URL
-// ===============================
+// =====================================================
+// FILTRO AUTOMÁTICO POR URL + BLOQUEO DEL MENÚ REGIONAL
+// =====================================================
 const regParam = new URLSearchParams(window.location.search).get("regional");
 if (regParam) {
-    // Forzar regional inicial
+
+    // 1. Forzar regional fija
     regionalActual = regParam;
 
-    // Volver a aplicar filtros ANTES de renderizar
+    // 2. Filtrar datos por regional ANTES del render
     filtrados = datos.filter(d => (d.regional ?? "") === regParam);
     construirGruposPorOT();
     updateRegionalLabel();
-}
-    render();
-    setLastUpdate(new Date());
-    // Reseteo tracking de edición (la regla verde depende de pendientes=0)
-    otsEnEdicion.clear();
-    showToast('Datos cargados desde el servidor.', 'info');
-  }catch(err){
-    console.error(err);
-    mostrarAlerta('No se pudo cargar el dataset del servidor.');
-    showToast('Error al cargar datos del servidor.', 'error');
-    // Filtro vacío si falla
-    regionalesDisponibles = [];
-    regionalActual = 'Todas';
-    buildRegionalMenu();
-    updateRegionalLabel();
-  }finally{
-    btn.disabled=false; btn.textContent='Actualizar';
-    updateHeaderStats();
-  }
+
+    // 3. BLOQUEAR MENÚ REGIONAL (IMPORTANTE)
+    const btnRegional = document.getElementById("btnRegional");
+    const menuRegional = document.getElementById("menuRegional");
+    const regionalBox = document.getElementById("regionalBox");
+
+    if (btnRegional) {
+        btnRegional.style.pointerEvents = "none";   // No clic
+        btnRegional.style.opacity = "0.55";         // Visual deshabilitado
+        btnRegional.title = "Filtro bloqueado";     // Tooltip
+    }
+
+    if (menuRegional) {
+        menuRegional.style.display = "none";        // Oculta menú si intentan abrirlo vía DOM
+    }
+
+    if (regionalBox) {
+        regionalBox.style.pointerEvents = "none";   // Bloqueo envolvente
+    }
 }
 
 /* ======= Cómputos ======= */
