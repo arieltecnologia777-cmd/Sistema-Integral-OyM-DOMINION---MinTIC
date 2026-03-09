@@ -732,7 +732,19 @@ async function cargarDesdeServidor(){
     construirGruposPorOT();
     buildRegionalMenu();    // poblar menú
     updateRegionalLabel();  // actualizar etiqueta del botón
+// ===============================
+// FILTRO AUTOMÁTICO POR URL
+// ===============================
+const regParam = new URLSearchParams(window.location.search).get("regional");
+if (regParam) {
+    // Forzar regional inicial
+    regionalActual = regParam;
 
+    // Volver a aplicar filtros ANTES de renderizar
+    filtrados = datos.filter(d => (d.regional ?? "") === regParam);
+    construirGruposPorOT();
+    updateRegionalLabel();
+}
     render();
     setLastUpdate(new Date());
     // Reseteo tracking de edición (la regla verde depende de pendientes=0)
