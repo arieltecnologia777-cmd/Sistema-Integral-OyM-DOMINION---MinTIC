@@ -516,35 +516,27 @@ body {
 <div class="header">
   <div class="header-title">Exclusiones de Operatividad</div>
   <div class="header-sub"><strong>¡Bienvenido al modulo de exclusiones!</strong></div>
-<div id="regionalActivoBadge"
-     style="margin-top:8px; 
-            display:inline-block; 
-            background:#e8eef7; 
-            color:#0e4aa8; 
-            border:1px solid #cfdaf0;
-            padding:6px 12px; 
-            border-radius:10px; 
-            font-size:13px; 
-            font-weight:600;">
-    Regional activa: —
-</div>
+
   <div class="controls">
+
     <button id="btnCargar" class="btn btn-blue" type="button">Cargar / Actualizar</button>
 
-    <!-- === Filtro Regional (segunda posición; restaurado) === -->
-    <div class="filter-box" id="regionalBox">
-      <button id="btnRegional" class="filter-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" title="Filtrar por regional">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M3 6h18l-7 8v4l-4 2v-6L3 6z"/>
-        </svg>
-        <span id="lblRegional">Regional: Todas</span>
-      </button>
-      <div id="menuRegional" class="filter-menu" role="listbox" aria-label="Regional">
-        <!-- Opciones dinámicas -->
-      </div>
-    </div>
+    <!-- NUEVO BADGE: Regional activa -->
+    <span id="regionalActivoBadge"
+        style="display:inline-flex;
+               align-items:center;
+               gap:6px;
+               background:#e8eef7;
+               color:#0e4aa8;
+               border:1px solid #cfdaf0;
+               padding:8px 14px;
+               border-radius:10px;
+               font-size:14px;
+               font-weight:600;">
+        Regional activa: —
+    </span>
 
-    <!-- Eliminar registros (HEADER) - Local -->
+    <!-- Eliminar registros -->
     <button id="btnEliminarGlobal" class="btn-header-danger" type="button" disabled>🗑️ Eliminar registros</button>
 
     <div class="search-pill" title="Buscar por OT">
