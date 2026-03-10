@@ -881,21 +881,23 @@ async function cargarDesdeServidor(){
     const j = await res.json();
     const arr = Array.isArray(j?.data) ? j.data : [];
     /* Normalizamos a estructura local usada por la UI (tolerante a casing en 'regional') */
-    datos = arr.map((r,i)=>({
+   datos = arr.map((r,i)=>({
       id:i+1,
-idReal: (
-  r.ID ?? r.Id ?? r.id ?? r.Sitio ?? r.sitio ?? ''
-).toString().trim(),
+      idReal: (
+        r.ID ??
+        r.Id ??
+        r.id ??
+        r.id_Benef ??
+        r.ID_Benef ??
+        r.Id_benef ??
+        r.idbenef ??
+        r.idbeneficio ??
+        r.Sitio ??
+        r.sitio ??
+        ''
+      ).toString().trim(),
       fecha: r.fecha ?? '',
       ot : (r.ot ?? '').toString(),
-      causa: r.causa ?? '',
-      regional: (
-        r.regional ??
-        r.Regional ??
-        r.REGIONAL ??
-        r.region ??
-        r.Region ?? ''
-      ).toString().trim(),
       fotos: [], // adjuntos solo locales para UI
       /* [MOD] inyectar 'tipo' según módulo activo */
       tipo: __MOD
