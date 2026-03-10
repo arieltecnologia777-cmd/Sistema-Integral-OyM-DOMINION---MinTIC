@@ -1956,34 +1956,41 @@ try { log(`OP: separador detectado "${sep}"`); } catch(_e){}
     throw new Error(`El archivo no tiene columnas suficientes. Esperaba al menos ${Math.max(colH, colM)+1}; tiene ${headers.length}.`);
   }
 
-  // 3) Filtrar
-  setStage('Filtrando…'); setBar(40); setPct(40);
-  const ban = ['traslado','reubicacion','pre-postulacion fm'];
-  const total = rows.length-1;
-  const chunk = Math.max(50, Math.floor(total/60));
-  for(let i=1; i<rows.length; i++){
-    const r = rows[i]; if(!r) continue;
-    const h = normTxt(r[colH]);
-    const m = normTxt(r[colM]);
-    const isDominion = (h === 'dominion');
-    const banned = ban.some(t => m.includes(t));
-// ---- Rellenar ID REAL según columna detectada ----
-if (colId !== -1) {
-    // La columna id_Benef existía, ahora se llama ID → limpiar valor
+  // 3) Filtrar  ➜  NUEVA REGLA: solo “Sin stopper” en columna M (Stopper) y H = DOMINION
+setStage('Filtrando…'); setBar(40); setPct(40);
+
+const total = rows.length - 1;
+const chunk = Math.max(50, Math.floor(total / 60));
+
+for (let i = 1; i < rows.length; i++) {
+  const r = rows[i]; 
+  if (!r) continue;
+
+  const h = normTxt(r[colH]);   // columna H
+  const m = normTxt(r[colM]);   // columna M (Stopper)
+
+  const isDominion  = (h === 'dominion');
+  const stopperOk   = (m === 'sin stopper');   // ← aquí está la nueva condición
+
+  // ---- Rellenar ID REAL según columna detectada (se mantiene) ----
+  if (colId !== -1) {
     r[colId] = (r[colId] ?? '').toString().trim();
-} else {
-    // Si tuvimos que crear una columna ID nueva:
-    // Puedes elegir qué usar como ID real.
-    // Aquí usamos la primera columna del CSV como fallback.
+  } else {
     r.push((r[0] ?? '').toString().trim());
-}
-    if(isDominion && !banned){ out.push(r); }
-    if(i%chunk===0 || i===total){
-      const p = 40 + Math.min(58, Math.round(i/total*58));
-      setBar(p); setPct(p);
-      await new Promise(rr => setTimeout(rr,0));
-    }
   }
+
+  // Mantener solo DOMINION + “Sin stopper”
+  if (isDominion && stopperOk) {
+    out.push(r);
+  }
+
+  // Progreso
+  if (i % chunk === 0 || i === total) {
+    const p = 40 + Math.min(58, Math.round(i / total * 58));
+    setBar(p); setPct(p);
+    await new Promise(rr => setTimeout(rr, 0));
+  }
+}
 
   // 4) Generar salida
   setStage('Generando archivo…'); setBar(99); setPct(99);
