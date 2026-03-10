@@ -128,6 +128,12 @@ body{
 .col-ot{ font-weight:800; color:#0e2040; white-space:nowrap; }
 /* >>> NUEVO: estilo de la celda Regional (mismo look que OT) */
 .col-regional{ font-weight:800; color:#0e2040; white-space:nowrap; }
+/* >>> NUEVO: celda de ID */
+.col-id{
+  font-weight:700;
+  color:#223150;
+  white-space:nowrap;
+}
 
 /* Hover fila (relieve) */
 .tabla tbody tr{
@@ -1203,16 +1209,17 @@ function render(){
   const box=document.createElement('div'); box.className='tabla-box';
   const tbl=document.createElement('table'); tbl.className='tabla';
   tbl.innerHTML=`
-    <thead>
-      <tr>
-        <th>Regional</th>
-        <th>OT</th>
-        <th>Total registros</th>
-        <th>Registros pendientes</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="tbodyOTs"></tbody>`;
+  <thead>
+    <tr>
+      <th>Regional</th>
+      <th>ID</th>
+      <th>OT</th>
+      <th>Total registros</th>
+      <th>Registros pendientes</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody id="tbodyOTs"></tbody>`;
   box.appendChild(tbl);
   wrap.appendChild(box);
 
@@ -1223,6 +1230,15 @@ function render(){
     const regsSet = new Set((g.items ?? []).map(x => (x.regional ?? '').toString().trim()).filter(Boolean));
     const regionalTexto = regsSet.size ? Array.from(regsSet).join(', ') : '—';
 
+// >>> NUEVO: etiqueta de ID para la fila (tomamos el primer ID del grupo)
+let idLabel = '—';
+try{
+  if ((g.items ?? []).length) {
+    const first = g.items[0];
+    idLabel = String(first.id ?? '—');
+  }
+}catch(_){}
+
     const tr=document.createElement('tr');
     const idPrimario = `btn_primary_${cssId(otClave)}`;
     const idEliminar = `btn_eliminar_${cssId(otClave)}`;
@@ -1231,21 +1247,22 @@ function render(){
     const enEdicion = otsEnEdicion.has(otClave) && !yaCompleta;
 
     tr.innerHTML = `
-      <td class="col-regional">${esc(regionalTexto)}</td>
-      <td class="col-ot">${esc(otClave)}</td>
-      <td><span class="count-total">${total}</span></td>
-      <td><span class="count-pend">${pendientes}</span></td>
-      <td>
-        <button class="btn-pill btn-primary" id="${idPrimario}" data-ot="${esc(otClave)}" data-mode=""></button>
-        <button class="btn-pill btn-preview" id="${idPreview}" data-ot="${esc(otClave)}" title="Ver registros (solo lectura)">
-          ${svgEye()}Vista previa
-        </button>
-        <button class="btn-pill btn-eliminar" id="${idEliminar}" data-ot="${esc(otClave)}" title="Eliminar todos los registros" disabled>
-          ${svgTrash()}Eliminar
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
+  <td class="col-regional">${esc(regionalTexto)}</td>
+  <td class="col-id">${esc(idLabel)}</td>
+  <td class="col-ot">${esc(otClave)}</td>
+  <td><span class="count-total">${total}</span></td>
+  <td><span class="count-pend">${pendientes}</span></td>
+  <td>
+    <button class="btn-pill btn-primary" id="${idPrimario}" data-ot="${esc(otClave)}" data-mode=""></button>
+    <button class="btn-pill btn-preview" id="${idPreview}" data-ot="${esc(otClave)}" title="Ver registros (solo lectura)">
+      ${svgEye()}Vista previa
+    </button>
+    <button class="btn-pill btn-eliminar" id="${idEliminar}" data-ot="${esc(otClave)}" title="Eliminar todos los registros" disabled>
+      ${svgTrash()}Eliminar
+    </button>
+  </td>
+`;
+ody.appendChild(tr);
 
     const btnPrim = tr.querySelector(`#${idPrimario}`);
     const btnDel = tr.querySelector(`#${idEliminar}`);
