@@ -2000,6 +2000,12 @@ if (idx !== -1) {
   try { log('Backlog: renombré "Orden De Trabajo" → "OT".'); } catch(_e){}
 }
 
+// 3) "Sitio" → "ID"  (para que el backend/UX trabajen con ID)
+idx = headers.findIndex(h => (h ?? '').toString().trim().toLowerCase() === 'sitio');
+if (idx !== -1) {
+  headers[idx] = 'ID';
+  try { log('Backlog: renombré "Sitio" → "ID".'); } catch(_e){}
+}
 // (opcional, inofensivo): si quieres que “Aliado Ot” salga como “Aliado OT”
 idx = headers.findIndex(h => (h ?? '').toString().trim().toLowerCase() === 'aliado ot');
 if (idx !== -1) {
