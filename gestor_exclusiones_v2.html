@@ -1248,15 +1248,13 @@ function render(){
     const regsSet = new Set((g.items ?? []).map(x => (x.regional ?? '').toString().trim()).filter(Boolean));
     const regionalTexto = regsSet.size ? Array.from(regsSet).join(', ') : '—';
 
-// >>> BACKLOG: ID real por OT (primer registro del grupo)
-// No usamos 'first.id' (índice local); usamos 'first.idReal' que viene del backend.
+// === ID REAL universal (Operatividad + Backlog + SLA) ===
 let idLabel = '—';
-if (__MOD === 'backlog') {
-  try {
-    const first = (g.items ?? [])[0];
-    const v = (first?.idReal ?? '').toString().trim();
-    if (v) idLabel = v;
-  } catch(_) {}
+try {
+  const first = (g.items ?? [])[0];
+  const v = (first?.idReal ?? '').toString().trim();
+  if (v) idLabel = v;
+} catch(_) {}
 }
 
     const tr=document.createElement('tr');
