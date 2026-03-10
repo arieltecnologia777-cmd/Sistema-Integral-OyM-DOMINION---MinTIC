@@ -1904,6 +1904,29 @@ log(`OP: CSV separado por: "${sep === '\t' ? 'TAB' : sep}"`);
 if(!rows.length){ sayOp('El CSV está vacío.'); return; }
 const headers = rows[0] || [];
 
+// ===================================================
+// NORMALIZAR ID REAL EN OPERATIVIDAD
+// Convierte id_Benef → ID (misma lógica que BACKLOG/SITIO)
+// ===================================================
+
+// 1) Buscar si existe columna id_Benef (con o sin mayúsculas)
+let colId = headers.findIndex(h => 
+    String(h).trim().toLowerCase() === 'id_benef' ||
+    String(h).trim().toLowerCase() === 'idbenef'
+);
+
+// 2) Si existe → renombrar como "ID"
+if (colId !== -1) {
+    headers[colId] = 'ID';
+}
+
+// 3) Si NO existe columna ID → la creamos al final
+else {
+    colId = headers.length;
+    headers.push('ID');
+    // Y a cada fila le agregaremos valor después
+}
+
 // >>> BLOQUE NUEVO: Normalizar encabezado "OT Maximo" -> "OT"
 (function(){
   const idx = (headers || []).findIndex(h => {
@@ -1944,6 +1967,16 @@ try { log(`OP: separador detectado "${sep}"`); } catch(_e){}
     const m = normTxt(r[colM]);
     const isDominion = (h === 'dominion');
     const banned = ban.some(t => m.includes(t));
+// ---- Rellenar ID REAL según columna detectada ----
+if (colId !== -1) {
+    // La columna id_Benef existía, ahora se llama ID → limpiar valor
+    r[colId] = (r[colId] ?? '').toString().trim();
+} else {
+    // Si tuvimos que crear una columna ID nueva:
+    // Puedes elegir qué usar como ID real.
+    // Aquí usamos la primera columna del CSV como fallback.
+    r.push((r[0] ?? '').toString().trim());
+}
     if(isDominion && !banned){ out.push(r); }
     if(i%chunk===0 || i===total){
       const p = 40 + Math.min(58, Math.round(i/total*58));
