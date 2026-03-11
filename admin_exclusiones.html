@@ -225,22 +225,6 @@ zoom: 0.99;
   transform-origin: 50% 0%; /* punto de giro arriba */
 }
 
-/* === Animación: campana vibrando cuando llega notificación === */
-@keyframes bell-shake {
-  0%   { transform: rotate(0deg); }
-  15%  { transform: rotate(-18deg); }
-  30%  { transform: rotate(14deg); }
-  45%  { transform: rotate(-12deg); }
-  60%  { transform: rotate(8deg); }
-  75%  { transform: rotate(-5deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.btn-notif.has-new .bell-wrap {
-  animation: bell-shake 0.6s ease-in-out;
-  transform-origin: 50% 0%; /* punto de giro arriba */
-}
-
 /* === DING VISUAL: aro azul que emerge y se desvanece === */
 @keyframes bell-ding {
   0%   { transform: scale(0.6); opacity: 0.0; }
@@ -2747,14 +2731,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function checkAll(){
-    const results = await Promise.all(PROJS.map(checkProject));
-    const anyNew = results.some(r => r.ok && r.hasNew);
-    const btn = document.getElementById(BTN_ID);
-    if(btn){
-      if(anyNew) btn.classList.add('has-new');
-      else       btn.classList.remove('has-new');
-    }
+  const results = await Promise.all(PROJS.map(checkProject));
+  const anyNew = results.some(r => r.ok && r.hasNew);
+  const btn = document.getElementById(BTN_ID);
+
+  if(!btn) return;
+
+  if(anyNew){
+    // Activar punto rojo + ding-ding
+    triggerBellDingTwice();
+  } else {
+    // Sin nuevos -> quitar punto rojo
+    btn.classList.remove('has-new');
   }
+}
 
   function markAllSeen(){
     const now = Date.now();
@@ -2789,6 +2779,24 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => b.classList.remove('has-new'), 5000); // se apaga a los 5s
 })();
 
+// === Helper: re-disparar animación (ding… pausa… ding) manteniendo el punto rojo ===
+function triggerBellDingTwice() {
+  const btn = document.getElementById('btnNotificaciones');
+  if (!btn) return;
+
+  // Primer DING inmediato
+  btn.classList.remove('has-new');
+  void btn.offsetWidth;              // reflow
+  btn.classList.add('has-new');
+
+  // Segundo DING después de una pausa (ajustable)
+  setTimeout(() => {
+    btn.classList.remove('has-new');
+    void btn.offsetWidth;
+    btn.classList.add('has-new');
+  }, 150); // ← PAUSA entre ding y ding
+}
+
 // === Helper: re-disparar animación de notificación ===
 function triggerBellDing(){
   const btn = document.getElementById('btnNotificaciones');
@@ -2802,24 +2810,6 @@ function triggerBellDing(){
 
 // === Prueba rápida ===
 triggerBellDing();
-
-// === Helper: re-disparar animación (ding-ding) manteniendo el punto rojo ===
-function triggerBellDingTwice() {
-  const btn = document.getElementById('btnNotificaciones');
-  if (!btn) return;
-
-  // Si ya tiene .has-new, forzamos reflow para reiniciar las animaciones
-  const had = btn.classList.contains('has-new');
-  if (had) {
-    // Mantener el punto rojo activo: quitamos y agregamos en el mismo frame
-    btn.classList.remove('has-new');
-    void btn.offsetWidth; // reflow
-    btn.classList.add('has-new');
-  } else {
-    // Si no la tenía, al agregarla ya se anima (CSS con 2 iteraciones)
-    btn.classList.add('has-new');
-  }
-}
 
 // === Prueba rápida manual desde consola ===
 // triggerBellDingTwice();
