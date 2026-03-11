@@ -882,38 +882,38 @@ async function cargarDesdeServidor(){
     const arr = Array.isArray(j?.data) ? j.data : [];
     /* Normalizamos a estructura local usada por la UI (tolerante a casing en 'regional') */
    datos = arr.map((r,i)=>({
-    id: i+1,
+  id: i+1,
 
-    // ID REAL (Operatividad + Backlog + variantes)
-    idReal: (
-        r.ID ??
-        r.Id ??
-        r.id ??
-        r.id_Benef ??
-        r.ID_Benef ??
-        r.Id_benef ??
-        r.idbenef ??
-        r.idbeneficio ??
-        r.Sitio ??
-        r.sitio ??
-        ''
-    ).toString().trim(),
+  // ID REAL (Operatividad + Backlog + variantes)
+  idReal: (
+      r.ID ??
+      r.Id ??
+      r.id ??
+      r.id_Benef ??
+      r.ID_Benef ??
+      r.Id_benef ??
+      r.idbenef ??
+      r.idbeneficio ??
+      r.Sitio ??
+      r.sitio ??
+      ''
+  ).toString().trim(),
 
-    fecha: r.fecha ?? '',
-    ot: (r.ot ?? '').toString(),
+  // ⬇️ Normalizados a string + trim para el contador
+  fecha:  (r.fecha  ?? '').toString().trim(),
+  ot:     (r.ot     ?? '').toString().trim(),
+  causa:  (r.causa  ?? '').toString().trim(),   // ← ***NUEVO: LEEMOS LA CAUSA PERSISTIDA***
+  regional: (
+      r.regional ??
+      r.Regional ??
+      r.REGIONAL ??
+      r.region ??
+      r.Region ??
+      ''
+  ).toString().trim(),
 
-    // ⚠️ ESTE FALTABA → ¡por eso se rompió todo!
-    regional: (
-        r.regional ??
-        r.Regional ??
-        r.REGIONAL ??
-        r.region ??
-        r.Region ??
-        ''
-    ).toString().trim(),
-
-    fotos: [],
-    tipo: __MOD
+  fotos: [],
+  tipo: __MOD
 })).filter(x => x.ot);
 
     /* Armar lista de regionales detectadas */
