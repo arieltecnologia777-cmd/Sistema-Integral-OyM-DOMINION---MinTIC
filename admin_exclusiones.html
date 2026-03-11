@@ -102,24 +102,6 @@ zoom: 0.99;
       color:#213159;
       transition:0.15s ease;
     }
-/* ——— Indicador tipo WhatsApp (punto rojo) ——— */
-/* Fallback: anclado al botón (funciona aunque no haya .ms-Icon) */
-.btn-notif{
-  position: relative;
-}
-.btn-notif.has-new::after{
-  content:'';
-  position:absolute;
-  /* Ajusta si quieres moverlo un poquito */
-  top: 8px;
-  right: 10px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background:#e11d48;
-  box-shadow:0 0 0 2px #fff;
-}
-
 /* Preferencia: anclado al ícono si existe (más preciso) */
 .btn-notif .ms-Icon{
   position: relative;
