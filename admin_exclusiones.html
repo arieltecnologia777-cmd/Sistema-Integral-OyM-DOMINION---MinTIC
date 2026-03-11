@@ -1022,6 +1022,12 @@ zoom: 0.99;
   }
 }
 </style>
+<style>
+  /* z-index máximo para que el modal de confirmación quede SIEMPRE encima */
+  #modalConfirm.modal-backdrop {
+      z-index: 9999 !important;
+  }
+</style>
 </head>
 <body class="only-ai">
   <!-- SIDEBAR -->
