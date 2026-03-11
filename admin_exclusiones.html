@@ -2800,14 +2800,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 })();
 
-// ===== PRUEBA RÁPIDA: forzar el punto rojo 5s para validar CSS/HTML =====
-(function(){
-  const b = document.getElementById('btnNotificaciones');
-  if(!b) return;
-  b.classList.add('has-new');     // << debería verse el puntico rojo inmediato
-  setTimeout(() => b.classList.remove('has-new'), 5000); // se apaga a los 5s
-})();
-
 // === Helper: re-disparar animación (ding… pausa… ding) manteniendo el punto rojo ===
 function triggerBellDingTwice() {
   const btn = document.getElementById('btnNotificaciones');
@@ -2836,9 +2828,6 @@ function triggerBellDing(){
   void btn.offsetWidth;  // fuerza reflow
   btn.classList.add('has-new');
 }
-
-// === Prueba rápida ===
-triggerBellDing();
 
 // === Prueba rápida manual desde consola ===
 // triggerBellDingTwice();
