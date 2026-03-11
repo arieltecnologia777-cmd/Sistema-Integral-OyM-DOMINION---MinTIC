@@ -118,6 +118,37 @@ zoom: 0.99;
   background:#e11d48;
   box-shadow:0 0 0 2px #fff;
 }
+
+/* Campana SVG: tamaño, separación y ancla del puntico */
+.btn-notif .ico-bell{
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  display: inline-block;
+  vertical-align: middle;
+  color: currentColor;
+  position: relative;        /* ancla del punto rojo */
+}
+
+/* Reanclar el puntico al SVG (si usas SVG) */
+.btn-notif.has-new .ico-bell::after{
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e11d48;
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+}
+
+/* Texto */
+.btn-notif .lbl{
+  font-weight: 800;
+}
+
 .side-actions .btn:focus-visible{
   outline: 2px solid rgba(14,74,168,.35);
   outline-offset: 2px;
@@ -142,6 +173,102 @@ zoom: 0.99;
       vertical-align:middle;
       fill:currentColor;
     }
+/* === CAMPANA NOTIFICACIONES (SVG EN WRAPPER) === */
+
+/* Envoltorio de la campana: base y ancla */
+.btn-notif .bell-wrap{
+  position: relative;       /* ancla del puntito */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;              /* tamaño coherente con otros íconos */
+  height: 18px;
+  margin-right: 8px;
+  color: currentColor;      /* hereda color del botón */
+}
+
+/* SVG interno: ocupa el contenedor */
+.btn-notif .bell-wrap .ico-bell{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* El puntito rojo (se muestra cuando hay .has-new en el botón) */
+.btn-notif.has-new .bell-wrap::after{
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e11d48;      /* rojo */
+  box-shadow: 0 0 0 2px #fff;
+  pointer-events: none;
+}
+
+/* === Animación: campana vibrando cuando llega notificación === */
+
+@keyframes bell-shake {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(-18deg); }
+  30%  { transform: rotate(14deg); }
+  45%  { transform: rotate(-12deg); }
+  60%  { transform: rotate(8deg); }
+  75%  { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.btn-notif.has-new .bell-wrap {
+  animation: bell-shake 0.6s ease-in-out;
+  transform-origin: 50% 0%; /* punto de giro arriba */
+}
+
+/* === Animación: campana vibrando cuando llega notificación === */
+@keyframes bell-shake {
+  0%   { transform: rotate(0deg); }
+  15%  { transform: rotate(-18deg); }
+  30%  { transform: rotate(14deg); }
+  45%  { transform: rotate(-12deg); }
+  60%  { transform: rotate(8deg); }
+  75%  { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.btn-notif.has-new .bell-wrap {
+  animation: bell-shake 0.6s ease-in-out;
+  transform-origin: 50% 0%; /* punto de giro arriba */
+}
+
+/* === DING VISUAL: aro azul que emerge y se desvanece === */
+@keyframes bell-ding {
+  0%   { transform: scale(0.6); opacity: 0.0; }
+  30%  { transform: scale(0.9); opacity: 0.35; }
+  60%  { transform: scale(1.15); opacity: 0.18; }
+  100% { transform: scale(1.35); opacity: 0.0; }
+}
+
+/* Usamos ::before para el aro (NO interfiere con el punto rojo de ::after) */
+.btn-notif .bell-wrap::before{
+  content:'';
+  position:absolute;
+  inset: -6px;               /* aro un poquito más grande que la campana */
+  border-radius: 50%;
+  border: 2px solid rgba(14,74,168,.55);   /* azul Dominion */
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.6);
+}
+
+/* Se dispara el ding cuando llega la notificación */
+.btn-notif.has-new .bell-wrap::before{
+  animation: bell-ding 800ms ease-out 1;
+}
+
+/* El puntito rojo SIGUE igual en ::after (lo que ya tienes) */
+/* .btn-notif.has-new .bell-wrap::after { ... }  <-- ya lo tienes arriba */
+
     .btn-outlook{ background:#e8eef7; color:#0a5bd3; border-color:#cfe0ff; }
     .btn-teams{ background:#464EB8; color:#fff; border-color:#464EB8; }
     .btn .ms-Icon{ font-size:18px; line-height:1; }
@@ -897,8 +1024,14 @@ zoom: 0.99;
         <div class="side-actions">
 <!-- Notificaciones (Worker) -->
 <button type="button" class="btn btn-outlook btn-notif" id="btnNotificaciones" title="Ver notificaciones">
-  <!-- Ícono campana MDL2 (ya cargas fabric-icons.css) -->
-  <i class="ms-Icon ms-Icon--Ringer" aria-hidden="true" style="font-size:16px;line-height:1"></i>
+  <!-- Envoltorio HTML para poder dibujar el puntito -->
+  <span class="bell-wrap" aria-hidden="true">
+    <!-- Ícono campana (SVG) -->
+    <svg class="ico-bell" viewBox="0 0 24 24" role="img" focusable="false" aria-label="Notificaciones">
+      <path d="M12 2a6 6 0 00-6 6v4.2l-1.4 2.8a1 1 0 00.9 1.4h13a1 1 0 00.9-1.4L18 12.2V8a6 6 0 00-6-6z" fill="currentColor"/>
+      <circle cx="12" cy="19" r="2" fill="currentColor"/>
+    </svg>
+  </span>
   <span class="lbl" style="font-weight:800">Notificaciones</span>
 </button>
           <!-- Notificar 1 -->
@@ -2655,6 +2788,41 @@ document.addEventListener('DOMContentLoaded', () => {
   b.classList.add('has-new');     // << debería verse el puntico rojo inmediato
   setTimeout(() => b.classList.remove('has-new'), 5000); // se apaga a los 5s
 })();
+
+// === Helper: re-disparar animación de notificación ===
+function triggerBellDing(){
+  const btn = document.getElementById('btnNotificaciones');
+  if(!btn) return;
+
+  // Quitar y poner la clase con reflow para reiniciar animaciones CSS
+  btn.classList.remove('has-new');
+  void btn.offsetWidth;  // fuerza reflow
+  btn.classList.add('has-new');
+}
+
+// === Prueba rápida ===
+triggerBellDing();
+
+// === Helper: re-disparar animación (ding-ding) manteniendo el punto rojo ===
+function triggerBellDingTwice() {
+  const btn = document.getElementById('btnNotificaciones');
+  if (!btn) return;
+
+  // Si ya tiene .has-new, forzamos reflow para reiniciar las animaciones
+  const had = btn.classList.contains('has-new');
+  if (had) {
+    // Mantener el punto rojo activo: quitamos y agregamos en el mismo frame
+    btn.classList.remove('has-new');
+    void btn.offsetWidth; // reflow
+    btn.classList.add('has-new');
+  } else {
+    // Si no la tenía, al agregarla ya se anima (CSS con 2 iteraciones)
+    btn.classList.add('has-new');
+  }
+}
+
+// === Prueba rápida manual desde consola ===
+// triggerBellDingTwice();
 
 </script>
 </body>
