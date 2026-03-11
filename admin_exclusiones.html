@@ -5,8 +5,18 @@
   <title>Admin – Exclusiones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
-  <!-- Fluent UI MDL2 (íconos oficiales Microsoft) -->
-  <link rel="stylesheet" href="https://res.cdn.office.net/files/fabric-cdn-prod_20240201.001/assets/icons/fabric-icons.css" />
+
+  <!-- Prefetch + Preconnect para Fabric Icons -->
+  <link rel="preconnect" href="https://static2.sharepointonline.com" crossorigin>
+  <link rel="dns-prefetch" href="https://static2.sharepointonline.com">
+
+  <!-- (Opcional duplicado, si quieres forzar aún más velocidad) -->
+  <link rel="preconnect" href="https://static2.sharepointonline.com" crossorigin>
+  <link rel="dns-prefetch" href="https://static2.sharepointonline.com">
+
+  <!-- Aquí debajo va tu CSS de Fabric Icons -->
+  <link rel="stylesheet"
+        href="https://static2.sharepointonline.com/files/fabric/assets/icons/fabric-icons.min.css">
   <style>
     :root{
       /* ====== CONTROLES RÁPIDOS ====== */
