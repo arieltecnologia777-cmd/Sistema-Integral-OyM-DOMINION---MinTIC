@@ -36,6 +36,7 @@
     *{ box-sizing: border-box }
     html,body{ height:100% }
     body{
+zoom: 0.99;
       margin:0;
       font-family:"Segoe UI", system-ui, Roboto, Arial, sans-serif;
       color:#1a2333;
@@ -47,7 +48,12 @@
       overflow-x:hidden;
     }
     /* ===== Sidebar ===== */
-    .sidebar-wrap{ width: var(--sidebar-w); padding: var(--page-gap) 14px; flex: 0 0 var(--sidebar-w); }
+.sidebar-wrap{
+  padding: var(--page-gap) 8px;  /* ← conservamos tu padding actual */
+  position: relative;            /* contexto para z-index */
+  z-index: 10;                   /* por encima de las tarjetas */
+  pointer-events: auto;          /* asegura que reciba clics */
+}
     .sidebar{
       position: sticky; top: var(--page-gap);
       display:flex; flex-direction:column; gap:14px; padding:16px 14px;
@@ -88,6 +94,7 @@
       justify-content:flex-start;
       gap:10px;
       padding:10px 12px;
+      font-size: 12px;
       border-radius:12px;
       border:1px solid rgba(210,225,250,.9);
       box-shadow:0 6px 16px rgba(20, 40, 90, .08);
@@ -95,6 +102,15 @@
       color:#213159;
       transition:0.15s ease;
     }
+.side-actions .btn:focus-visible{
+  outline: 2px solid rgba(14,74,168,.35);
+  outline-offset: 2px;
+}
+.side-actions .btn[disabled]{ 
+  opacity:.55; 
+  cursor:not-allowed; 
+}
+
     /* >>> RESALTADO AZUL AL PASAR / CLIC (solo sidebar) <<< */
     .side-actions .btn:hover,
     .side-actions .btn:focus,
@@ -106,7 +122,7 @@
     }
     /* Tamaño para los SVG de marca (Outlook/Teams) en sidebar */
     .side-actions .brand-ico{
-      width:18px; height:18px; display:inline-block; flex:0 0 auto;
+      width:18px; height:15px; display:inline-block; flex:0 0 auto;
       vertical-align:middle;
       fill:currentColor;
     }
@@ -133,9 +149,28 @@
     .chip .ico{ width:18px; height:18px; }
     /* ===== Main / Container ===== */
     .main{ flex:1; min-width:0; display:flex; flex-direction:column; }
-    .container{ width:100%; max-width: var(--content-max); margin-inline:auto; padding-inline: clamp(16px, 2vw, 24px); }
+    .container{
+  width:100%;
+  max-width: var(--content-max);
+  margin-left: 0;        /* PEGADO a la izquierda */
+  margin-right: auto;
+  padding-inline: 8px;   /* aire mínimo a los lados */
+}
     /* ===== Hero ===== */
-    .hero{ padding:18px 0 10px; border-bottom:1px solid rgba(199,215,243,.55); background:rgba(255,255,255,.68); backdrop-filter: blur(8px); }
+    .hero{
+  padding:6px 0 4px !important;   /* antes 18px 0 10px */
+  border-bottom:1px solid rgba(199,215,243,.55);
+  background:rgba(255,255,255,.68);
+  backdrop-filter: blur(8px);
+  min-height: 36px !important;     /* altura mínima */
+}
+.title{
+  font-size:22px !important;       /* más pequeño también */
+  margin:2px 0 0 !important;
+}
+.breadcrumb{
+  font-size:12px !important;
+}
     .breadcrumb { font-weight:700; padding-top: 2px; }
     .title{ font-size:28px; font-weight:800; color:#0e2040; margin:6px 0 4px; }
     .subtitle{ color:#4e5d78; }
@@ -341,11 +376,14 @@
     /* ===== Ajustes ===== */
     .tiles.container{ margin-top: 60px; }
     .container:last-of-type{ padding-bottom: 0 !important; }
-    @media (min-width: 1440px){
-      :root{ --content-max: 1280px; }
-      .container{ margin-left: clamp(16px, 2vw, 32px); margin-right: auto; padding-inline: clamp(16px, 1.6vw, 24px); }
-      .hero{ padding:14px 0 8px; }
-      .tiles{ padding-block:14px; gap:12px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+   @media (min-width: 1440px){
+  :root{ --content-max: 1280px; }
+  .container{
+    margin-left: 0;         /* MUY pegado al sidebar */
+    margin-right: auto;
+    padding-inline: 8px;    /* igual que arriba */
+  }
+}
     }
     /* ===== Móvil ===== */
     @media (max-width: 980px){
@@ -446,17 +484,17 @@
     .only-ai #estado { display: none !important; }
     /* Lienzo principal en modo IA */
     .only-ai #ai-canvas{
-      flex: 1 1 auto;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: clamp(10px, 2vw, 16px);
-      margin: 0 !important;
-    }
+  flex: 1 1 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 6px;    /* MUCHO más pegado */
+  margin: 0 !important;
+}
     .only-ai #ai-inner{ width: min(820px, 100%); margin: 0 !important; }
     .only-ai #asistente-exclusiones-container{ margin: 0 !important; }
     .only-ai .container:last-of-type{ padding-bottom: 0 !important; }
-    .only-ai #ai-canvas{ padding-top: clamp(8px, 1.8vw, 16px); padding-bottom: clamp(8px, 1.8vw, 16px); }
+    .only-ai #ai-canvas{ padding-top: clamp(7px, 1.8vw, 1px); padding-bottom: clamp(8px, 1.8vw, 16px); }
     .only-ai .hero + .log-band{ margin-top: 8px; }
 
     /* --- FIX: reactivar botones del modal en modo only-ai --- */
@@ -556,7 +594,7 @@
       font-weight:900;
       color:#0e2040;
       margin-bottom:8px;
-      font-size:18px; /* más cercano a la captura */
+      font-size:14px; /* más cercano a la captura */
       line-height:1.1;
     }
     .chat-msgs{ /* área de mensajes (con FAQ inicial) */
@@ -589,7 +627,7 @@
 
     .chat-input{ display:flex; gap:12px; align-items:center; }
     .chat-input input{
-      flex:1 1 auto; height:44px;
+      flex:1 1 auto; height:28px;
       padding:10px 12px 10px 44px; /* espacio para ícono a la izquierda */
       border-radius:999px; border:1px solid #dbe6ff;
       outline:none; box-shadow: 0 2px 6px rgba(14,42,94,.10) inset, 0 4px 10px rgba(14,42,94,.06);
@@ -605,7 +643,7 @@
     }
     .chat-input button{
       flex:0 0 auto;
-      height:26px;
+      height:20px;
       padding:0 4px;
       border-radius:999px;
       border:0;
@@ -785,16 +823,16 @@
 :root{
   --col-left:  360px;  /* asistente + chat */
   --col-mid:   310px;  /* tareas */
-  --col-right: 370px;  /* kpi */
+  --col-right: 397px;  /* kpi */
   --content-max: 1360px;
 }
 
 /* --- LAPTOPS: 1366px hacia abajo (compactar proporciones) --- */
 @media (max-width: 1400px){
   :root{
-    --col-left:  720px;
-    --col-mid:   540px;
-    --col-right: 540px;
+    --col-left:  360px;
+    --col-mid:   280px;
+    --col-right: 360px;
     --content-max: 1280px;
   }
 }
@@ -802,9 +840,9 @@
 /* --- PANTALLAS GRANDES: Full HD ancha / 1440px en adelante --- */
 @media (min-width: 1600px){
   :root{
-    --col-left:  820px;
-    --col-mid:   660px;
-    --col-right: 660px;
+    --col-left:  500px;
+    --col-mid:   400px;
+    --col-right: 500px;
     --content-max: 1500px;
   }
 }
@@ -875,30 +913,7 @@
               <circle cx="20.2" cy="9.3" r="1.4" fill="currentColor" opacity=".7"></circle>
             </svg>
             Crear evento Teams
-          </button>
-
-          <!-- Vaciar módulos (desde sidebar) -->
-          <button type="button" class="btn" id="btnVaciarModulo" title="Vaciar datos de uno o varios módulos">
-            <svg class="brand-ico" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3 6h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"></path>
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.6" fill="none"></path>
-              <rect x="5" y="6" width="14" height="14" rx="2.2" ry="2.2" fill="currentColor" opacity=".06"></rect>
-              <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"></path>
-            </svg>
-            Vaciar módulos
-          </button>
-        </div>
-      </div>
-
-      <!-- Pie pegado al fondo (fuera del scroll) -->
-      <div class="side-foot">
-        <button class="chip" type="button" id="btnHome" title="Ir al inicio">
-          <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          Home
-        </button>
-        <div class="chip" id="temaChip">Tema oscuro</div>
-      </div>
-    </div>
+          </button> 
   </aside>
 
   <!-- MAIN -->
@@ -906,7 +921,6 @@
     <!-- HERO (visible) -->
     <section class="hero">
       <div class="container">
-        <div class="breadcrumb">¡Bienvenido(a) al modulo de excluciones!</div>
         <h1 class="title">Panel admin</h1>
       </div>
     </section>
@@ -1021,16 +1035,16 @@
   }
   .asist-head{ display:flex; align-items:center; gap:10px; }
   /* Mascota */
-  .mascot{ width:70px; height:100px; flex:0 0 90px; position:relative; overflow:visible;
+  .mascot{ width:70px; height:75px; flex:0 0 60px; position:relative; overflow:visible;
     animation: m-float 3s ease-in-out infinite; transform-origin:60% 40%; }
   .mascot img{ width:100%; height:100%; display:block; object-fit:contain; animation:m-tilt 5.5s ease-in-out infinite; }
   @keyframes m-float { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-7px) } }
   @keyframes m-tilt { 0%,100%{ transform:rotate(0deg) } 50%{ transform:rotate(-2.2deg) } }
-  .asist-title{ font-weight:900; color:#0e2040; font-size:20px; line-height:1.05; }
+  .asist-title{ font-weight:900; color:#0e2040; font-size:18px; line-height:1.05; }
   .asist-sub{ margin-top:4px; color:#6b7893; font-size:14.5px; }
-  .ask{ margin:14px 0 10px; }
+  .ask{ margin:0px 0 6px; }
   .ask .q{
-    display:inline-block; font-weight:900; font-size:22px; line-height:1.1; color:#0b2a6b;
+    display:inline-block; font-weight:900; font-size:15px; line-height:1.1; color:#0b2a6b;
     background: linear-gradient(90deg, #e8f1ff, #d8e6ff);
     padding:8px 12px; border-radius:14px; border:1px solid #cfe0ff;
     box-shadow: 0 6px 14px rgba(14,42,94,.10);
@@ -1100,7 +1114,7 @@
 
     <!-- Chat -->
     <section id="ai-chat" class="chat-wrap" aria-label="Chat del módulo Exclusiones">
-      <div class="chat-head">Escríbeme y ejecuto al instante cualquier orden 🫡</div>
+      <div class="chat-head">Escríbeme y ejecuto al instante tu orden 🫡</div>
       <div id="chatMsgs" class="chat-msgs" aria-live="polite"></div>      <div class="chat-input">
         <input id="chatQ" type="text" placeholder="'Escribe tu pregunta sobre Ex..." />
         <button id="chatSend" type="button" class="cta cta--primary">Preguntar</button>
@@ -2511,5 +2525,38 @@ if (/\boperatividad\b/.test(s)) {
   })();
   </script>
   <!-- ============== FIN ASISTENTE IA – DOMINION (EMBEBIDO) ============== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Utilidad simple para abrir correo
+  function openMailTo(to, subj, body){
+    const url = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+    window.location.href = url;
+  }
+
+  // Notificar a líder R1
+  document.getElementById('btnNotifyR1')?.addEventListener('click', () => {
+    openMailTo('liderR1@dominion.com', 'Exclusiones - Acción requerida (R1)',
+               'Hola,\n\nSe requiere tu apoyo para revisar las exclusiones de la Regional 1.\nGracias.');
+  });
+
+  // Notificar a líder R2
+  document.getElementById('btnNotifyR2')?.addEventListener('click', () => {
+    openMailTo('liderR2@dominion.com', 'Exclusiones - Acción requerida (R2)',
+               'Hola,\n\nSe requiere tu apoyo para revisar las exclusiones de la Regional 2.\nGracias.');
+  });
+
+  // Crear evento Teams (Outlook Web)
+  document.getElementById('btnTeamsMeeting')?.addEventListener('click', () => {
+    window.open('https://outlook.office.com/calendar/action/compose', '_blank', 'noopener');
+  });
+
+  // Vaciar módulos (reutiliza flujo del botón verde de la card)
+  document.getElementById('btnVaciarModulo')?.addEventListener('click', () => {
+    const proxy = document.getElementById('btnQuickClear');
+    if (proxy) proxy.click();
+    else alert('No encontré #btnQuickClear para reusar el flujo.');
+  });
+});
+</script>
 </body>
 </html>
