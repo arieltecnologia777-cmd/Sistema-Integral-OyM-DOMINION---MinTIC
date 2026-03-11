@@ -1561,6 +1561,45 @@ async function eliminarRegistrosGlobal(){
   showToast('Se eliminaron los registros de todas las OTs (local).', 'info');
   updateHeaderStats();
 }
+/* ======= Eliminar por OT (solo local) ======= */
+async function eliminarRegistrosOT(ot){
+  const regActiva = sessionStorage.getItem("gestor_regional") || "Todas";
+  const humano = (regActiva === "Todas")
+    ? "TODOS los registros de la OT (todas las regionales)"
+    : `los registros de la OT en la regional ${regActiva}`;
+
+  const ok = await confirmModal(`¿Eliminar ${humano}? (solo en memoria)`);
+  if(!ok) return;
+
+  let tocados = 0;
+  const otKey = (ot ?? '').toString().trim();
+
+  for (const it of datos){
+    const sameOT = (it.ot ?? '').toString().trim() === otKey;
+    if(!sameOT) continue;
+
+    // Si el gestor es R1/R2, solo limpia su propia regional
+    if (regActiva !== "Todas"){
+      if ((it.regional ?? '').toString().trim() !== regActiva) continue;
+    }
+
+    // Limpieza local de los campos editables
+    if ((it.causa ?? '') !== '' || (Array.isArray(it.fotos) && it.fotos.length)){
+      it.causa = '';
+      it.fotos = [];
+      tocados++;
+    }
+  }
+
+  // Esta OT vuelve a tener pendientes (causas vacías): quitamos "en edición"
+  otsEnEdicion.delete(ot);
+
+  // Re-pintar tabla y contadores
+  render();
+  updateHeaderStats();
+
+  showToast(`OT ${ot}: ${tocados} registro(s) eliminados (local).`, 'info');
+}
 
 /* ======= Delegación de clic (tabla) ======= */
 $('#wrapGrupos').addEventListener('click', (e)=>{
