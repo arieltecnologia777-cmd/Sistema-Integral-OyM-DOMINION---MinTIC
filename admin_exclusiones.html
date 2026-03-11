@@ -2886,42 +2886,78 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeNotifPanel();
 });
 
-// ==== Cargar lista de notificaciones del Worker ====
-
+// ==== Cargar lista de notificaciones del Worker (agregador con fallback) ====
 async function loadNotifications(){
-  const list  = document.getElementById('notifList');
-  if(!list) return;
+  const list = document.getElementById('notifList');
+  if (!list) return;
 
   list.innerHTML = `<div class="n-item">Cargando notificaciones…</div>`;
 
+  const API_ROOT = 'https://exclusiones-worker.modulo-de-exclusiones.workers.dev';
+  const PROJS    = ['p1','p2','p3'];
+  const bust     = `_t=${Date.now()}`;
+
+  // 1) Intento global (si existe unificado)
   try{
-    const res = await fetch('https://exclusiones-worker.modulo-de-exclusiones.workers.dev/admin/notificaciones/list');
-    const j = await res.json().catch(()=>null);
-
-    if(!j || !j.ok){
-      list.innerHTML = `<div class="n-item">Error al cargar notificaciones.</div>`;
-      return;
+    const r = await fetch(`${API_ROOT}/admin/notificaciones/list?${bust}`, { mode: 'cors', cache: 'no-store' });
+    const j = await r.json().catch(()=>null);
+    if (r.ok && j?.ok && Array.isArray(j.items)) {
+      return renderNotifList(list, j.items);
     }
+    // si 404 u estructura no ok, seguimos al fallback
+  }catch(_e){ /* seguimos al fallback */ }
 
-    const arr = j.items || [];
+  // 2) Fallback: consultar por proyecto y unificar
+  const results = await Promise.allSettled(
+    PROJS.map(p => fetch(`${API_ROOT}/${p}/admin/notificaciones/list?${bust}`, { mode:'cors', cache:'no-store' })
+                    .then(res => res.json().catch(()=>null))
+                    .catch(()=>null))
+  );
 
-    if(arr.length === 0){
-      list.innerHTML = `<div class="n-item">No hay notificaciones recientes.</div>`;
-      return;
+  // Extraer items válidos
+  let items = [];
+  results.forEach((rs, i) => {
+    const j = rs.status === 'fulfilled' ? rs.value : null;
+    if (j?.ok && Array.isArray(j.items)) {
+      // etiquetamos el origen por si lo quieres mostrar luego
+      const tagged = j.items.map(it => ({ ...it, proyecto: PROJS[i] }));
+      items.push(...tagged);
     }
+  });
 
-    list.innerHTML = arr.map(n => `
-      <div class="n-item">
-        <strong>${n.region || '—'}</strong><br>
-        ${n.mensaje || ''}<br>
-        <small>${new Date(n.ts).toLocaleString()}</small>
-      </div>
-    `).join('');
-
-  }catch(err){
-    list.innerHTML = `<div class="n-item">Error: ${err.message}</div>`;
+  if (!items.length) {
+    list.innerHTML = `<div class="n-item">Error al cargar notificaciones.</div>`;
+    return;
   }
+
+  // Ordenar por timestamp desc (asumiendo it.ts = epoch ms o ISO válido)
+  items.sort((a,b) => (Number(b.ts||0) - Number(a.ts||0)));
+
+  renderNotifList(list, items);
 }
+
+// Helper de pintado (UI)
+function renderNotifList(listEl, items){
+  if (!items || !items.length) {
+    listEl.innerHTML = `<div class="n-item">No hay notificaciones recientes.</div>`;
+    return;
+  }
+  listEl.innerHTML = items.map(n => {
+    const fecha = n.ts ? new Date(n.ts) : null;
+    const when  = fecha && !isNaN(fecha.getTime()) ? fecha.toLocaleString() : '—';
+    const region = n.region || n.proyecto?.toUpperCase?.() || '—';
+    const msg = (n.mensaje || n.msg || '').toString();
+
+    return `
+      <div class="n-item">
+        <strong>${region}</strong><br>
+        ${msg}<br>
+        <small>${when}</small>
+      </div>
+    `;
+  }).join('');
+}
+
 
 </script>
 <!-- Modal de NOTIFICACIONES -->
