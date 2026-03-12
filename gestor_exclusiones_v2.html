@@ -596,6 +596,137 @@ html{
   }
 }
 /* === /FIX ZOOM GLOBAL === */
+
+/* ====== IA mini (drawer de chat + subida) ====== */
+.ia-mini{ position: fixed; inset: 0; z-index: 12020; display:none; }
+.ia-mini.show{ display:block; }
+
+.ia-mini-backdrop{
+  position:absolute; inset:0;
+  background: rgba(10,16,30,.35); backdrop-filter: blur(2px);
+}
+
+.ia-mini-panel{
+  position: absolute; top:0; right:0; height:100%;
+  width:min(420px, 92vw);
+  background:#fff;
+  border-left:1px solid #e6ecfb;
+  box-shadow: -24px 0 80px rgba(0,0,0,.28);
+  display:flex; flex-direction:column;
+}
+
+.ia-mini-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px; border-bottom:1px solid #e9eefb;
+  background:#ffffffcc; backdrop-filter: blur(6px);
+}
+.ia-mini-hl{ display:flex; align-items:center; gap:12px; }
+.ia-mini-avatar{
+  width:36px; height:36px; border-radius:10px;
+  background:#f2f6ff; border:1px solid #e2ecff;
+}
+.ia-mini-title{ font-weight:900; color:#0e2040; }
+.ia-mini-sub{ font-size:12px; color:#4b5974; }
+.ia-mini-close{
+  background:#fff; border:1px solid #dfe7fb;
+  border-radius:999px; padding:6px 10px; cursor:pointer;
+}
+.ia-mini-close:hover{ background:#f5f8ff; }
+
+.ia-mini-thread{
+  flex:1; overflow:auto;
+  padding:12px 14px;
+  background:linear-gradient(180deg,#f8fbff,#fff);
+  display:flex; flex-direction:column; gap:10px;
+}
+
+.ia-msg{
+  max-width:86%; padding:10px 12px;
+  border-radius:12px; font-size:14px; line-height:1.25;
+  box-shadow:0 4px 14px rgba(14,42,94,.08);
+}
+.ia-msg.bot{
+  background:#eef4ff; border:1px solid #d7e4ff; color:#0e2a63;
+  align-self:flex-start;
+}
+.ia-msg.user{
+  background:#0e4aa8; border:1px solid #0c3f8f; color:#fff;
+  align-self:flex-end;
+}
+
+.ia-mini-input{
+  padding:12px; border-top:1px solid #e9eefb;
+  display:flex; gap:8px; background:#fff;
+}
+.ia-mini-text{
+  flex:1; height:40px;
+  border-radius:12px; border:1px solid #d7e0f5;
+  padding:0 12px; font-size:14px;
+}
+.ia-mini-btn{
+  height:40px; padding:0 14px;
+  border-radius:12px; border:1px solid #d7e0f5;
+  background:#fff; color:#0e4aa8; cursor:pointer;
+}
+.ia-mini-btn:hover{ background:#f4f7ff; }
+
+.ia-mini-btn-primary{
+  background:#0e4aa8; color:#fff; border-color:#0e4aa8;
+}
+.ia-mini-btn-primary:hover{ background:#0c3f8f; }
+
+.ia-mini-upload{
+  padding:12px 14px;
+  border-top:1px solid #e9eefb; background:#fff;
+}
+.ia-mini-upload.hidden{ display:none; }
+.ia-mini-lb{
+  display:block; font-weight:800; color:#122240; margin-bottom:8px;
+}
+.ia-mini-file{
+  display:block; width:100%;
+  border:1px dashed #cfe0ff;
+  background:#f9fbff;
+  padding:12px; border-radius:12px;
+  margin-bottom:10px;
+}
+.ia-mini-upload-actions{
+  display:flex; justify-content:flex-end;
+}
+/* ===== Variante centrada del IA mini (modal prompt) ===== */
+.ia-mini.center .ia-mini-panel{
+  /* Deja de ser sidebar: se vuelve tarjeta centrada */
+  position: relative;
+  right: auto; top: auto; height: auto;
+  width: min(560px, 94vw);
+  max-height: 78vh;
+  margin: 10vh auto 0;              /* centra horizontal y baja un poco */
+  border-left: none;
+  border: 1px solid #e6ecfb;
+  border-radius: 16px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+
+.ia-mini.center .ia-mini-thread{
+  /* El hilo hace scroll dentro del modal */
+  max-height: calc(78vh - 56px - 56px - 90px); /* alto total - header - input - margen */
+  overflow: auto;
+}
+
+.ia-mini.center .ia-mini-backdrop{
+  /* igual que antes, solo aseguramos capa oscura */
+  background: rgba(10,16,30,.45);
+  backdrop-filter: blur(4px);
+}
+
+/* Ajustes sutiles del header en modal */
+.ia-mini.center .ia-mini-head{
+  border-bottom: 1px solid #e9eefb;
+  background: #fff;
+  backdrop-filter: none;
+}
+
 </style>
 </head>
 <body>
@@ -625,8 +756,13 @@ html{
     <div class="sb-ico sb-ico-sky"></div>
     <div class="sb-label">SLA</div>
   </button>
-</aside>
+<!-- === Asistente (sidebar) === -->
+  <button class="sb-item" id="btnIAmini" data-mod="asistente">
+    <img src="assistant_casco.png" alt="Asistente" class="sb-ai-avatar" width="18" height="18" />
+    <div class="sb-label">Asistente</div>
+  </button>
 
+</aside>
 <!-- BOTÓN HAMBURGUESA (SOLO MÓVIL) -->
 <button id="sidebarToggle" class="sidebar-toggle">&#9776;</button>
 <!-- HEADER -->
@@ -750,6 +886,45 @@ html{
     </div>
   </div>
 </div>
+<!-- ================== Drawer IA mini (chat y subida) ================== -->
+<div id="iaMini" class="ia-mini" aria-hidden="true">
+  <div class="ia-mini-backdrop" data-close="1" tabindex="-1"></div>
+
+  <aside class="ia-mini-panel" role="dialog" aria-labelledby="iaMiniTitle" aria-modal="true">
+    <header class="ia-mini-head">
+      <div class="ia-mini-hl">
+        <img src="assistant_casco.png" alt="Asistente" class="ia-mini-avatar" width="36" height="36"/>
+        <div>
+          <div id="iaMiniTitle" class="ia-mini-title">Asistente</div>
+          <div class="ia-mini-sub">Automatizo cargas por módulo (Operatividad, Backlog, SLA)</div>
+        </div>
+      </div>
+      <button type="button" class="ia-mini-close" title="Cerrar" data-close="1">✕</button>
+    </header>
+
+    <div id="iaMiniThread" class="ia-mini-thread" aria-live="polite" aria-atomic="false"></div>
+
+    <div id="iaMiniUpload" class="ia-mini-upload hidden">
+      <label class="ia-mini-lb">
+        Subir archivo <strong>CSV/XLSX</strong> para <strong id="iaMiniModLabel">—</strong>
+      </label>
+      <input id="iaMiniFile" class="ia-mini-file" type="file"
+             accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+      <div class="ia-mini-upload-actions">
+        <button id="iaMiniSave" class="ia-mini-btn ia-mini-btn-primary" type="button" disabled>Guardar registro</button>
+      </div>
+    </div>
+
+    <form id="iaMiniForm" class="ia-mini-input" autocomplete="off">
+      <input id="iaMiniText" class="ia-mini-text" type="text"
+             placeholder="Escribe: operatividad | backlog | sla…"
+             aria-label="Mensaje al asistente" />
+      <button class="ia-mini-btn" type="submit" title="Enviar">Preguntar</button>
+    </form>
+  </aside>
+</div>
+<!-- ================== /Drawer IA mini ================== -->
+
 <script>
 /* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
 /* [MOD] Detección de módulo + API_BASE dinámica (sin tocar UI) */
@@ -1851,19 +2026,32 @@ setTimeout(() => {
    SIDEBAR NAV + HAMBURGER
 ====================== */
 
-// Activar módulo actual
+// Activar módulo actual (solo módulos reales)
 document.querySelectorAll(".sb-item").forEach(btn=>{
-  if(btn.dataset.mod === __MOD){
+  const mod = (btn.dataset.mod || '').trim().toLowerCase();
+  if (mod === __MOD && (mod === 'operatividad' || mod === 'backlog' || mod === 'sla')) {
     btn.classList.add("active");
   }
 });
 
-// Navegación entre módulos
+// Navegación entre módulos (ignora Asistente)
 document.querySelectorAll(".sb-item").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    const mod = btn.dataset.mod;
-    const base = window.location.pathname.split("/").pop();
-    window.location.href = `${base}?m=${mod}`;
+  btn.addEventListener("click", (e)=>{
+    const mod = (btn.dataset.mod || '').trim().toLowerCase();
+
+    // Si es el botón del asistente → NO navegar, solo abrir el drawer
+    if (mod === 'asistente' || btn.id === 'btnIAmini') {
+      e.preventDefault();
+      e.stopPropagation();
+      iaMiniOpen?.();
+      return;
+    }
+
+    // Solo navegar si es uno de los módulos válidos
+    if (mod === 'operatividad' || mod === 'backlog' || mod === 'sla') {
+      const base = window.location.pathname.split("/").pop();
+      window.location.href = `${base}?m=${mod}`;
+    }
   });
 });
 
@@ -1874,6 +2062,14 @@ const toggle = document.getElementById("sidebarToggle");
 toggle.addEventListener("click", ()=>{
   sb.classList.toggle("open");
 });
+
+// << Abrir drawer desde el botón del sidebar >>
+document.getElementById('btnIAmini')?.addEventListener('click', (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  iaMiniOpen?.();
+});
+
   // === Ajustar el título visual según __MOD (solo rótulo, no afecta datos) ===
 (function(){
   const h1 = document.querySelector('.header-title');
@@ -1885,6 +2081,193 @@ toggle.addEventListener("click", ()=>{
   };
   h1.textContent = map[__MOD] || 'Exclusiones';
 })();
+
+/* === IA mini (drawer) — versión mínima === */
+const iaMiniRoot   = document.getElementById('iaMini');
+const iaMiniThread = document.getElementById('iaMiniThread');
+const iaMiniForm   = document.getElementById('iaMiniForm');
+const iaMiniText   = document.getElementById('iaMiniText');
+const iaMiniUpload = document.getElementById('iaMiniUpload');
+const iaMiniModLbl = document.getElementById('iaMiniModLabel');
+const iaMiniFile   = document.getElementById('iaMiniFile');
+const iaMiniSave   = document.getElementById('iaMiniSave');
+
+let iaMiniTargetMod = null;
+
+function iaMiniOpen(){
+  if(!iaMiniRoot) return console.warn('No existe #iaMini');
+  iaMiniRoot.classList.add('show', 'center'); // ← activa el modo centrado
+  iaMiniRoot.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  if(iaMiniThread){
+    iaMiniThread.innerHTML = '';
+    iaMiniSay('bot','¡Hola! ¿Qué deseas hacer? (operatividad, backlog o sla)');
+  }
+  if(iaMiniUpload){ iaMiniUpload.classList.add('hidden'); }
+  if(iaMiniFile){ iaMiniFile.value=''; }
+  if(iaMiniSave){ iaMiniSave.disabled = true; }
+  iaMiniTargetMod = null;
+  iaMiniText?.focus();
+}
+function iaMiniClose(){
+  if(!iaMiniRoot) return;
+  iaMiniRoot.classList.remove('show');
+  iaMiniRoot.classList.remove('center'); // ← limpia el modo centrado al cerrar
+  iaMiniRoot.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+function iaMiniSay(who, text){
+  if(!iaMiniThread) return;
+  const b = document.createElement('div');
+  b.className = `ia-msg ${who}`;
+  b.textContent = text;
+  iaMiniThread.appendChild(b);
+  iaMiniThread.scrollTop = iaMiniThread.scrollHeight;
+}
+function normalizeIntent(s){
+  const t = (s||'').toString().trim().toLowerCase();
+  if(/op(?:eratividad|erativa)?|^oper$|^op$/.test(t)) return 'operatividad';
+  if(/back(?:log)?|^back$|^ind$/.test(t)) return 'backlog';
+  if(/sla/.test(t)) return 'sla';
+  return null;
+}
+function labelFor(mod){
+  return mod==='operatividad' ? 'Operatividad'
+       : mod==='backlog'      ? 'IND Backlog'
+       : mod==='sla'          ? 'SLA' : '—';
+}
+
+// Cerrar por backdrop o botón ✕
+iaMiniRoot?.addEventListener('click', (e)=>{ if(e.target?.dataset?.close) iaMiniClose(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && iaMiniRoot?.classList.contains('show')) iaMiniClose(); });
+
+// Enviar texto → detectar intención y mostrar upload
+iaMiniForm?.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const msg = iaMiniText?.value?.trim();
+  if(!msg) return;
+  iaMiniSay('user', msg);
+  iaMiniText.value = '';
+  const mod = normalizeIntent(msg);
+  if(!mod){
+    iaMiniSay('bot','No entendí. Escribe operatividad, backlog o sla.');
+    return;
+  }
+  iaMiniTargetMod = mod;
+  if(iaMiniModLbl) iaMiniModLbl.textContent = labelFor(mod);
+  iaMiniUpload?.classList.remove('hidden');
+  iaMiniSay('bot', `Perfecto: ${labelFor(mod)}. Adjunta tu CSV/XLSX y pulsa “Guardar registro”.`);
+});
+
+// Habilitar botón guardar cuando haya archivo
+iaMiniFile?.addEventListener('change', ()=>{
+  if(!iaMiniSave) return;
+  iaMiniSave.disabled = !(iaMiniFile.files && iaMiniFile.files.length > 0);
+});
+
+/* === Helper POST con fallbacks (multipart/form-data) === */
+async function postFormWithFallback(base, paths, formData, headers){
+  let lastErr = null;
+  for(const p of paths){
+    try{
+      const res = await fetch(`${base}${p}`, {
+        method:'POST',
+        mode:'cors',
+        headers: { ...(headers||{}) },  // NO poner Content-Type, el navegador lo añade por ser FormData
+        body: formData
+      });
+      const json = await res.json().catch(()=>null);
+      if(res.ok && json && (json.ok === true || json.result === 'ok')) {
+        return { ok:true, used:p, json };
+      }
+      lastErr = new Error(json?.error || `HTTP ${res.status} (${p})`);
+    }catch(e){ lastErr = e; }
+  }
+  return { ok:false, error: lastErr?.message || 'Fallo desconocido' };
+}
+
+/* === Mapeo de módulo elegido → base del Worker === */
+function baseFor(mod){
+  // Usa el API_ROOT que ya tienes arriba en tu script
+  return `${API_ROOT}/${mod==='operatividad' ? 'p1' : (mod==='backlog' ? 'p2' : 'p3')}`;
+}
+function labelFor(mod){
+  return mod==='operatividad' ? 'Operatividad'
+       : mod==='backlog'      ? 'IND Backlog'
+       : mod==='sla'          ? 'SLA' : '—';
+}
+
+/* === Click en “Guardar registro” === */
+iaMiniSave?.addEventListener('click', async ()=>{
+  if(!iaMiniTargetMod){
+    iaMiniSay('bot','Primero dime el módulo: operatividad | backlog | sla.');
+    return;
+  }
+  const f = iaMiniFile?.files?.[0];
+  if(!f){
+    iaMiniSay('bot','Selecciona un archivo (CSV/XLS/XLSX) antes de guardar.');
+    return;
+  }
+
+  // UI → estado “enviando”
+  iaMiniSave.disabled = true;
+  const oldText = iaMiniSave.textContent;
+  iaMiniSave.textContent = 'Enviando…';
+
+  try{
+    // Regional del gestor + token (manteniendo tu patrón)
+    const regActiva = sessionStorage.getItem('gestor_regional') || (typeof regionalActual !== 'undefined' ? regionalActual : 'Todas') || 'Todas';
+    const token = (sessionStorage.getItem('admin_token') || sessionStorage.getItem('gestor_token') || 'GESTOR_DOMINION').trim();
+
+    // FormData para multipart
+    const form = new FormData();
+    form.append('file', f);
+    form.append('mod', iaMiniTargetMod);  // operatividad | backlog | sla
+    form.append('regional', regActiva);
+    form.append('ts', String(Date.now()));
+
+    // Posibles rutas en tu Worker (orden de preferencia)
+    const resp = await postFormWithFallback(
+      baseFor(iaMiniTargetMod),
+      [
+        '/api/admin/subir',
+        '/api/subir',
+        '/api/uploadCSV',
+        '/upload'
+      ],
+      form,
+      { 'Authorization': `Bearer ${token}` }
+    );
+
+    if(resp.ok){
+      iaMiniSay('bot', `Archivo recibido para ${labelFor(iaMiniTargetMod)} ✅`);
+      // Toast si tienes showToast disponible
+      try{ showToast(`Asistente: carga enviada a ${labelFor(iaMiniTargetMod)} (${resp.used}).`, 'success'); }catch(_){}
+
+      // Si el prompt está en el mismo módulo de la vista actual → refrescar
+      try{
+        if(typeof __MOD !== 'undefined' && __MOD === iaMiniTargetMod && typeof cargarDesdeServidor === 'function'){
+          await cargarDesdeServidor();
+        }
+      }catch(_){}
+
+      // Limpiar selección y restablecer botón
+      if(iaMiniFile) iaMiniFile.value = '';
+      iaMiniSave.disabled = true;
+      iaMiniSave.textContent = oldText || 'Guardar registro';
+    }else{
+      throw new Error(resp.error || 'No se pudo guardar en el servidor');
+    }
+  }catch(err){
+    console.error(err);
+    iaMiniSay('bot', `Error al guardar: ${err.message}`);
+    try{ showToast?.(`Asistente: error al guardar (${err.message}).`, 'error'); }catch(_){}
+    iaMiniSave.textContent = oldText || 'Guardar registro';
+    iaMiniSave.disabled = false;
+  }
+});
+
+
 </script>
 </body>
 </html>
