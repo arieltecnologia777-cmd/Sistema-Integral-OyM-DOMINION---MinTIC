@@ -2197,6 +2197,29 @@ function labelFor(mod){
        : mod==='sla'          ? 'SLA' : '—';
 }
 
+// ===== CSV parser simple (soporta comillas y separadores) =====
+function parseCSV(text, sep = ',') {
+  const rows = [];
+  let cur = '', row = [], inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], n = text[i+1];
+    if (c === '"') {
+      if (inQuotes && n === '"') { cur += '"'; i++; }        // doble comilla -> literal "
+      else { inQuotes = !inQuotes; }                         // abre/cierra
+    } else if (c === sep && !inQuotes) {
+      row.push(cur); cur = '';
+    } else if ((c === '\n' || c === '\r') && !inQuotes) {
+      if (cur.length || row.length) { row.push(cur); rows.push(row); }
+      cur = ''; row = [];
+      if (c === '\r' && n === '\n') i++;                     // CRLF
+    } else {
+      cur += c;
+    }
+  }
+  if (cur.length || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
 /* === Click en “Guardar registro” === */
 iaMiniSave?.addEventListener('click', async ()=>{
   if(!iaMiniTargetMod){
