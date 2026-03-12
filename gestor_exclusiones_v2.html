@@ -909,7 +909,7 @@ html{
         Subir archivo <strong>CSV/XLSX</strong> para <strong id="iaMiniModLabel">—</strong>
       </label>
       <input id="iaMiniFile" class="ia-mini-file" type="file"
-             accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+             accept=".csv,text/csv" />
       <div class="ia-mini-upload-actions">
         <button id="iaMiniSave" class="ia-mini-btn ia-mini-btn-primary" type="button" disabled>Guardar registro</button>
       </div>
@@ -924,38 +924,6 @@ html{
   </aside>
 </div>
 <!-- ================== /Drawer IA mini ================== -->
-
-<!-- Loader con fallback para SheetJS (prueba unpkg -> cdnjs -> local) -->
-<script>
-(async () => {
-  const urls = [
-    'https://unpkg.com/xlsx@0.19.3/dist/xlsx.full.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.19.3/xlsx.full.min.js',
-    './vendor-xls.js' // ← deja este archivo en tu repo como plan C
-  ];
-
-  for (const src of urls) {
-    try {
-      await new Promise((ok, fail) => {
-        const s = document.createElement('script');
-        s.src = src;
-        s.async = true;
-        s.onload = () => ok();
-        s.onerror = () => fail(new Error('load error ' + src));
-        document.head.appendChild(s);
-      });
-      // ¿ya existe XLSX?
-      if (window.XLSX) { console.log('[loader] XLSX OK desde', src); break; }
-    } catch (e) {
-      console.warn('[loader] fallo cargando', src, e);
-    }
-  }
-
-  if (!window.XLSX) {
-    console.error('No se pudo cargar SheetJS (XLSX). Usa CSV o revisa bloqueadores/ORIGEN.');
-  }
-})();
-</script>
 
 <script>
 /* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
@@ -2188,7 +2156,7 @@ iaMiniForm?.addEventListener('submit', (e)=>{
   iaMiniTargetMod = mod;
   if(iaMiniModLbl) iaMiniModLbl.textContent = labelFor(mod);
   iaMiniUpload?.classList.remove('hidden');
-  iaMiniSay('bot', `Perfecto: ${labelFor(mod)}. Adjunta tu CSV/XLSX y pulsa “Guardar registro”.`);
+  iaMiniSay('bot', `Perfecto: ${labelFor(mod)}. Adjunta tu archivo CSV y pulsa “Guardar registro”.`);
 });
 
 // Habilitar botón guardar cuando haya archivo
@@ -2330,84 +2298,58 @@ const token = tokenMap[iaMiniTargetMod];
           await cargarDesdeServidor();
         }
       }catch(_){}
-// === Sobrescribir dataset automáticamente si el archivo es CSV/XLS/XLSX ===
+// === Sobrescribir dataset automáticamente (CSV-only) ===
 try {
   const lowerName = (f.name || '').toLowerCase();
-  let aoa = null;
 
-  if (lowerName.endsWith('.csv')) {
-    // 1) Leer CSV
+  if (!lowerName.endsWith('.csv')) {
+    iaMiniSay('bot', 'Por favor sube un archivo CSV.');
+  } else {
+    // 1) Leer CSV en el navegador
     const text = await new Promise((resolve, reject) => {
       const rd = new FileReader();
       rd.onload = () => resolve(rd.result);
       rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
       rd.readAsText(f, 'utf-8');
     });
-    // 2) Separador heurístico
+
+    // 2) Separador heurístico: ',' o ';'
     const sep = (text.split(';').length > text.split(',').length) ? ';' : ',';
-    // 3) AOA desde CSV
-    aoa = parseCSV(text, sep);
 
-  } else if (lowerName.endsWith('.xls') || lowerName.endsWith('.xlsx')) {
-    // 1) Leer Excel
+    // 3) AOA desde CSV (tu worker normaliza por módulo)
+    const aoa = parseCSV(text, sep);
 
-console.log('[IA-mini] Leyendo XLSX con SheetJS…', !!window.XLSX, f.name); // Log 1
-
-const buf = await f.arrayBuffer();
-const wb = XLSX.read(buf, { type: 'array' });
-
-// Elegir la primera hoja que tenga rango (!ref)
-let sheetName = wb.SheetNames[0];
-for (const n of wb.SheetNames) {
-  const ws0 = wb.Sheets[n];
-  if (ws0 && ws0['!ref']) { sheetName = n; break; }
-}
-const ws = wb.Sheets[sheetName];
-
-// AOA desde Excel (header:1 => primera fila son encabezados)
-aoa = XLSX.utils.sheet_to_json(ws, {
-  header: 1,
-  raw: false,    // formatea fechas como texto legible
-  defval: '',    // celdas vacías => ''
-  blankrows: false
-});
-console.log('[IA-mini] Hoja usada:', sheetName, 'Filas leídas (incluye encabezado):', aoa.length);
-
-  }
-
-  if (Array.isArray(aoa) && aoa.length) {
-    // 4) Enviar a /api/sobrescribir con Bearer JSON
-    const base = baseFor(iaMiniTargetMod); // p1/p2/p3
-    const tokenMap = {
-      operatividad: "ADMINARIELITO777",
-      backlog:      "ARIEL-P2_c1N0mD-9tX4zQ-2026_Exclu#2",
-      sla:          "ARIEL-P3_k7V2sL-4pT9yM-2026_Exclu#3"
-    };
-    const adminToken = tokenMap[iaMiniTargetMod];
-
-console.log('[IA-mini] Enviando /api/sobrescribir con filas:', aoa.length, 'base:', baseFor(iaMiniTargetMod));
-
-    const resp2 = await postJSONWithFallback(
-      base,
-      ['/api/sobrescribir'],
-      { aoa },
-      { 'Authorization': `Bearer ${adminToken}` } // JSON (Bearer) => preflight OK en tu Worker
-    );
-
-    if (resp2.ok) {
-      iaMiniSay('bot', 'Dataset actualizado en el servidor ✅');
-      try { await cargarDesdeServidor(); } catch(_) {}
+    if (!Array.isArray(aoa) || !aoa.length) {
+      iaMiniSay('bot', 'El CSV no tiene filas legibles. Verifica que la primera fila sea el encabezado.');
     } else {
-      iaMiniSay('bot', `Guardé el archivo, pero sobrescribir falló: ${resp2.error}. Pulsa "Actualizar" o revisa Network.`);
+      // 4) Enviar a /api/sobrescribir con Bearer JSON
+      const base = baseFor(iaMiniTargetMod); // p1/p2/p3
+      const tokenMap = {
+        operatividad: "ADMINARIELITO777",
+        backlog:      "ARIEL-P2_c1N0mD-9tX4zQ-2026_Exclu#2",
+        sla:          "ARIEL-P3_k7V2sL-4pT9yM-2026_Exclu#3"
+      };
+      const adminToken = tokenMap[iaMiniTargetMod];
+
+      const resp2 = await postJSONWithFallback(
+        base,
+        ['/api/sobrescribir'],
+        { aoa },
+        { 'Authorization': `Bearer ${adminToken}` }
+      );
+
+      if (resp2.ok) {
+        iaMiniSay('bot', 'Dataset actualizado en el servidor ✅');
+        try { await cargarDesdeServidor(); } catch(_) {}
+      } else {
+        iaMiniSay('bot', `Guardé el archivo, pero sobrescribir falló: ${resp2.error}. Pulsa "Actualizar" o revisa Network.`);
+      }
     }
-  } else {
-    iaMiniSay('bot', 'Archivo recibido, pero no se pudieron leer filas. Verifica que tenga encabezados.');
   }
 } catch (e) {
   iaMiniSay('bot', `Guardé el archivo, pero falló la actualización de la tabla: ${e.message}`);
 }
-// === /Sobrescribir CSV/XLS/XLSX ===
-
+// === /CSV-only ===
       // Limpiar selección y restablecer botón
       if(iaMiniFile) iaMiniFile.value = '';
       iaMiniSave.disabled = true;
