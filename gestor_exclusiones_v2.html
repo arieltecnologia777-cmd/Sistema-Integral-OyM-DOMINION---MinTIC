@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- Sello de build para diagnosticar versiones renderizadas -->
 <meta name="x-build" content="build-2026-03-02-merge-beta-ui+backend-p1+B-option+regional-filter+col-regional">
+
 <style>
 :root{
   --dom-blue:#0e4aa8; /* Azul corporativo */
@@ -621,9 +622,17 @@ html{
   background:#ffffffcc; backdrop-filter: blur(6px);
 }
 .ia-mini-hl{ display:flex; align-items:center; gap:12px; }
+/* === Avatar grande en el IA mini (modal prompt) === */
 .ia-mini-avatar{
-  width:36px; height:36px; border-radius:10px;
-  background:#f2f6ff; border:1px solid #e2ecff;
+  width: 54px !important;      /* antes 36px */
+  height: 54px !important;
+  border-radius: 12px;
+  background: #f2f6ff;
+  border: 1px solid #d6e4ff;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-left: 2px;            /* opcional: lo acerca al borde */
+  box-shadow: 0 3px 8px rgba(14,42,94,.12); /* toque sutil */
 }
 .ia-mini-title{ font-weight:900; color:#0e2040; }
 .ia-mini-sub{ font-size:12px; color:#4b5974; }
@@ -725,6 +734,169 @@ html{
   border-bottom: 1px solid #e9eefb;
   background: #fff;
   backdrop-filter: none;
+}
+/* === IA avatar (sidebar) — hacer más grande y consistente === */
+.sb-ai-avatar{
+  width: 30px !important;
+  height: 30px !important;
+  object-fit: contain;
+  /* Para que no se “pegue” al texto */
+  margin-left: 2px;
+}
+
+/* === Asistente (sidebar): icono más notorio y PEGAO a la izquierda === */
+#btnIAmini{
+  padding-left: 6px !important;   /* antes estaba ~10-12px; lo pegamos más */
+  gap: 10px;                       /* deja un poco menos de aire entre icono y texto */
+}
+
+#btnIAmini .sb-ai-avatar{
+  width: 26px;                     /* sube el tamaño para notarlo más (ajustable: 24–28) */
+  height: 26px;
+  margin-left: 0;                  /* sin margen extra a la izquierda */
+  object-fit: contain;
+
+  /* Opcional: pastilla para resaltar el icono */
+  background: #eef4ff;
+  border: 1px solid #cfe0ff;
+  border-radius: 8px;
+  padding: 3px;                    /* aire interno de la pastilla */
+  box-shadow: 0 1px 2px rgba(14,74,168,.15);
+}
+
+/* Opcional: efecto sutil al hover del botón de Asistente */
+#btnIAmini:hover .sb-ai-avatar{
+  transform: scale(1.05);
+  transition: transform .12s ease, box-shadow .12s ease;
+  box-shadow: 0 2px 6px rgba(14,74,168,.18);
+}
+/* ===== Asistente (sidebar): icono grande, sin cuadro, pegado a la izquierda ===== */
+#btnIAmini{
+  padding-left: 6px !important;     /* más pegado al borde izquierdo */
+  gap: 12px;                         /* espacio entre icono y texto (ajustable) */
+}
+
+#btnIAmini .sb-ai-avatar{
+  /* Tamaño notorio (ajusta si quieres 24px / 28px) */
+  width: 28px !important;
+  height: 28px !important;
+
+  /* Quitar “cuadro” y rellenos */
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+
+  /* Alineación/consistencia */
+  margin-left: 0 !important;
+  object-fit: contain;
+  flex-shrink: 0;                    /* evita que el icono se comprima en layouts estrechos */
+}
+
+/* === Botón "Adjuntar CSV" (estilo pastilla azul) === */
+.btn-upload-csv{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;              /* alto y ancho visual */
+  background: #0e4aa8;             /* azul corporativo */
+  color: #fff;                     /* texto blanco */
+  font-weight: 800;                /* negrita similar a la imagen */
+  font-size: 14px;
+  border: none;
+  border-radius: 999px;            /* pastilla */
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(14,74,168,.20);
+  transition: background .15s ease, transform .08s ease, box-shadow .15s ease;
+  user-select: none;
+  text-decoration: none;           /* por si algún navegador lo trata como link */
+}
+
+.btn-upload-csv:hover{
+  background: #0c3f8f;             /* un toque más oscuro al hover */
+  box-shadow: 0 6px 16px rgba(14,74,168,.28);
+}
+
+.btn-upload-csv:active{
+  transform: translateY(1px);
+}
+
+/* Nombre del archivo (opcional, junto al botón) */
+.ia-mini-file-name{
+  margin-left: 10px;
+  font-size: 13px;
+  color: #41506b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  display: inline-block;
+}
+
+/* Ajuste del contenedor de upload para que se vea limpio */
+#iaMiniUpload{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Fuerza que el bloque de subida NO se vea jamás hasta ser activado */
+#iaMiniUpload.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Asegura que el prompt SÍ se vea */
+#iaMiniForm {
+  display: flex !important;
+}
+
+/* === Botón "Adjuntar CSV" — versión más pequeña === */
+.btn-upload-csv{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;          /* antes 10px 16px → más pequeño */
+  background: #0e4aa8;
+  color: #fff;
+  font-weight: 700;           /* menos pesado visualmente */
+  font-size: 13px;            /* antes 14px */
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(14,74,168,.15);
+  transition: background .15s ease, transform .08s ease, box-shadow .15s ease;
+}
+
+.btn-upload-csv:hover{
+  background: #0c3f8f;
+  box-shadow: 0 5px 12px rgba(14,74,168,.20);
+}
+
+.btn-upload-csv:active{
+  transform: translateY(1px);
+}
+/* === Botón "Guardar registro" — versión más pequeña === */
+.ia-mini-btn{
+  height: 32px !important;       /* antes 40px → más pequeño */
+  padding: 0 14px;
+  border-radius: 10px;
+  border:1px solid #d7e0f5;
+  background:#fff;
+  color:#0e4aa8;
+  font-size: 13px;               /* antes 14px */
+  cursor:pointer;
+}
+
+.ia-mini-btn-primary{
+  background:#0e4aa8 !important;
+  border-color:#0e4aa8 !important;
+  color:#fff !important;
 }
 
 </style>
@@ -906,10 +1078,19 @@ html{
 
     <div id="iaMiniUpload" class="ia-mini-upload hidden">
       <label class="ia-mini-lb">
-        Subir archivo <strong>CSV/XLSX</strong> para <strong id="iaMiniModLabel">—</strong>
+        Subir archivo <strong>CSV</strong> para <strong id="iaMiniModLabel">—</strong>>
       </label>
-      <input id="iaMiniFile" class="ia-mini-file" type="file"
-       accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+      <!-- Botón visual -->
+<label for="iaMiniFile" class="btn-upload-csv" title="Adjuntar CSV">
+  Adjuntar CSV
+</label>
+
+<!-- Input REAL (oculto) -->
+<input id="iaMiniFile" class="ia-mini-file" type="file"
+       accept=".csv,text/csv" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" />
+
+<!-- Nombre del archivo seleccionado (opcional) -->
+<span id="iaMiniFileName" class="ia-mini-file-name" aria-live="polite"></span>
       <div class="ia-mini-upload-actions">
         <button id="iaMiniSave" class="ia-mini-btn ia-mini-btn-primary" type="button" disabled>Guardar registro</button>
       </div>
@@ -923,11 +1104,6 @@ html{
     </form>
   </aside>
 </div>
-<!-- ================== /Drawer IA mini ================== -->
-
-<!-- Librería XLSX (debe cargarse antes de tu script) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.19.3/xlsx.full.min.js"
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 /* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
 /* [MOD] Detección de módulo + API_BASE dinámica (sin tocar UI) */
@@ -2119,13 +2295,30 @@ function iaMiniClose(){
   iaMiniRoot.setAttribute('aria-hidden','true');
   document.body.style.overflow='';
 }
-function iaMiniSay(who, text){
+function iaMiniSay(who, text, speed = 18){
   if(!iaMiniThread) return;
+
   const b = document.createElement('div');
   b.className = `ia-msg ${who}`;
-  b.textContent = text;
+
+  // espacio reservado para la animación
+  const span = document.createElement('span');
+  b.appendChild(span);
+
   iaMiniThread.appendChild(b);
-  iaMiniThread.scrollTop = iaMiniThread.scrollHeight;
+
+  let i = 0;
+
+  function escribir() {
+    if (i < text.length) {
+      span.textContent += text.charAt(i);
+      i++;
+      iaMiniThread.scrollTop = iaMiniThread.scrollHeight;
+      setTimeout(escribir, speed);   // velocidad (ajustable)
+    }
+  }
+
+  escribir();
 }
 function normalizeIntent(s){
   const t = (s||'').toString().trim().toLowerCase();
@@ -2164,8 +2357,16 @@ iaMiniForm?.addEventListener('submit', (e)=>{
 
 // Habilitar botón guardar cuando haya archivo
 iaMiniFile?.addEventListener('change', ()=>{
-  if(!iaMiniSave) return;
-  iaMiniSave.disabled = !(iaMiniFile.files && iaMiniFile.files.length > 0);
+  if (iaMiniSave) {
+    iaMiniSave.disabled = !(iaMiniFile.files && iaMiniFile.files.length > 0);
+  }
+  // Mostrar nombre del archivo junto al botón
+  const nameEl = document.getElementById('iaMiniFileName');
+  if (nameEl) {
+    const f = iaMiniFile.files && iaMiniFile.files[0];
+    nameEl.textContent = f ? f.name : '';
+    nameEl.title = f ? f.name : '';
+  }
 });
 
 /* === Helper POST con fallbacks (multipart/form-data) === */
@@ -2268,8 +2469,10 @@ if (
   k === "observacion" ||
   k === "observaciones" ||
   k === "comentario" ||
-  k === "comentarios"
-) return "Causa";
+  k === "comentarios" ||
+  k.includes("exclusion") ||      // captura “exclusión”
+  k.includes("exclu")             // captura cualquier abreviación
+) return "Causa";                 // ← SIEMPRE con tilde
 
   return raw?.toString()?.trim() || '';
 }
@@ -2309,7 +2512,7 @@ iaMiniSave?.addEventListener('click', async ()=>{
   }
   const f = iaMiniFile?.files?.[0];
   if(!f){
-    iaMiniSay('bot','Selecciona un archivo (CSV/XLS/XLSX) antes de guardar.');
+    iaMiniSay('bot','Selecciona un archivo CSV antes de guardar.');
     return;
   }
 
@@ -2338,65 +2541,73 @@ iaMiniSave?.addEventListener('click', async ()=>{
 
 
   // =====================================================================
-  // 2) PRIMERO — LEER CSV Y EJECUTAR /api/sobrescribir (PRIORIDAD)
-  // =====================================================================
-  if (!lowerName.endsWith('.csv')) {
-    iaMiniSay('bot', 'Por favor sube un archivo CSV.');
+// 2) PRIMERO — LEER CSV y EJECUTAR /api/sobrescribir (PRIORIDAD)
+//     *SOLO CSV* + Encabezados FORZADOS (plantilla canónica)
+// =====================================================================
+if (!lowerName.endsWith('.csv')) {
+  iaMiniSay('bot', 'Por favor sube un archivo CSV (.csv).');
+} else {
+  // A) Leer CSV (UTF-8; limpiamos BOM y nulos si aparecen)
+  let text = await new Promise((resolve, reject) => {
+    const rd = new FileReader();
+    rd.onload  = () => resolve(rd.result);
+    rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
+    rd.readAsText(f);
+  });
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  if (text.indexOf('\0') !== -1) text = text.replace(/\0/g, '');
+
+  // B) Detectar separador: coma, punto y coma, TAB o PIPE
+  function detectSeparator(sampleText){
+    const sample = sampleText.split(/\r?\n/).slice(0, 5).join("\n");
+    const candidates = [',', ';', '\t', '|'];
+    let best = ',', max = 0;
+    for (const sep of candidates){
+      const count = (sample.match(new RegExp('\\' + sep, 'g')) || []).length;
+      if (count > max){ max = count; best = sep; }
+    }
+    return best;
+  }
+  const sep = detectSeparator(text);
+
+  // C) AOA + Normalización + Encabezados FORZADOS (plantilla fija)
+  const aoa = parseCSV(text, sep);
+  const aoaCanonBase = toCanonicalAOA(aoa);
+
+  // Plantilla canónica que SIEMPRE usará el backend
+  function forceTemplateHeaders(aoa2){
+    const template = ["Fecha","ID","OT","Causa","Regional"];
+    const rows = Array.isArray(aoa2) ? aoa2.slice(1) : [];
+    return [template, ...rows];
+  }
+  const aoaCanon = forceTemplateHeaders(aoaCanonBase);
+
+  if (!Array.isArray(aoa) || !aoa.length) {
+    iaMiniSay('bot', 'El CSV no tiene filas válidas.');
   } else {
+    // D) POST /api/sobrescribir
+    const base = baseFor(iaMiniTargetMod);
+    const tokenMap = {
+      operatividad: "ADMINARIELITO777",
+      backlog:      "ARIEL-P2_c1N0mD-9tX4zQ-2026_Exclu#2",
+      sla:          "ARIEL-P3_k7V2sL-4pT9yM-2026_Exclu#3"
+    };
+    const adminToken = tokenMap[iaMiniTargetMod];
 
-    // A) Leer CSV
-    const text = await new Promise((resolve, reject) => {
-      const rd = new FileReader();
-      rd.onload = () => resolve(rd.result);
-      rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
-      rd.readAsText(f);
-    });
+    const respSob = await postJSONWithFallback(
+      base, ['/api/sobrescribir'],
+      { aoa: aoaCanon },
+      { 'Authorization': `Bearer ${adminToken}` }
+    );
 
-    // B) Detectar separador REAL: coma, punto y coma, TAB o PIPE
-function detectSeparator(text){
-  const sample = text.split(/\r?\n/).slice(0, 5).join("\n");
-  const candidates = [',', ';', '\t', '|'];
-  let best = ',', max = 0;
-
-  for(const sep of candidates){
-    const count = (sample.match(new RegExp('\\' + sep, 'g')) || []).length;
-    if(count > max){
-      max = count;
-      best = sep;
-    }
-  }
-  return best;
-}
-
-const sep = detectSeparator(text);
-
-    // C) Convertir a AOA
-    const aoa = parseCSV(text, sep);
-const aoaCanon = toCanonicalAOA(aoa);
-    if (!Array.isArray(aoa) || !aoa.length) {
-      iaMiniSay('bot', 'El CSV no tiene filas válidas.');
+    if (respSob.ok) {
+      iaMiniSay('bot', 'Dataset actualizado en el servidor ✅');
+      try { await cargarDesdeServidor(); } catch(_){}
     } else {
-
-      // D) POST al backend → /api/sobrescribir
-      const base = baseFor(iaMiniTargetMod);
-
-      const respSob = await postJSONWithFallback(
-  base,
-  ['/api/sobrescribir'],
-  { aoa: aoaCanon },
-  { 'Authorization': `Bearer ${adminToken}` }
-);
-      if (respSob.ok) {
-        sobrescritoOK = true;
-        iaMiniSay('bot', 'Dataset actualizado en el servidor ✅');
-
-        try { await cargarDesdeServidor(); } catch(_){}
-      } else {
-        iaMiniSay('bot', `Sobrescribir falló: ${respSob.error}`);
-      }
+      iaMiniSay('bot', `Sobrescribir falló: ${respSob.error}`);
     }
   }
-
+}
 
 
   // =====================================================================
@@ -2462,51 +2673,6 @@ const aoaCanon = toCanonicalAOA(aoa);
 }
     
 });
-
-// --- Helper para leer Excel .xlsx/.xls y enviar al backend ---
-async function procesarXLSX(file) {
-  if (typeof XLSX === 'undefined') {
-    iaMiniSay('bot', 'No se pudo cargar la librería XLSX.');
-    return;
-  }
-
-  iaMiniSay('bot', 'Procesando Excel…');
-
-  const data = await file.arrayBuffer();
-  const wb = XLSX.read(data, { type: 'array' });
-
-  const sheet = wb.Sheets[wb.SheetNames[0]];
-  if (!sheet) {
-    iaMiniSay('bot', 'El Excel no contiene hojas.');
-    return;
-  }
-
-  const aoa = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-  const aoaCanon = toCanonicalAOA(aoa);
-
-  const base = baseFor(iaMiniTargetMod);
-
-  const tokenMap = {
-    operatividad: "ADMINARIELITO777",
-    backlog:      "ARIEL-P2_c1N0mD-9tX4zQ-2026_Exclu#2",
-    sla:          "ARIEL-P3_k7V2sL-4pT9yM-2026_Exclu#3"
-  };
-  const adminToken = tokenMap[iaMiniTargetMod];
-
-  const respSob = await postJSONWithFallback(
-    base,
-    ['/api/sobrescribir'],
-    { aoa: aoaCanon },
-    { 'Authorization': `Bearer ${adminToken}` }
-  );
-
-  if (respSob.ok) {
-    iaMiniSay('bot', 'Dataset actualizado desde XLSX ✔');
-    try { await cargarDesdeServidor(); } catch(_) {}
-  } else {
-    iaMiniSay('bot', 'Error al procesar XLSX: ' + respSob.error);
-  }
-}
 
 </script>
 </body>
