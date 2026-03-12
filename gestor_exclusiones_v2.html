@@ -2346,7 +2346,7 @@ iaMiniSave?.addEventListener('click', async ()=>{
       const rd = new FileReader();
       rd.onload = () => resolve(rd.result);
       rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
-      rd.readAsText(f, 'utf-8');
+      rd.readAsText(f);
     });
 
     // B) Detectar separador REAL: coma, punto y coma, TAB o PIPE
