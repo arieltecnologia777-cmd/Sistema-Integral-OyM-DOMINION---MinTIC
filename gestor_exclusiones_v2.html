@@ -2225,6 +2225,7 @@ iaMiniSave?.addEventListener('click', async ()=>{
     form.append('mod', iaMiniTargetMod);  // operatividad | backlog | sla
     form.append('regional', regActiva);
     form.append('ts', String(Date.now()));
+    form.append('token', token);
 
     // Posibles rutas en tu Worker (orden de preferencia)
     const resp = await postFormWithFallback(
@@ -2236,7 +2237,7 @@ iaMiniSave?.addEventListener('click', async ()=>{
         '/upload'
       ],
       form,
-      { 'Authorization': `Bearer ${token}` }
+      {}
     );
 
     if(resp.ok){
