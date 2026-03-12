@@ -925,6 +925,7 @@ html{
 </div>
 <!-- ================== /Drawer IA mini ================== -->
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.19.3/dist/xlsx.full.min.js"></script>
 <script>
 /* ======================= CONFIG BACKEND (Cloudflare Workers) ======================= */
 /* [MOD] Detección de módulo + API_BASE dinámica (sin tocar UI) */
@@ -2298,25 +2299,35 @@ const token = tokenMap[iaMiniTargetMod];
           await cargarDesdeServidor();
         }
       }catch(_){}
-// === Sobrescribir dataset automáticamente si el archivo es CSV ===
+// === Sobrescribir dataset automáticamente si el archivo es CSV/XLS/XLSX ===
 try {
   const lowerName = (f.name || '').toLowerCase();
+  let aoa = null;
 
   if (lowerName.endsWith('.csv')) {
-    // 1) Leer CSV en el navegador
+    // 1) Leer CSV
     const text = await new Promise((resolve, reject) => {
       const rd = new FileReader();
       rd.onload = () => resolve(rd.result);
       rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
       rd.readAsText(f, 'utf-8');
     });
-
-    // 2) Elegir separador simple (heurística , o ;)
+    // 2) Separador heurístico
     const sep = (text.split(';').length > text.split(',').length) ? ';' : ',';
+    // 3) AOA desde CSV
+    aoa = parseCSV(text, sep);
 
-    // 3) AOA crudo; tu Worker normaliza Backlog (p2) internamente
-    const aoa = parseCSV(text, sep);
+  } else if (lowerName.endsWith('.xls') || lowerName.endsWith('.xlsx')) {
+    // 1) Leer Excel
+    const buf = await f.arrayBuffer();
+    const wb = XLSX.read(buf, { type: 'array' });
+    const sheetName = wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    // 2) AOA desde Excel (header=1 => primera fila = encabezados)
+    aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: '' });
+  }
 
+  if (Array.isArray(aoa) && aoa.length) {
     // 4) Enviar a /api/sobrescribir con Bearer JSON
     const base = baseFor(iaMiniTargetMod); // p1/p2/p3
     const tokenMap = {
@@ -2330,7 +2341,7 @@ try {
       base,
       ['/api/sobrescribir'],
       { aoa },
-      { 'Authorization': `Bearer ${adminToken}` }
+      { 'Authorization': `Bearer ${adminToken}` } // JSON (Bearer) => preflight OK en tu Worker
     );
 
     if (resp2.ok) {
@@ -2340,12 +2351,12 @@ try {
       iaMiniSay('bot', `Guardé el archivo, pero sobrescribir falló: ${resp2.error}. Pulsa "Actualizar" o revisa Network.`);
     }
   } else {
-    iaMiniSay('bot', 'Archivo recibido. Para ver la tabla al instante, sube CSV (XLS/XLSX lo podemos habilitar luego).');
+    iaMiniSay('bot', 'Archivo recibido, pero no se pudieron leer filas. Verifica que tenga encabezados.');
   }
 } catch (e) {
   iaMiniSay('bot', `Guardé el archivo, pero falló la actualización de la tabla: ${e.message}`);
 }
-// === /Sobrescribir CSV ===
+// === /Sobrescribir CSV/XLS/XLSX ===
 
       // Limpiar selección y restablecer botón
       if(iaMiniFile) iaMiniFile.value = '';
