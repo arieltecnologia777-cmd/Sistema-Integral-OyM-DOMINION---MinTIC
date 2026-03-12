@@ -2223,13 +2223,16 @@ function parseCSV(text, sep = ',') {
 // === Normalización de cabeceras a canónicas ===
 // 1) Quitar acentos, espacios dobles, minúsculas
 function normKey(s){
-  return (s ?? '')
+  return (s ?? "")
     .toString()
     .trim()
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove accents
-    .replace(/[^a-z0-9]+/g,' ')                      // symbols -> space
-    .replace(/\s+/g,' ')
+    // 💥 IMPORTANTE: quitar tildes (áéíóúñ)
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    // reemplazar caracteres raros por espacios
+    .replace(/[^a-z0-9]+/g, " ")
+    // compactar espacios
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -2250,19 +2253,20 @@ function canonicalFor(raw){
   // Regional
   if (k.includes('regional') || k.includes('region')) return 'Regional';
 
-  // Causa (variantes frecuentes)
-  if (
-    k === 'causa' ||
-    k === 'justificacion' ||
-    k === 'motivo' ||
-    k === 'causa exclusion' ||
-    k === 'causa de exclusion' ||
-    k === 'motivo de exclusion' ||
-    k === 'observacion' ||
-    k === 'observaciones' ||
-    k === 'comentario' ||
-    k === 'comentarios'
-  ) return 'Causa';
+  // Causa (muchas variantes)
+if (
+  k === "causa" ||
+  k === "justificacion" ||
+  k === "motivo" ||
+  k === "causa exclusion" ||
+  k === "causa de exclusion" ||
+  k === "motivo exclusion" ||
+  k === "motivo de exclusion" ||
+  k === "observacion" ||
+  k === "observaciones" ||
+  k === "comentario" ||
+  k === "comentarios"
+) return "Causa";
 
   return raw?.toString()?.trim() || '';
 }
