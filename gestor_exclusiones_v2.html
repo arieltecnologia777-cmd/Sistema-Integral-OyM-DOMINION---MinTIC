@@ -2220,6 +2220,80 @@ function parseCSV(text, sep = ',') {
   return rows;
 }
 
+// === Normalización de cabeceras a canónicas ===
+// 1) Quitar acentos, espacios dobles, minúsculas
+function normKey(s){
+  return (s ?? '')
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')  // remove accents
+    .replace(/[^a-z0-9]+/g,' ')                      // symbols -> space
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+// 2) Mapa de variantes → clave canónica
+function canonicalFor(raw){
+  const k = normKey(raw);
+
+  // Fecha
+  if (k.includes('fecha')) return 'Fecha';
+
+  // ID
+  if (k === 'id' || k.includes('id ')) return 'ID';
+
+  // OT (muchas variantes)
+  if (k==='ot' || k.includes('orden de trabajo') || k.includes('ot max') || k.includes('# ot'))
+    return 'OT';
+
+  // Regional
+  if (k.includes('regional') || k.includes('region')) return 'Regional';
+
+  // Causa (variantes frecuentes)
+  if (
+    k === 'causa' ||
+    k === 'justificacion' ||
+    k === 'motivo' ||
+    k === 'causa exclusion' ||
+    k === 'causa de exclusion' ||
+    k === 'motivo de exclusion' ||
+    k === 'observacion' ||
+    k === 'observaciones' ||
+    k === 'comentario' ||
+    k === 'comentarios'
+  ) return 'Causa';
+
+  return raw?.toString()?.trim() || '';
+}
+
+// 3) AOA → AOA canónico (orden: Fecha, ID, OT, Causa, Regional)
+function toCanonicalAOA(aoa){
+  if (!Array.isArray(aoa) || aoa.length === 0) return aoa;
+
+  const header = aoa[0] ?? [];
+  const rows = aoa.slice(1);
+
+  // índice por columna
+  const idx = {};
+  header.forEach((h,i)=>{
+    const canon = canonicalFor(h);
+    if (canon && !(canon in idx)) idx[canon] = i;
+  });
+
+  const ideal = ['Fecha','ID','OT','Causa','Regional'];
+
+  const newHeader = ideal;
+  const newRows = rows.map(r=>{
+    return ideal.map(key=>{
+      const pos = idx[key];
+      return (typeof pos === 'number') ? (r[pos] ?? '') : '';
+    });
+  });
+
+  return [newHeader, ...newRows];
+}
+
 /* === Click en “Guardar registro” === */
 iaMiniSave?.addEventListener('click', async ()=>{
   if(!iaMiniTargetMod){
@@ -2276,7 +2350,7 @@ iaMiniSave?.addEventListener('click', async ()=>{
 
     // C) Convertir a AOA
     const aoa = parseCSV(text, sep);
-
+const aoaCanon = toCanonicalAOA(aoa);
     if (!Array.isArray(aoa) || !aoa.length) {
       iaMiniSay('bot', 'El CSV no tiene filas válidas.');
     } else {
@@ -2285,11 +2359,11 @@ iaMiniSave?.addEventListener('click', async ()=>{
       const base = baseFor(iaMiniTargetMod);
 
       const respSob = await postJSONWithFallback(
-        base,
-        ['/api/sobrescribir'],
-        { aoa },
-        { 'Authorization': `Bearer ${adminToken}` }
-      );
+  base,
+  ['/api/sobrescribir'],
+  { aoa: aoaCanon },
+  { 'Authorization': `Bearer ${adminToken}` }
+);
 
       if (respSob.ok) {
         sobrescritoOK = true;
