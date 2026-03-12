@@ -2298,6 +2298,54 @@ const token = tokenMap[iaMiniTargetMod];
           await cargarDesdeServidor();
         }
       }catch(_){}
+// === Sobrescribir dataset automáticamente si el archivo es CSV ===
+try {
+  const lowerName = (f.name || '').toLowerCase();
+
+  if (lowerName.endsWith('.csv')) {
+    // 1) Leer CSV en el navegador
+    const text = await new Promise((resolve, reject) => {
+      const rd = new FileReader();
+      rd.onload = () => resolve(rd.result);
+      rd.onerror = () => reject(new Error('No se pudo leer el CSV'));
+      rd.readAsText(f, 'utf-8');
+    });
+
+    // 2) Elegir separador simple (heurística , o ;)
+    const sep = (text.split(';').length > text.split(',').length) ? ';' : ',';
+
+    // 3) AOA crudo; tu Worker normaliza Backlog (p2) internamente
+    const aoa = parseCSV(text, sep);
+
+    // 4) Enviar a /api/sobrescribir con Bearer JSON
+    const base = baseFor(iaMiniTargetMod); // p1/p2/p3
+    const tokenMap = {
+      operatividad: "ADMINARIELITO777",
+      backlog:      "ARIEL-P2_c1N0mD-9tX4zQ-2026_Exclu#2",
+      sla:          "ARIEL-P3_k7V2sL-4pT9yM-2026_Exclu#3"
+    };
+    const adminToken = tokenMap[iaMiniTargetMod];
+
+    const resp2 = await postJSONWithFallback(
+      base,
+      ['/api/sobrescribir'],
+      { aoa },
+      { 'Authorization': `Bearer ${adminToken}` }
+    );
+
+    if (resp2.ok) {
+      iaMiniSay('bot', 'Dataset actualizado en el servidor ✅');
+      try { await cargarDesdeServidor(); } catch(_) {}
+    } else {
+      iaMiniSay('bot', `Guardé el archivo, pero sobrescribir falló: ${resp2.error}. Pulsa "Actualizar" o revisa Network.`);
+    }
+  } else {
+    iaMiniSay('bot', 'Archivo recibido. Para ver la tabla al instante, sube CSV (XLS/XLSX lo podemos habilitar luego).');
+  }
+} catch (e) {
+  iaMiniSay('bot', `Guardé el archivo, pero falló la actualización de la tabla: ${e.message}`);
+}
+// === /Sobrescribir CSV ===
 
       // Limpiar selección y restablecer botón
       if(iaMiniFile) iaMiniFile.value = '';
