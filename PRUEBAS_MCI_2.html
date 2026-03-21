@@ -170,32 +170,37 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
     /* Responsive */
     @media (max-width:1024px){.col-6{grid-column:span 12}.col-4{grid-column:span 12}.col-3{grid-column:span 6}}
     
-/* === [ANCLA REAL] MOVIL — SIDEBAR SUPER COMPACTO === */
+/* === [ANCLA REAL] SIDEBAR MOVIL — MÁS TRANSPARENTE Y COMPACTO === */
 @media (max-width:860px){
-  .sidebar{
+
+  /* Sidebar oculto por defecto */
+  #sidebar{
     position: fixed;
     inset: 0 auto 0 0;
     transform: translateX(-100%);
-    width: min(60vw, 280px);   /* ⬅️ BAJADO */
-    margin: 4px;
-    padding: 12px 10px;
-    box-shadow: none;
+    width: min(60vw, 280px) !important;   /* ancho móvil */
+    margin: 4px !important;
+    padding: 12px 10px !important;
+    box-shadow: none !important;
   }
 
-  body.sidebar-open .sidebar{
-    transform: none;
-    background: color-mix(in srgb, var(--sb-bg) 52%, transparent);
-    border-color: var(--sb-line);
-    box-shadow: var(--neo-shadow);
-    backdrop-filter: blur(14px) saturate(120%) brightness(0.96);
-    -webkit-backdrop-filter: blur(14px) saturate(120%) brightness(0.96);
+  /* Sidebar abierto (AQUÍ SUBIMOS TRANSPARENCIA) */
+  body.sidebar-open #sidebar{
+    transform: none !important;
+
+    /* MÁS TRANSPARENTE → 28% blanco, 72% transparente */
+    background: color-mix(in srgb, var(--sb-bg) 8%, transparent) !important;
+
+    border-color: var(--sb-line) !important;
+    box-shadow: var(--neo-shadow) !important;
+    backdrop-filter: blur(14px) saturate(120%) brightness(0.96) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(120%) brightness(0.96) !important;
   }
 
-  .hamburger{ display:flex; }
-  .container{ padding:10px; }
+  .hamburger{ display:flex !important; }
+  .container{ padding:10px !important; }
 }
-/* === [/ANCLA REAL] === */
-
+/* === [/ANCLA REAL] SIDEBAR MOVIL — MÁS TRANSPARENTE Y COMPACTO === */
     /* Badges & status */
     .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;border-radius:999px;padding:6px 10px}
     .badge.ok{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
@@ -1069,7 +1074,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
                   <div class="col-12 field"><label>Firma (imagen)</label>
                     <div class="photo-grid">
                       <div class="photo-cell" data-title="Firma técnico">
-                        <input id="inp-firma-tec" type="file" accept="image/*" capture="environment">
+                        <input id="inp-firma-tec" type="file" accept="image/*">
                         <div class="placeholder">
                           <svg viewBox="0 0 24 24" fill="none">
                             <path d="M4 16v3a1 1 0 0 0 1 1h3M16 4h3a1 1 0 0 1 1 1v3M4 8V5a1 1 0 0 1 1-1h3M16 20h3a1 1 0 0 0 1-1v-3"
@@ -1111,7 +1116,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
   <!-- Caja de foto REAL (clickable) -->
   <div class="photo-grid">
     <div class="photo-cell" data-title="Coordenadas GPS (Excel)">
-      <input id="img-gps-geo" type="file" accept="image/*" capture="environment">
+      <input id="img-gps-geo" type="file" accept="image/*">
       <div class="placeholder">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M12 2v3m0 14v3m9-9h-3M6 12H3m11 0a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z"
@@ -1129,7 +1134,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
   <label>Dispositivo móvil conectado al AP exterior</label>
   <div class="photo-grid">
     <div class="photo-cell" data-title="Móvil conectado - Exterior">
-      <input id="img-movil-ext" type="file" accept="image/*" capture="environment">
+      <input id="img-movil-ext" type="file" accept="image/*">
       <div class="placeholder">
         <svg viewBox="0 0 24 24" fill="none">
           <rect x="7" y="2" width="10" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
@@ -1146,7 +1151,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <label>Equipos WIFI Interior</label>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="AP Interior">
-                  <input id="img-ap-int" type="file" accept="image/*" capture="environment">
+                  <input id="img-ap-int" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0M10 12a2 2 0 1 1 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto AP Interior</div>
@@ -1160,7 +1165,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <label>Equipos WIFI Exterior 1 (AP1)</label>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="AP Exterior 1">
-                  <input id="img-ap-ext1" type="file" accept="image/*" capture="environment">
+                  <input id="img-ap-ext1" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0M10 12a2 2 0 1 1 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto AP Exterior 1</div>
@@ -1174,7 +1179,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <label>Equipos WIFI Exterior 2 (AP2 – si aplica)</label>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="AP Exterior 2">
-                  <input id="img-ap-ext2" type="file" accept="image/*" capture="environment">
+                  <input id="img-ap-ext2" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0M10 12a2 2 0 1 1 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto AP Exterior 2</div>
@@ -1188,7 +1193,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
   <label>Equipos de cómputo conectados a Internet (IE)</label>
   <div class="photo-grid">
     <div class="photo-cell" data-title="PC conectados - Interior">
-      <input id="img-pc-int" type="file" accept="image/*" capture="environment">
+      <input id="img-pc-int" type="file" accept="image/*">
       <div class="placeholder">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M4 6h16v10H4zM8 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -1206,7 +1211,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Señalética exterior</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Señalética exterior">
-                  <input id="img-senal-ext" type="file" accept="image/*" capture="environment">
+                  <input id="img-senal-ext" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 7h14l-3-3H8l-3 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto</div>
@@ -1219,7 +1224,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Señalética interior</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Señalética interior">
-                  <input id="img-senal-int" type="file" accept="image/*" capture="environment">
+                  <input id="img-senal-int" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 7h14l-3-3H8l-3 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto</div>
@@ -1232,7 +1237,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Solución de respaldo (4 horas) · si aplica</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Solución respaldo">
-                  <input id="img-respaldo" type="file" accept="image/*" capture="environment">
+                  <input id="img-respaldo" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto</div>
@@ -1247,7 +1252,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Print de servidor (evento UPS)</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Print servidor TRIARA UPS">
-                  <input id="img-print-ups" type="file" accept="image/*" capture="environment">
+                  <input id="img-print-ups" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M6 9V5h12v4M6 14h12v5H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir print</div>
@@ -1260,7 +1265,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Medición eléctrica 1</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Medición eléctrica 1">
-                  <input id="img-med1" type="file" accept="image/*" capture="environment">
+                  <input id="img-med1" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="m13 2-2 7h4l-3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto</div>
@@ -1273,7 +1278,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Medición eléctrica 2</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Medición eléctrica 2">
-                  <input id="img-med2" type="file" accept="image/*" capture="environment">
+                  <input id="img-med2" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="m13 2-2 7h4l-3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir foto</div>
@@ -1288,7 +1293,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Navegación AP Indoor</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Navegación Indoor">
-                  <input id="img-nav-indoor" type="file" accept="image/*" capture="environment">
+                  <input id="img-nav-indoor" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v10H4zM8 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir evidencia</div>
@@ -1301,7 +1306,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Navegación AP Outdoor</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Navegación Outdoor">
-                  <input id="img-nav-outdoor" type="file" accept="image/*" capture="environment">
+                  <input id="img-nav-outdoor" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16v10H4zM8 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir evidencia</div>
@@ -1314,7 +1319,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Prueba de velocidad</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Speedtest">
-                  <input id="img-speedtest" type="file" accept="image/*" capture="environment">
+                  <input id="img-speedtest" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9M12 3v5m0 0l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir speedtest</div>
@@ -1330,7 +1335,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Portal cautivo</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Portal cautivo">
-                  <input id="img-portal" type="file" accept="image/*" capture="environment">
+                  <input id="img-portal" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M5 11V7a7 7 0 0 1 14 0v4M5 11h14v8H5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir evidencia</div>
@@ -1343,7 +1348,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Bloqueo de páginas · 1</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Bloqueo páginas #1">
-                  <input id="img-block1" type="file" accept="image/*" capture="environment">
+                  <input id="img-block1" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M5 11V7a7 7 0 0 1 14 0v4M5 11h14v8H5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir evidencia</div>
@@ -1356,7 +1361,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
               <div class="field"><label>Bloqueo de páginas · 2</label></div>
               <div class="photo-grid">
                 <div class="photo-cell" data-title="Bloqueo páginas #2">
-                  <input id="img-block2" type="file" accept="image/*" capture="environment">
+                  <input id="img-block2" type="file" accept="image/*">
                   <div class="placeholder">
                     <svg viewBox="0 0 24 24" fill="none"><path d="M5 11V7a7 7 0 0 1 14 0v4M5 11h14v8H5z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
                     <div>Subir evidencia</div>
@@ -1402,7 +1407,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
   <!-- Cuerpo foto -->
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #1">
-      <input id="img-antes-serial-1" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-1" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #1</div></div>
     </div>
   </div>
@@ -1422,7 +1427,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
 
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #2">
-      <input id="img-antes-serial-2" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-2" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #2</div></div>
     </div>
   </div>
@@ -1443,7 +1448,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
 
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #3">
-      <input id="img-antes-serial-3" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-3" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #3</div></div>
     </div>
   </div>
@@ -1464,7 +1469,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
 
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #4">
-      <input id="img-antes-serial-4" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-4" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #4</div></div>
     </div>
   </div>
@@ -1485,7 +1490,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
 
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #5">
-      <input id="img-antes-serial-5" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-5" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #5</div></div>
     </div>
   </div>
@@ -1506,7 +1511,7 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
 
   <div class="photo-body">
     <div class="photo-cell" data-title="Serial a retirar #6">
-      <input id="img-antes-serial-6" type="file" accept="image/*" capture="environment">
+      <input id="img-antes-serial-6" type="file" accept="image/*">
       <div class="placeholder"><div>Subir foto serial #6</div></div>
     </div>
   </div>
@@ -1521,18 +1526,18 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
         <div class="card">
           <h3>8. Registro fotográfico · Diagnóstico (antes de intervención)</h3>
           <div class="photo-grid">
-            <div class="photo-cell" data-title="Diagnóstico #1"><input id="img-antes-diag-1"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #2"><input id="img-antes-diag-2"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #3"><input id="img-antes-diag-3"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #4"><input id="img-antes-diag-4"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #5"><input id="img-antes-diag-5"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #6"><input id="img-antes-diag-6"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #7"><input id="img-antes-diag-7"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #8"><input id="img-antes-diag-8"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #9"><input id="img-antes-diag-9"  type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #10"><input id="img-antes-diag-10" type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #11"><input id="img-antes-diag-11" type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
-            <div class="photo-cell" data-title="Diagnóstico #12"><input id="img-antes-diag-12" type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #1"><input id="img-antes-diag-1"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #2"><input id="img-antes-diag-2"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #3"><input id="img-antes-diag-3"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #4"><input id="img-antes-diag-4"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #5"><input id="img-antes-diag-5"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #6"><input id="img-antes-diag-6"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #7"><input id="img-antes-diag-7"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #8"><input id="img-antes-diag-8"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #9"><input id="img-antes-diag-9"  type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #10"><input id="img-antes-diag-10" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #11"><input id="img-antes-diag-11" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
+            <div class="photo-cell" data-title="Diagnóstico #12"><input id="img-antes-diag-12" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
           </div>
         </div>
 
@@ -1551,30 +1556,30 @@ background: color-mix(in srgb, var(--sb-bg) 42%, transparent);
         <div class="card">
           <h3>10. Serial de repuestos instalados (Fotos)</h3>
           <div class="photo-grid">
-            <div class="photo-cell" data-title="Serial instalado #1"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #1</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #2"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #2</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #3"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #3</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #4"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #4</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #5"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #5</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #6"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir foto serial #6</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #1"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #1</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #2"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #2</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #3"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #3</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #4"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #4</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #5"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #5</div></div></div>
+            <div class="photo-cell" data-title="Serial instalado #6"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #6</div></div></div>
           </div>
         </div>
 
         <div class="card">
           <h3>11. Registro fotográfico · Resultado (después de intervención)</h3>
           <div class="photo-grid">
-            <div class="photo-cell" data-title="Resultado #1"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
-            <div class="photo-cell" data-title="Resultado #2"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
-            <div class="photo-cell" data-title="Resultado #3"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
-            <div class="photo-cell" data-title="Resultado #4"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
-            <div class="photo-cell" data-title="Resultado #5"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
-            <div class="photo-cell" data-title="Resultado #6"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
-            <div class="photo-cell" data-title="Resultado #7"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
-            <div class="photo-cell" data-title="Resultado #8"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
-            <div class="photo-cell" data-title="Resultado #9"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
-            <div class="photo-cell" data-title="Resultado #10"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
-            <div class="photo-cell" data-title="Resultado #11"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
-            <div class="photo-cell" data-title="Resultado #12"><input type="file" accept="image/*" capture="environment"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
+            <div class="photo-cell" data-title="Resultado #1"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
+            <div class="photo-cell" data-title="Resultado #2"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
+            <div class="photo-cell" data-title="Resultado #3"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
+            <div class="photo-cell" data-title="Resultado #4"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
+            <div class="photo-cell" data-title="Resultado #5"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
+            <div class="photo-cell" data-title="Resultado #6"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
+            <div class="photo-cell" data-title="Resultado #7"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
+            <div class="photo-cell" data-title="Resultado #8"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
+            <div class="photo-cell" data-title="Resultado #9"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
+            <div class="photo-cell" data-title="Resultado #10"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
+            <div class="photo-cell" data-title="Resultado #11"><input type="file" aaccept="image/*"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
+            <div class="photo-cell" data-title="Resultado #12"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
           </div>
         </div>
 
