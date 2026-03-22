@@ -3280,6 +3280,23 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
   margin-top: 0 !important;
 }
 
+* ===== FIX: nivelar altura de la tarjeta #1 (Coordenadas) con las demás ===== */
+/* El problema es min-height:240px aplicado SOLO a .p-geo más arriba en el CSS. */
+
+#sec-pruebas .pruebas-2col > .p-item.p-geo {
+  /* Opción 1: igualar al resto de p-item */
+  min-height: 228px !important;
+}
+
+/* Si prefieres empatar con la “SUBIDA NOTORIA” del theme (las photo-cell quedan ~230px),
+   usa esta alternativa en vez de la anterior: */
+/*
+#sec-pruebas .pruebas-2col > .p-item.p-geo {
+  min-height: 214px !important;  /* base de contenedor */
+}
+body.theme-pro #sec-pruebas .pruebas-2col > .p-item.p-geo {
+  min-height: 230px !important;  /* acompasa con el alargue del theme en photo-cell */
+}
     
   </style>
 </head>
