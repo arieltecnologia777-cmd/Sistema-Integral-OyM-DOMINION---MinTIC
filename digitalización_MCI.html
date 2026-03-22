@@ -3131,7 +3131,7 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
   }
 }
 
-    /* === OCULTAR “Control de cambios” (menú + sección) ========================= */
+/* === OCULTAR “Control de cambios” (menú + sección) ========================= */
 .nav a[data-target="sec-cambios"]{ 
   display: none !important;           /* oculta la opción del menú */
 }
@@ -3144,7 +3144,8 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
   padding: 0 !important;
   margin: 0 !important;
 }
-    
+
+
   </style>
 </head>
 <body class="theme-pro">
@@ -3784,12 +3785,30 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
         <div class="card">
           <h3>Etiqueta para fotos</h3>
           <div class="grid">
-            <div class="col-3 field"><label>ID Beneficiario</label><input type="text" placeholder="Ej. 30124"></div>
-            <div class="col-6 field"><label>Sede educativa o caso especial</label><input type="text" placeholder="CE MARQUETALIA"></div>
-            <div class="col-3 field"><label>Fecha</label><input type="date"></div>
-            <div class="col-6 field"><label>Coordenadas · Latitud</label><input type="number" step="0.000001" placeholder="10.375367"></div>
-            <div class="col-6 field"><label>Coordenadas · Longitud</label><input type="number" step="0.000001" placeholder="73.774123"></div>
-          </div>
+            <div class="col-3 field">
+  <label>ID Beneficiario</label>
+  <input id="etq-idben" type="text">
+</div>
+
+<div class="col-6 field">
+  <label>Sede educativa o caso especial</label>
+  <input id="etq-sede" type="text">
+</div>
+
+<div class="col-3 field">
+  <label>Fecha</label>
+  <input id="etq-fecha" type="date">
+</div>
+
+<div class="col-6 field">
+  <label>Coordenadas · Latitud</label>
+  <input id="etq-lat" type="number" step="0.000001">
+</div>
+
+<div class="col-6 field">
+  <label>Coordenadas · Longitud</label>
+  <input id="etq-lon" type="number" step="0.000001">
+</div>
         </div>
       </section>
 
@@ -4345,6 +4364,49 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
     console.warn('syncSapCardHeaders: no se pudieron sincronizar títulos', e);
   }
 })();
+
+
+// === ETIQUETA · ESPEJO (=) de ACTA y PRUEBAS =================================
+// Orígenes (ACTA y PRUEBAS)
+const srcIdBen = document.getElementById('inp-idben');   // ACTA · ID beneficiario
+const srcSede  = document.getElementById('inp-sede');     // ACTA · Sede
+const srcFecha = document.getElementById('inp-fecha');    // ACTA · Fecha (type="date", yyyy-mm-dd)
+const srcLat   = document.getElementById('inp-lat');      // PRUEBAS · Latitud (barra)
+const srcLon   = document.getElementById('inp-lon');      // PRUEBAS · Longitud (barra)
+
+// Destinos (ETIQUETA)
+const etqIdBen = document.getElementById('etq-idben');
+const etqSede  = document.getElementById('etq-sede');
+const etqFecha = document.getElementById('etq-fecha');    // también type="date"
+const etqLat   = document.getElementById('etq-lat');
+const etqLon   = document.getElementById('etq-lon');
+
+// Sincroniza (como "= en Excel"): copia valores 1:1, sin formateos extra
+function syncEtiqueta() {
+  if (srcIdBen && etqIdBen) etqIdBen.value = srcIdBen.value ?? '';
+  if (srcSede  && etqSede)  etqSede.value  = srcSede.value  ?? '';
+  if (srcFecha && etqFecha) etqFecha.value = srcFecha.value ?? ''; // yyyy-mm-dd compatible
+  if (srcLat   && etqLat)   etqLat.value   = srcLat.value   ?? '';
+  if (srcLon   && etqLon)   etqLon.value   = srcLon.value   ?? '';
+}
+
+// Disparar al cargar DOM (por si el usuario ya llenó ACTA antes de visitar ETIQUETA)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', syncEtiqueta);
+} else {
+  syncEtiqueta();
+}
+
+// Escuchar cambios en vivo en los campos de origen
+[srcIdBen, srcSede, srcFecha, srcLat, srcLon].forEach(el => {
+  if (!el) return;
+  el.addEventListener('input',  syncEtiqueta);
+  el.addEventListener('change', syncEtiqueta);
+});
+
+// (Opcional) Si quieres que en ETIQUETA no puedan editarse manualmente, descomenta:
+// [etqIdBen, etqSede, etqFecha, etqLat, etqLon].forEach(el => { if (el) el.readOnly = true; });
+
 
     document.getElementById('exportBtn').addEventListener('click', exportarMCI);
   </script>
