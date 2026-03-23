@@ -4472,12 +4472,13 @@ const fotosDespues = [
 ].filter(Boolean);
 
 
-      // ANTES: Observaciones
-      const antesObs = (document.getElementById('inp-antes-obs')?.value ?? '').trim();
+      // ANTES / DESPUÉS: Observaciones
+const antesObs   = (document.getElementById('inp-antes-obs')  ?.value ?? '').trim();
+const despuesObs = (document.getElementById('inp-despues-obs')?.value ?? '').trim();
 
-      // Coordenadas
-      const latitud  = (document.getElementById('inp-lat')?.value ?? '').trim();
-      const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
+// Coordenadas
+const latitud  = (document.getElementById('inp-lat')?.value ?? '').trim();
+const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
 
       // Declaración: acompaña
       const acompNombre = (document.getElementById('inp-acomp-nombre')?.value ?? '').trim();
@@ -4581,6 +4582,19 @@ const fotosDespues = [
       try{
         setStatus('Enviando al Flow…');
         setWorking(true, 'Enviando…');
+// --- Inyecta campos faltantes en los objetos a enviar ---
+if (typeof payloadJson === 'object' && payloadJson) {
+  // Observación de DESPUÉS al payload principal
+  payloadJson.despuesObs = despuesObs;
+}
+
+// (opcional pero recomendado) asegura que las fotos de DESPUÉS
+// viajen en el objeto de imágenes si usas imgsJson separado:
+if (typeof imgsJson === 'object' && imgsJson) {
+  if (!Array.isArray(imgsJson.despues)) {
+    imgsJson.despues = Array.isArray(fotosDespues) ? fotosDespues : [];
+  }
+}
 
         const resp = await fetch(FLOW_URL, {
           method: 'POST',
