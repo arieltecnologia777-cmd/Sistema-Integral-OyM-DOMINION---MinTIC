@@ -3549,17 +3549,21 @@ body.theme-pro #sec-despues .photo-grid .photo-cell::before{
           <div class="table card">
             <table aria-label="Equipos instalados o retirados">
               <thead>
-                <tr>
-                  <th style="width:36%">SAP · Descripción</th>
-                  <th style="width:16%">Cant. Retirado</th>
-                  <th style="width:16%">Cant. Instalado</th>
-                  <th style="width:22%">Serial (opcional)</th>
-                  <th style="width:10%"></th>
-                </tr>
-              </thead>
+  <tr>
+    <th style="width:36%">SAP · Descripción</th>
+    <th style="width:18%; text-align:center; padding-left:85px;">Instalado / Retirado</th>
+    <th style="width:26%; text-align:center; padding-left:90px;">Serial (obligatorio)</th>
+   <th style="width:10%"></th>
+  </tr>
+</thead>
               <tbody id="tbody-equipos"></tbody>
               <tfoot>
-                <tr><td colspan="5"><button class="btn secondary" id="addRowBtn">Agregar fila</button></td></tr>
+                <tr><td colspan="5"><button class="btn secondary"
+        id="addRowBtn"
+        style="padding:6px 14px; font-size:12px; border-radius:6px;">
+  Agregar fila
+</button>
+</td></tr>
               </tfoot>
             </table>
           </div>
@@ -4203,25 +4207,68 @@ body.theme-pro #sec-despues .photo-grid .photo-cell::before{
       ["4060273","BATERIA LFP48V30AH LITIO LIFEPO4 UPSN"],
       ["1052446","ANTENA 3FT 5GHZ 32DBI 4.9-5.9GHZ CBNW"],
     ]);
-    function makeRow(){
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input list="sap-list" placeholder="Ej: 4059979 · UPS..." class="inp-sap"></td>
-        <td><input type="number" min="0" step="1" value="0" class="inp-ret"></td>
-        <td><input type="number" min="0" step="1" value="0" class="inp-ins"></td>
-        <td><input type="text" placeholder="Serial (opcional)" class="inp-serial"></td>
-        <td><button class="btn secondary btn-del" title="Eliminar fila">Eliminar</button></td>
-      `;
-      const sapInput = tr.querySelector('.inp-sap');
-      sapInput.addEventListener('change', ()=>{
-        const v = sapInput.value.trim();
-        if (v.includes('·')) return;
-        const desc = sapMap.get(v);
-        if (desc) sapInput.value = `${v} · ${desc}`;
-      });
-      tr.querySelector('.btn-del').addEventListener('click', () => tr.remove());
-      return tr;
-    }
+    
+function makeRow() {
+  const tr = document.createElement('tr');
+
+  // ID único para separar grupos de radios por fila
+  const rowId = 'r' + Math.random().toString(36).substring(2, 9);
+
+  tr.innerHTML = `
+    <td>
+      <input list="sap-list" placeholder="Ej: 4059979 · UPS..." class="inp-sap">
+    </td>
+
+    <td style="text-align:center; white-space:nowrap;">
+  <div style="display:flex; align-items:center; justify-content:flex-start; margin-left:60px; gap:20px;">
+    
+    <label style="display:flex; align-items:center; gap:6px; font-size:13px;">
+  <input type="radio" name="tipo-${rowId}" value="INSTALADO" class="inp-tipo">
+  Instalado
+</label>
+
+<label style="display:flex; align-items:center; gap:6px; font-size:13px;">
+  <input type="radio" name="tipo-${rowId}" value="RETIRADO" class="inp-tipo">
+  Retirado
+</label>
+
+  </div>
+</td>
+
+    <td style="text-align:center;">
+  <div style="display:flex; justify-content:center; width:100%;">
+    <input type="text" placeholder="Escribe el serial"
+           class="inp-serial"
+           required
+           style="width:190px; margin-left:100px;">
+  </div>
+</td>
+
+
+    <td>
+      <button class="btn secondary btn-del"
+        title="Eliminar fila"
+        style="padding:4px 10px; font-size:12px; border-radius:6px;">
+  Eliminar
+</button>
+    </td>
+  `;
+
+  // Autocompletar SAP
+  const sapInput = tr.querySelector('.inp-sap');
+  sapInput.addEventListener('change', () => {
+    const v = sapInput.value.trim();
+    if (v.includes('·')) return;
+    const desc = sapMap.get(v);
+    if (desc) sapInput.value = `${v} · ${desc}`;
+  });
+
+  // Eliminar fila
+  tr.querySelector('.btn-del').addEventListener('click', () => tr.remove());
+
+  return tr;
+}
+
     addRowBtn.addEventListener('click', () => tbody.appendChild(makeRow()));
     tbody.appendChild(makeRow()); // fila inicial
 
@@ -4517,20 +4564,37 @@ const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
       // 3. Descripción
       const descripcion = (document.getElementById('inp-descripcion')?.value ?? '');
 
-      // Equipos / seriales
-      const filasEquipos = [];
-      const filasRetirados = [];
-      const filasInstalados = [];
-      document.querySelectorAll('#tbody-equipos tr').forEach(tr => {
-        const sapDesc = tr.querySelector('.inp-sap')?.value?.trim() ?? '';
-        const cantRet = Number(tr.querySelector('.inp-ret')?.value ?? 0);
-        const cantIns = Number(tr.querySelector('.inp-ins')?.value ?? 0);
-        const serial  = tr.querySelector('.inp-serial')?.value?.trim() ?? '';
-        if (!sapDesc) return;
-        filasEquipos.push({ sapDesc, cantRet, cantIns, serial });
-        if (cantRet > 0 && serial) filasRetirados.push({ sapDesc, serial });
-        if (cantIns > 0 && serial) filasInstalados.push({ sapDesc, serial });
-      });
+      // === NUEVO LECTOR DE FILAS (INSTALADO/RETIRADO + SERIAL) ===
+const filasEquipos = [];
+const errores = [];
+
+document.querySelectorAll('#tbody-equipos tr').forEach(tr => {
+  const sapRaw = tr.querySelector('.inp-sap')?.value?.trim() ?? '';
+  if (!sapRaw) return; // ignorar filas vacías
+
+  // Extraer solo el código SAP (antes del ·)
+  const sap = sapRaw.includes('·') ? sapRaw.split('·')[0].trim() : sapRaw;
+
+  // Tipo (radio)
+  const tipoInput = tr.querySelector('input.inp-tipo:checked');
+  const tipo = tipoInput ? tipoInput.value : '';
+
+  // Serial obligatorio
+  const serial = tr.querySelector('.inp-serial')?.value?.trim() ?? '';
+
+  // Validación: tipo + serial obligatorio
+  if (!tipo || !serial) {
+    errores.push('Hay filas sin tipo o sin serial.');
+    return;
+  }
+
+  filasEquipos.push({
+    sap,
+    descripcion: sapMap.get(sap) ?? '',
+    tipo,
+    serial
+  });
+});
 
       // PRUEBAS: imágenes
       const imgsJson = {
@@ -4557,27 +4621,31 @@ const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
       const pruebasObs = (document.getElementById('inp-pruebas-obs')?.value ?? '');
 
       // 2) Payload para el Flow
-      const payloadJson = {
-        numeroCaso, fecha, idBen, insertImages: false,
-        departamento, municipio, centroPoblado, sede,
-        correo, responsableNombre, cedula, contacto,
-        descripcion,
-        acompNombre, acompCargo, acompCedula, acompTel1, acompTel2, acompCorreo,
-        tecNombre, tecCargo, tecCedula, tecTel, tecCorreo,
-        firmaActaDataUrl,
-        filasEquipos, filasRetirados, filasInstalados,
-        imgs: { ...imgsJson, despues: fotosDespues }, pruebasObs,
-        latitud, longitud
-      };
+const payloadJson = {
+  numeroCaso, fecha, idBen, insertImages: false,
+  departamento, municipio, centroPoblado, sede,
+  correo, responsableNombre, cedula, contacto,
+  descripcion,
+  acompNombre, acompCargo, acompCedula, acompTel1, acompTel2, acompCorreo,
+  tecNombre, tecCargo, tecCedula, tecTel, tecCorreo,
+  firmaActaDataUrl,
 
-      Object.assign(payloadJson, {
-        sapAntes1, sapAntes2, sapAntes3, sapAntes4, sapAntes5, sapAntes6,
-        fotoAntesSerial1, fotoAntesSerial2, fotoAntesSerial3,
-        fotoAntesSerial4, fotoAntesSerial5, fotoAntesSerial6,
-        fotoAntesDiag1, fotoAntesDiag2, fotoAntesDiag3, fotoAntesDiag4, fotoAntesDiag5, fotoAntesDiag6,
-        fotoAntesDiag7, fotoAntesDiag8, fotoAntesDiag9, fotoAntesDiag10, fotoAntesDiag11, fotoAntesDiag12,
-        antesObs
-      });
+  // 👇 ÚNICO arreglo válido del PASO 3
+  filasEquipos,
+
+  imgs: { ...imgsJson, despues: fotosDespues },
+  pruebasObs,
+  latitud, longitud
+};
+
+Object.assign(payloadJson, {
+  sapAntes1, sapAntes2, sapAntes3, sapAntes4, sapAntes5, sapAntes6,
+  fotoAntesSerial1, fotoAntesSerial2, fotoAntesSerial3,
+  fotoAntesSerial4, fotoAntesSerial5, fotoAntesSerial6,
+  fotoAntesDiag1, fotoAntesDiag2, fotoAntesDiag3, fotoAntesDiag4, fotoAntesDiag5, fotoAntesDiag6,
+  fotoAntesDiag7, fotoAntesDiag8, fotoAntesDiag9, fotoAntesDiag10, fotoAntesDiag11, fotoAntesDiag12,
+  antesObs
+});
 
       try{
         setStatus('Enviando al Flow…');
