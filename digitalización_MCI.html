@@ -3258,8 +3258,7 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
     overflow: visible;    /* Nada de cortar dentro */
   }
 }
-
-    /* ===== REG FOTOG PRUEBAS → Solo la tarjeta de Coordenadas (p-geo) ===== */
+/* ===== REG FOTOG PRUEBAS → Solo la tarjeta de Coordenadas (p-geo) ===== */
 #sec-pruebas .p-item.p-geo {
   margin-top: 0 !important;     /* evita offset hacia abajo en el ítem completo */
   padding-top: 0 !important;
@@ -3279,8 +3278,8 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
 #sec-pruebas .p-item.p-geo .photo-grid {
   margin-top: 0 !important;
 }
-
-* ===== FIX: nivelar altura de la tarjeta #1 (Coordenadas) con las demás ===== */
+ 
+/* ===== FIX: nivelar altura de la tarjeta #1 (Coordenadas) con las demás ===== */
 /* El problema es min-height:240px aplicado SOLO a .p-geo más arriba en el CSS. */
 
 #sec-pruebas .pruebas-2col > .p-item.p-geo {
@@ -3297,7 +3296,155 @@ body.theme-pro #sec-acta .photo-grid .photo-cell[data-title="Firma técnico"]{
 body.theme-pro #sec-pruebas .pruebas-2col > .p-item.p-geo {
   min-height: 230px !important;  /* acompasa con el alargue del theme en photo-cell */
 }
-    
+ 
+/* ============================================================
+   UNIFICAR MARCO BLANCO (cuadro interior) en ANTES / DESPUÉS
+   - Replica la proporción grande de "Firma técnico" (ACTA)
+   - No toca PRUEBAS (queda tal cual tu referencia OK)
+   - ADICIÓN: pegar al final del CSS
+   ============================================================ */
+
+/* DESKTOP / TABLET (≥861px): marco blanco más ALTO y ANCHO */
+body.theme-pro #sec-antes .photo-grid .photo-cell::after,
+body.theme-pro #sec-despues .photo-grid .photo-cell::after {
+  top: 30px !important;      /* antes 56px → sube el cuadro hacia el título */
+  left: 10px !important;
+  right: 10px !important;
+  bottom: 12px !important;
+  border-radius: 16px !important; /* armoniza con "Firma técnico" */
+}
+
+/* Asegura que la IMAGEN coincida EXACTO con el marco blanco */
+body.theme-pro #sec-antes .photo-grid .photo-cell img,
+body.theme-pro #sec-despues .photo-grid .photo-cell img {
+  position: absolute !important;
+  top: 30px !important;
+  left: 10px !important;
+  right: 10px !important;
+  bottom: 12px !important;
+  width: calc(100% - 20px) !important;          /* 10 + 10 */
+  height: calc(100% - (30px + 12px)) !important;/* top + bottom */
+  object-fit: contain !important;
+  object-position: center center !important;
+  border-radius: 14px !important;
+  background: #fff !important;
+  z-index: 4 !important;
+}
+
+/* MÓVIL (≤860px): compacta 2px pero conserva la “subida notoria” */
+@media (max-width: 860px){
+  body.theme-pro #sec-antes .photo-grid .photo-cell::after,
+  body.theme-pro #sec-despues .photo-grid .photo-cell::after {
+    top: 28px !important;    /* antes 54px → mucho más alto */
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 10px !important;
+    border-radius: 14px !important;
+  }
+
+  body.theme-pro #sec-antes .photo-grid .photo-cell img,
+  body.theme-pro #sec-despues .photo-grid .photo-cell img {
+    top: 28px !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 10px !important;
+    width: calc(100% - 16px) !important;          /* 8 + 8 */
+    height: calc(100% - (28px + 10px)) !important;/* top + bottom */
+    border-radius: 12px !important;
+  }
+}
+
+/* (Opcional) Si ves el texto/íconos muy “apretados”, dales 1px más de aire */
+body.theme-pro #sec-antes .photo-grid .photo-cell .placeholder,
+body.theme-pro #sec-despues .photo-grid .photo-cell .placeholder {
+  padding: 10px 10px 12px !important;
+}
+
+/* ============================================================
+   AJUSTE CABECERA + RESERVA SUPERIOR (ANTES / DESPUÉS)
+   - Evita que el encabezado invada el cuadro blanco
+   - Subimos el encabezado y ampliamos la reserva superior
+   - PRUEBAS NO se toca
+   ============================================================ */
+
+/* DESKTOP / TABLET (≥861px): más reserva para títulos de 1–2 líneas */
+body.theme-pro #sec-antes .photo-grid .photo-cell,
+body.theme-pro #sec-despues .photo-grid .photo-cell{
+  /* antes: padding-top: 48px en theme-pro → ampliamos a 58px */
+  padding-top: 58px !important;
+}
+
+/* El título sube un poco (más pegado al borde) y puede ocupar 2 líneas */
+body.theme-pro #sec-antes .photo-grid .photo-cell::before,
+body.theme-pro #sec-despues .photo-grid .photo-cell::before{
+  top: 6px !important;         /* antes ~10px → sube 4px */
+  height: auto !important;     /* permite 1–2 líneas sin recortar */
+  min-height: 22px !important; /* conserva altura mínima de una línea */
+  line-height: 1.15 !important;
+  white-space: normal !important;
+}
+
+/* MÓVIL (≤860px): también más reserva, pero compacta */
+@media (max-width: 860px){
+  body.theme-pro #sec-antes .photo-grid .photo-cell,
+  body.theme-pro #sec-despues .photo-grid .photo-cell{
+    /* antes: padding-top: 46px → ampliamos a 54px */
+    padding-top: 54px !important;
+  }
+
+  body.theme-pro #sec-antes .photo-grid .photo-cell::before,
+  body.theme-pro #sec-despues .photo-grid .photo-cell::before{
+    top: 6px !important;       /* mismo criterio que desktop */
+    height: auto !important;
+    min-height: 20px !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+  }
+}
+
+/* Nota: el marco blanco ya fue subido a 30px/28px en tu ajuste previo.
+   Con este bloque, la reserva aumenta arriba sin bajar el marco. */
+
+/* ============================================================
+   TÍTULOS MÁS PEQUEÑOS EN TODAS LAS HOJAS (theme-pro)
+   - Aplica a ACTA, PRUEBAS, ANTES y DESPUÉS
+   - Reduce tamaño y altura de línea, mantiene legibilidad
+   - No altera tu cuadro blanco (marco ::after) ni toolbars
+   - ADICIÓN: pegar al final del CSS
+   ============================================================ */
+
+/* DESKTOP / TABLET (≥861px): bajar tipografía global de los títulos */
+body.theme-pro #sec-acta   .photo-grid .photo-cell::before,
+body.theme-pro #sec-pruebas .photo-grid .photo-cell::before,
+body.theme-pro #sec-antes   .photo-grid .photo-cell::before,
+body.theme-pro #sec-despues .photo-grid .photo-cell::before{
+  font-size: 12px !important;    /* antes ~13px → más compacto */
+  line-height: 1.10 !important;  /* encabezado compacto y legible */
+  font-weight: 700 !important;   /* mantiene jerarquía visual */
+  top: 6px !important;           /* dejamos el margen superior seguro */
+  height: auto !important;       /* permite 1–2 líneas sin recorte */
+  min-height: 20px !important;   /* altura mínima si es 1 línea */
+  white-space: normal !important;/* permite romper línea en títulos largos */
+}
+
+/* MÓVIL (≤860px): un punto menos que desktop para más aire */
+@media (max-width: 860px){
+  body.theme-pro #sec-acta   .photo-grid .photo-cell::before,
+  body.theme-pro #sec-pruebas .photo-grid .photo-cell::before,
+  body.theme-pro #sec-antes   .photo-grid .photo-cell::before,
+  body.theme-pro #sec-despues .photo-grid .photo-cell::before{
+    font-size: 11px !important;  /* antes ~12px → más discreto en pantallas chicas */
+    line-height: 1.12 !important;
+    top: 6px !important;         /* consistente con desktop */
+    height: auto !important;
+    min-height: 18px !important;
+  }
+}
+
+/* (Opcional fino) Si algún título sigue quedando muy cerca del borde
+   superior, puedes subir 2 px más (top: 4px). Déjamelo saber y lo
+   dejo fijo o por tarjeta específica. */
+
   </style>
 </head>
 <body class="theme-pro">
@@ -3889,46 +4036,46 @@ body.theme-pro #sec-pruebas .pruebas-2col > .p-item.p-geo {
       </section>
 
       <!-- =========================
-           DESPUÉS
-      ========================== -->
-      <section id="sec-despues" class="section">
-        <div class="card">
-          <h3>10. Serial de repuestos instalados (Fotos)</h3>
-          <div class="photo-grid">
-            <div class="photo-cell" data-title="Serial instalado #1"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #1</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #2"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #2</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #3"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #3</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #4"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #4</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #5"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #5</div></div></div>
-            <div class="photo-cell" data-title="Serial instalado #6"><input type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #6</div></div></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>11. Registro fotográfico · Resultado (después de intervención)</h3>
-          <div class="photo-grid">
-            <div class="photo-cell" data-title="Resultado #1"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
-            <div class="photo-cell" data-title="Resultado #2"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
-            <div class="photo-cell" data-title="Resultado #3"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
-            <div class="photo-cell" data-title="Resultado #4"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
-            <div class="photo-cell" data-title="Resultado #5"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
-            <div class="photo-cell" data-title="Resultado #6"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
-            <div class="photo-cell" data-title="Resultado #7"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
-            <div class="photo-cell" data-title="Resultado #8"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
-            <div class="photo-cell" data-title="Resultado #9"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
-            <div class="photo-cell" data-title="Resultado #10"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
-            <div class="photo-cell" data-title="Resultado #11"><input type="file" aaccept="image/*"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
-            <div class="photo-cell" data-title="Resultado #12"><input type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
-          </div>
-        </div>
-
-        <div class="card">
-  <h3>12. Observaciones</h3>
-  <div class="field">
-    <textarea id="inp-despues-obs" placeholder="Observaciones después de la intervención"></textarea>
+ DESPUÉS 
+ ========================== -->
+<section id="sec-despues" class="section">
+  <div class="card">
+    <h3>10. Serial de repuestos instalados (Fotos)</h3>
+    <div class="photo-grid">
+      <div class="photo-cell" data-title="Serial instalado #1"><input id="img-despues-serial-1" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #1</div></div></div>
+      <div class="photo-cell" data-title="Serial instalado #2"><input id="img-despues-serial-2" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #2</div></div></div>
+      <div class="photo-cell" data-title="Serial instalado #3"><input id="img-despues-serial-3" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #3</div></div></div>
+      <div class="photo-cell" data-title="Serial instalado #4"><input id="img-despues-serial-4" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #4</div></div></div>
+      <div class="photo-cell" data-title="Serial instalado #5"><input id="img-despues-serial-5" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #5</div></div></div>
+      <div class="photo-cell" data-title="Serial instalado #6"><input id="img-despues-serial-6" type="file" accept="image/*"><div class="placeholder"><div>Subir foto serial #6</div></div></div>
+    </div>
   </div>
-</div>
-      </section>
+
+  <div class="card">
+    <h3>11. Registro fotográfico · Resultado (después de intervención)</h3>
+    <div class="photo-grid">
+      <div class="photo-cell" data-title="Resultado #1"><input id="img-despues-res-1" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #1</div></div></div>
+      <div class="photo-cell" data-title="Resultado #2"><input id="img-despues-res-2" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #2</div></div></div>
+      <div class="photo-cell" data-title="Resultado #3"><input id="img-despues-res-3" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #3</div></div></div>
+      <div class="photo-cell" data-title="Resultado #4"><input id="img-despues-res-4" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #4</div></div></div>
+      <div class="photo-cell" data-title="Resultado #5"><input id="img-despues-res-5" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #5</div></div></div>
+      <div class="photo-cell" data-title="Resultado #6"><input id="img-despues-res-6" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #6</div></div></div>
+      <div class="photo-cell" data-title="Resultado #7"><input id="img-despues-res-7" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #7</div></div></div>
+      <div class="photo-cell" data-title="Resultado #8"><input id="img-despues-res-8" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #8</div></div></div>
+      <div class="photo-cell" data-title="Resultado #9"><input id="img-despues-res-9" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #9</div></div></div>
+      <div class="photo-cell" data-title="Resultado #10"><input id="img-despues-res-10" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #10</div></div></div>
+      <div class="photo-cell" data-title="Resultado #11"><input id="img-despues-res-11" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #11</div></div></div>
+      <div class="photo-cell" data-title="Resultado #12"><input id="img-despues-res-12" type="file" accept="image/*"><div class="placeholder"><div>Subir evidencia #12</div></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>12. Observaciones</h3>
+    <div class="field">
+      <textarea id="inp-despues-obs" placeholder="Observaciones después de la intervención"></textarea>
+    </div>
+  </div>
+</section>
 
       <!-- =========================
            ETIQUETA
@@ -4292,6 +4439,39 @@ body.theme-pro #sec-pruebas .pruebas-2col > .p-item.p-geo {
       const fotoAntesDiag11 = await pickDataUrl('img-antes-diag-11');
       const fotoAntesDiag12 = await pickDataUrl('img-antes-diag-12');
 
+// DESPUÉS: imágenes Serial (6)
+const fotoDespuesSerial1 = await pickDataUrl('img-despues-serial-1');
+const fotoDespuesSerial2 = await pickDataUrl('img-despues-serial-2');
+const fotoDespuesSerial3 = await pickDataUrl('img-despues-serial-3');
+const fotoDespuesSerial4 = await pickDataUrl('img-despues-serial-4');
+const fotoDespuesSerial5 = await pickDataUrl('img-despues-serial-5');
+const fotoDespuesSerial6 = await pickDataUrl('img-despues-serial-6');
+
+// DESPUÉS: imágenes Resultado (12)
+const fotoDespuesRes1  = await pickDataUrl('img-despues-res-1');
+const fotoDespuesRes2  = await pickDataUrl('img-despues-res-2');
+const fotoDespuesRes3  = await pickDataUrl('img-despues-res-3');
+const fotoDespuesRes4  = await pickDataUrl('img-despues-res-4');
+const fotoDespuesRes5  = await pickDataUrl('img-despues-res-5');
+const fotoDespuesRes6  = await pickDataUrl('img-despues-res-6');
+const fotoDespuesRes7  = await pickDataUrl('img-despues-res-7');
+const fotoDespuesRes8  = await pickDataUrl('img-despues-res-8');
+const fotoDespuesRes9  = await pickDataUrl('img-despues-res-9');
+const fotoDespuesRes10 = await pickDataUrl('img-despues-res-10');
+const fotoDespuesRes11 = await pickDataUrl('img-despues-res-11');
+const fotoDespuesRes12 = await pickDataUrl('img-despues-res-12');
+
+// Arreglo final para DESPUÉS (misma arquitectura que ANTES: primero Serial (6), luego Resultado/Diagnóstico (12))
+const fotosDespues = [
+  fotoDespuesSerial1, fotoDespuesSerial2, fotoDespuesSerial3,
+  fotoDespuesSerial4, fotoDespuesSerial5, fotoDespuesSerial6,
+  fotoDespuesRes1,  fotoDespuesRes2,  fotoDespuesRes3,
+  fotoDespuesRes4,  fotoDespuesRes5,  fotoDespuesRes6,
+  fotoDespuesRes7,  fotoDespuesRes8,  fotoDespuesRes9,
+  fotoDespuesRes10, fotoDespuesRes11, fotoDespuesRes12
+].filter(Boolean);
+
+
       // ANTES: Observaciones
       const antesObs = (document.getElementById('inp-antes-obs')?.value ?? '').trim();
 
@@ -4385,7 +4565,7 @@ body.theme-pro #sec-pruebas .pruebas-2col > .p-item.p-geo {
         tecNombre, tecCargo, tecCedula, tecTel, tecCorreo,
         firmaActaDataUrl,
         filasEquipos, filasRetirados, filasInstalados,
-        imgs: imgsJson, pruebasObs,
+        imgs: { ...imgsJson, despues: fotosDespues }, pruebasObs,
         latitud, longitud
       };
 
