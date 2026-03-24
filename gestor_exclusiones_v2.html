@@ -1723,27 +1723,13 @@ function abrirModal(ot, {soloVista=false} = {}){
     modalBody.appendChild(wrap);
 
     const txt = wrap.querySelector(`#m_causa_${item.id}`);
-    const inp = wrap.querySelector(`#m_foto_${item.id}`);
+const inp = wrap.querySelector(`#m_foto_${item.id}`);
 
-    if(soloVista){
-      txt.setAttribute('readonly','readonly');
-      txt.setAttribute('disabled','disabled');
-      inp.setAttribute('disabled','disabled');
-    }else{
-      const debouncedUpdate = debounce(()=>updateEstadosOT(item.ot), 150);
-      txt.addEventListener('input', e=>{
-        item.causa = e.target.value;
-        const ref = datos.find(x=>x.id===item.id);
-        if(ref) ref.causa = item.causa;
-        debouncedUpdate();
-      });
-      inp.addEventListener('change', e=>{
-        const files = Array.from(e.target.files??[]);
-        item.fotos = files;
-        const ref=datos.find(x=>x.id===item.id); if(ref) ref.fotos=files;
-        debouncedUpdate();
-      });
-    }
+if(soloVista){
+  txt.setAttribute('readonly','readonly');
+  txt.setAttribute('disabled','disabled');
+  inp.setAttribute('disabled','disabled');
+}
   }
 
   const { pendientes } = contarCompletados(ot);
