@@ -1329,7 +1329,7 @@ aplicarBusquedaYFiltro();  // vuelve a renderizar con el filtro aplicado
   }
 }
 
-/* ======= Cómputos ======= */
+
 function contarCompletados(ot){
     // Si el modal está abierto, CONTAR valores REALES del modal
     const modal = document.getElementById('modalRegistros');
@@ -1377,6 +1377,7 @@ function contarCompletados(ot){
         pendientes: Math.max(0, total - completos)
     };
 }
+``
 function calcularPendientesGlobal(){
   const map = new Map();
   for(const r of datos){ const k=(r.ot??'').toString().trim(); if(!map.has(k)) map.set(k, []); map.get(k).push(r); }
