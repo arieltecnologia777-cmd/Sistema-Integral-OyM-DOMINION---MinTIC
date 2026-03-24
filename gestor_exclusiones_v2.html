@@ -1731,17 +1731,15 @@ function abrirModal(ot, {soloVista=false} = {}){
       inp.setAttribute('disabled','disabled');
     }else{
       const debouncedUpdate = debounce(()=>updateEstadosOT(item.ot), 150);
-      txt.addEventListener('input', e=>{
-  const nueva = e.target.value;
-
-  // NO pisar si no cambió realmente
-  if (item.causa !== nueva) {
+      txt.addEventListener('input', e => {
+    const nueva = e.target.value;
+    const ref = datos.find(x =>
+        normalizeFechaFront(x.fecha) === normalizeFechaFront(item.fecha) &&
+        (x.ot ?? "").toString().trim() === (item.ot ?? "").toString().trim()
+    );
+    if (ref) ref.causa = nueva;
     item.causa = nueva;
-    const ref = datos.find(x=>x.id===item.id);
-    if(ref) ref.causa = nueva;
-  }
-
-  debouncedUpdate();
+    debouncedUpdate();
 });
     }
   }
