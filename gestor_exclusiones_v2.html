@@ -1716,7 +1716,10 @@ function abrirModal(ot, {soloVista=false} = {}) {
   }
 
   // ✅ Copiamos cada registro para evitar referencias compartidas
-  const regs = regsOriginales.map(r => ({ ...r }));
+  const regs = regsOriginales.map(r => ({
+    ...r,
+    fecha: normalizeFechaFront(r.fecha)   // ✅ NUEVO
+}));
 
   otModalActual = ot;
   modalSoloVista = soloVista;
@@ -1901,7 +1904,7 @@ async function enviarRegistrosOT(ot){
       .map(r => ({
         id: r.idReal || r.id || '',        // ← clave real si la hay
         ot: r.ot,
-        fecha: r.fecha || '',
+        fecha: normalizeFechaFront(r.fecha || ''),
         causa: r.causa || '',
         regional: (r.regional||'').toString().trim()
       }));
