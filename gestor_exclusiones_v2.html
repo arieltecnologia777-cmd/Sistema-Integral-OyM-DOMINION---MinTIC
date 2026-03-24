@@ -1738,6 +1738,17 @@ function abrirModal(ot, {soloVista=false} = {}){
     const txt = wrap.querySelector(`#m_causa_${item.id}`);
 const inp = wrap.querySelector(`#m_foto_${item.id}`);
 
+// === ARIEL‑COPILOT FIX — actualizar estados al escribir o cargar fotos ===
+if (!soloVista) {
+    txt.addEventListener("input", () => {
+        updateEstadosOT(otModalActual);
+    });
+
+    inp.addEventListener("change", () => {
+        updateEstadosOT(otModalActual);
+    });
+}
+
 if(soloVista){
   txt.setAttribute('readonly','readonly');
   txt.setAttribute('disabled','disabled');
