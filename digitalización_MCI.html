@@ -4129,6 +4129,76 @@ body.theme-pro #sec-pruebas
     padding: 6px 8px 14px;
 }
 
+/* ✅ Reducir íconos de Indoor/Outdoor en móvil */
+@media (max-width: 860px) {
+
+  /* Íconos más pequeños en Indoor & Outdoor */
+  .p-item[data-title="Navegación Indoor"] .photo-cell.indoor-mini .placeholder::before,
+  .p-item[data-title="Navegación Indoor"] .photo-cell.indoor-mini .placeholder::after,
+  .p-item[data-title="Navegación Outdoor"] .photo-cell.indoor-mini .placeholder::before,
+  .p-item[data-title="Navegación Outdoor"] .photo-cell.indoor-mini .placeholder::after {
+      width: 22px !important;   /* antes 36px */
+      height: 22px !important;
+      background-size: 22px 22px !important;
+  }
+
+  /* Texto más pequeño para que quepa */
+  .p-item[data-title="Navegación Indoor"] .photo-cell.indoor-mini .placeholder div,
+  .p-item[data-title="Navegación Outdoor"] .photo-cell.indoor-mini .placeholder div {
+      font-size: 11px !important;
+  }
+
+  /* Ajuste de padding interno */
+  .photo-cell.indoor-mini {
+      padding: 4px !important;
+      min-height: 70px !important;
+      max-height: 70px !important;
+  }
+}
+
+/* ✅ Eliminar SOLO el ícono de cámara (before) en TODAS las tarjetas */
+.theme-pro .photo-cell .placeholder::before {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: none !important;
+}
+
+/* ✅ Mantener ícono de galería (after) — NO tocar */
+
+/* ✅ Reordenar el contenido del placeholder: ÍCONO ARRIBA, TEXTO ABAJO */
+.theme-pro .photo-cell .placeholder {
+    display: flex !important;
+    flex-direction: column !important;  /* vertical */
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;                /* separa icono y texto */
+}
+
+/* ✅ ÍCONO DE GALERÍA ARRIBA DEL TEXTO */
+.theme-pro .photo-cell .placeholder::after {
+    order: -1 !important;              /* mueve el icono ARRIBA */
+    display: block !important;
+    margin: 0 auto !important;
+
+    width: 28px !important;
+    height: 28px !important;
+    background-size: 28px 28px !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+/* ✅ El texto queda abajo */
+.theme-pro .photo-cell .placeholder div {
+    order: 2 !important;
+}
+/* ✅ Aumentar ligeramente el icono de galería */
+.theme-pro .photo-cell .placeholder::after {
+    width: 34px !important;
+    height: 32px !important;
+    background-size: 34px 34px !important;
+}
   </style>
 </head>
 <body class="theme-pro">
