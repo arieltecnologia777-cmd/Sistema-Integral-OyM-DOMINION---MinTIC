@@ -4218,9 +4218,7 @@ body.theme-pro #sec-pruebas
       <a href="#" data-target="sec-pruebas">REG FOTOG PRUEBAS NECESARIAS</a>
       <a href="#" data-target="sec-antes">REGISTRO FOTOGRÁFICO ANTES</a>
       <a href="#" data-target="sec-despues">REGISTRO FOTOGRÁFICO DESPUÉS</a>
-      <a href="#" data-target="sec-etiqueta">ETIQUETA RE FOTOGRÁFICO</a>
-      <a href="#" data-target="sec-cambios">Control de cambios</a>
-      
+      <a href="#" data-target="sec-etiqueta">ETIQUETA RE FOTOGRÁFICO</a>      
     </nav>
 <div class="sidebar-actions">
 
@@ -5697,6 +5695,28 @@ restoreDraft();
       return await downscaleDataUrl(raw, maxPx, quality);
     }
 
+
+// ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
+async function getFoto(id, maxPx = 1600, quality = 0.85) {
+    const input = document.getElementById(id);
+
+    // ✅ 1. Si el input tiene archivo → usarlo
+    if (input && input.files && input.files[0]) {
+        const raw = await fileToDataURL(input.files[0]);
+        return await downscaleDataUrl(raw, maxPx, quality);
+    }
+
+    // ✅ 2. Si NO tiene archivo → intentar obtener desde IndexedDB (restaurada)
+    return new Promise(resolve => {
+        cargarFotoOffline(id, async base64 => {
+            if (!base64) return resolve("");
+            const scaled = await downscaleDataUrl(base64, maxPx, quality);
+            resolve(scaled);
+        });
+    });
+}
+
+
     // === SAP ANTES: descripción al vuelo (Excel obtiene la final por BUSCARV)
     function describeSap(code) {
       if (!code) return '';
@@ -5728,304 +5748,231 @@ restoreDraft();
     }
 
     async function exportarMCI(){
-      // 1) Mínimos requeridos
-      const numeroCaso = document.getElementById('inp-numero-caso').value.trim();
-      const fechaISO = document.getElementById('inp-fecha').value;
-      const fecha = toDDMMYYYY(fechaISO);
-      if (!numeroCaso){ setStatus('Ingresa el N° de caso.', 'err'); return; }
-      if (!fecha){ setStatus('Selecciona una fecha válida.', 'err'); return; }
-      const idBen = document.getElementById('inp-idben').value.trim();
-      if (!idBen){ setStatus('Ingresa el ID beneficiario.', 'err'); return; }
 
-      // === ANTES: leer SAP
-      const sapAntes1 = (document.getElementById('inp-sap-antes-1')?.value ?? '').trim();
-      const sapAntes2 = (document.getElementById('inp-sap-antes-2')?.value ?? '').trim();
-      const sapAntes3 = (document.getElementById('inp-sap-antes-3')?.value ?? '').trim();
-      const sapAntes4 = (document.getElementById('inp-sap-antes-4')?.value ?? '').trim();
-      const sapAntes5 = (document.getElementById('inp-sap-antes-5')?.value ?? '').trim();
-      const sapAntes6 = (document.getElementById('inp-sap-antes-6')?.value ?? '').trim();
+    // 1) Mínimos requeridos
+    const numeroCaso = document.getElementById('inp-numero-caso').value.trim();
+    const fechaISO = document.getElementById('inp-fecha').value;
+    const fecha = toDDMMYYYY(fechaISO);
 
-      // ANTES: imágenes Serial (6)
-      const fotoAntesSerial1 = await pickDataUrl('img-antes-serial-1');
-      const fotoAntesSerial2 = await pickDataUrl('img-antes-serial-2');
-      const fotoAntesSerial3 = await pickDataUrl('img-antes-serial-3');
-      const fotoAntesSerial4 = await pickDataUrl('img-antes-serial-4');
-      const fotoAntesSerial5 = await pickDataUrl('img-antes-serial-5');
-      const fotoAntesSerial6 = await pickDataUrl('img-antes-serial-6');
+    if (!numeroCaso){ setStatus('Ingresa el N° de caso.', 'err'); return; }
+    if (!fecha){ setStatus('Selecciona una fecha válida.', 'err'); return; }
 
-      // ANTES: imágenes Diagnóstico (12)
-      const fotoAntesDiag1  = await pickDataUrl('img-antes-diag-1');
-      const fotoAntesDiag2  = await pickDataUrl('img-antes-diag-2');
-      const fotoAntesDiag3  = await pickDataUrl('img-antes-diag-3');
-      const fotoAntesDiag4  = await pickDataUrl('img-antes-diag-4');
-      const fotoAntesDiag5  = await pickDataUrl('img-antes-diag-5');
-      const fotoAntesDiag6  = await pickDataUrl('img-antes-diag-6');
-      const fotoAntesDiag7  = await pickDataUrl('img-antes-diag-7');
-      const fotoAntesDiag8  = await pickDataUrl('img-antes-diag-8');
-      const fotoAntesDiag9  = await pickDataUrl('img-antes-diag-9');
-      const fotoAntesDiag10 = await pickDataUrl('img-antes-diag-10');
-      const fotoAntesDiag11 = await pickDataUrl('img-antes-diag-11');
-      const fotoAntesDiag12 = await pickDataUrl('img-antes-diag-12');
+    const idBen = document.getElementById('inp-idben').value.trim();
+    if (!idBen){ setStatus('Ingresa el ID beneficiario.', 'err'); return; }
 
-// DESPUÉS: imágenes Serial (6)
-const fotoDespuesSerial1 = await pickDataUrl('img-despues-serial-1');
-const fotoDespuesSerial2 = await pickDataUrl('img-despues-serial-2');
-const fotoDespuesSerial3 = await pickDataUrl('img-despues-serial-3');
-const fotoDespuesSerial4 = await pickDataUrl('img-despues-serial-4');
-const fotoDespuesSerial5 = await pickDataUrl('img-despues-serial-5');
-const fotoDespuesSerial6 = await pickDataUrl('img-despues-serial-6');
+    // === SAP ANTES ===
+    const sapAntes1 = (document.getElementById('inp-sap-antes-1')?.value ?? '').trim();
+    const sapAntes2 = (document.getElementById('inp-sap-antes-2')?.value ?? '').trim();
+    const sapAntes3 = (document.getElementById('inp-sap-antes-3')?.value ?? '').trim();
+    const sapAntes4 = (document.getElementById('inp-sap-antes-4')?.value ?? '').trim();
+    const sapAntes5 = (document.getElementById('inp-sap-antes-5')?.value ?? '').trim();
+    const sapAntes6 = (document.getElementById('inp-sap-antes-6')?.value ?? '').trim();
 
-// DESPUÉS: imágenes Resultado (12)
-const fotoDespuesRes1  = await pickDataUrl('img-despues-res-1');
-const fotoDespuesRes2  = await pickDataUrl('img-despues-res-2');
-const fotoDespuesRes3  = await pickDataUrl('img-despues-res-3');
-const fotoDespuesRes4  = await pickDataUrl('img-despues-res-4');
-const fotoDespuesRes5  = await pickDataUrl('img-despues-res-5');
-const fotoDespuesRes6  = await pickDataUrl('img-despues-res-6');
-const fotoDespuesRes7  = await pickDataUrl('img-despues-res-7');
-const fotoDespuesRes8  = await pickDataUrl('img-despues-res-8');
-const fotoDespuesRes9  = await pickDataUrl('img-despues-res-9');
-const fotoDespuesRes10 = await pickDataUrl('img-despues-res-10');
-const fotoDespuesRes11 = await pickDataUrl('img-despues-res-11');
-const fotoDespuesRes12 = await pickDataUrl('img-despues-res-12');
+    // === ANTES SERIAL (6) ===
+    const fotoAntesSerial1 = await getFoto('img-antes-serial-1');
+    const fotoAntesSerial2 = await getFoto('img-antes-serial-2');
+    const fotoAntesSerial3 = await getFoto('img-antes-serial-3');
+    const fotoAntesSerial4 = await getFoto('img-antes-serial-4');
+    const fotoAntesSerial5 = await getFoto('img-antes-serial-5');
+    const fotoAntesSerial6 = await getFoto('img-antes-serial-6');
 
-// ✅ Arreglo FINAL de 18 posiciones — NO FILTRAR NADA
-const fotosDespues = [
-  fotoDespuesSerial1 || "",
-  fotoDespuesSerial2 || "",
-  fotoDespuesSerial3 || "",
-  fotoDespuesSerial4 || "",
-  fotoDespuesSerial5 || "",
-  fotoDespuesSerial6 || "",
-  fotoDespuesRes1  || "",
-  fotoDespuesRes2  || "",
-  fotoDespuesRes3  || "",
-  fotoDespuesRes4  || "",
-  fotoDespuesRes5  || "",
-  fotoDespuesRes6  || "",
-  fotoDespuesRes7  || "",
-  fotoDespuesRes8  || "",
-  fotoDespuesRes9  || "",
-  fotoDespuesRes10 || "",
-  fotoDespuesRes11 || "",
-  fotoDespuesRes12 || ""
-];
+    // === ANTES DIAGNÓSTICO (12) ===
+    const fotoAntesDiag1  = await getFoto('img-antes-diag-1');
+    const fotoAntesDiag2  = await getFoto('img-antes-diag-2');
+    const fotoAntesDiag3  = await getFoto('img-antes-diag-3');
+    const fotoAntesDiag4  = await getFoto('img-antes-diag-4');
+    const fotoAntesDiag5  = await getFoto('img-antes-diag-5');
+    const fotoAntesDiag6  = await getFoto('img-antes-diag-6');
+    const fotoAntesDiag7  = await getFoto('img-antes-diag-7');
+    const fotoAntesDiag8  = await getFoto('img-antes-diag-8');
+    const fotoAntesDiag9  = await getFoto('img-antes-diag-9');
+    const fotoAntesDiag10 = await getFoto('img-antes-diag-10');
+    const fotoAntesDiag11 = await getFoto('img-antes-diag-11');
+    const fotoAntesDiag12 = await getFoto('img-antes-diag-12');
 
-      // ANTES / DESPUÉS: Observaciones
-const antesObs   = (document.getElementById('inp-antes-obs')  ?.value ?? '').trim();
-const despuesObs = (document.getElementById('inp-despues-obs')?.value ?? '').trim();
+    // === DESPUÉS SERIAL (6) ===
+    const fotoDespuesSerial1 = await getFoto('img-despues-serial-1');
+    const fotoDespuesSerial2 = await getFoto('img-despues-serial-2');
+    const fotoDespuesSerial3 = await getFoto('img-despues-serial-3');
+    const fotoDespuesSerial4 = await getFoto('img-despues-serial-4');
+    const fotoDespuesSerial5 = await getFoto('img-despues-serial-5');
+    const fotoDespuesSerial6 = await getFoto('img-despues-serial-6');
 
-// Coordenadas
-const latitud  = (document.getElementById('inp-lat')?.value ?? '').trim();
-const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
+    // === DESPUÉS RESULTADO (12) ===
+    const fotoDespuesRes1  = await getFoto('img-despues-res-1');
+    const fotoDespuesRes2  = await getFoto('img-despues-res-2');
+    const fotoDespuesRes3  = await getFoto('img-despues-res-3');
+    const fotoDespuesRes4  = await getFoto('img-despues-res-4');
+    const fotoDespuesRes5  = await getFoto('img-despues-res-5');
+    const fotoDespuesRes6  = await getFoto('img-despues-res-6');
+    const fotoDespuesRes7  = await getFoto('img-despues-res-7');
+    const fotoDespuesRes8  = await getFoto('img-despues-res-8');
+    const fotoDespuesRes9  = await getFoto('img-despues-res-9');
+    const fotoDespuesRes10 = await getFoto('img-despues-res-10');
+    const fotoDespuesRes11 = await getFoto('img-despues-res-11');
+    const fotoDespuesRes12 = await getFoto('img-despues-res-12');
 
-      // Declaración: acompaña
-      const acompNombre = (document.getElementById('inp-acomp-nombre')?.value ?? '').trim();
-      const acompCargo  = (document.getElementById('inp-acomp-cargo') ?.value ?? '').trim();
-      const acompCedula = (document.getElementById('inp-acomp-cedula')?.value ?? '').trim();
-      const acompTel1   = (document.getElementById('inp-acomp-tel1')  ?.value ?? '').trim();
-      const acompTel2   = (document.getElementById('inp-acomp-tel2')  ?.value ?? '').trim();
-      const acompCorreo = (document.getElementById('inp-acomp-correo')?.value ?? '').trim();
+    const fotosDespues = [
+        fotoDespuesSerial1, fotoDespuesSerial2, fotoDespuesSerial3,
+        fotoDespuesSerial4, fotoDespuesSerial5, fotoDespuesSerial6,
+        fotoDespuesRes1, fotoDespuesRes2, fotoDespuesRes3,
+        fotoDespuesRes4, fotoDespuesRes5, fotoDespuesRes6,
+        fotoDespuesRes7, fotoDespuesRes8, fotoDespuesRes9,
+        fotoDespuesRes10, fotoDespuesRes11, fotoDespuesRes12
+    ];
 
-      // Declaración: repara
-      const tecNombre = (document.getElementById('inp-tec-nombre')?.value ?? '').trim();
-      const tecCargo  = (document.getElementById('inp-tec-cargo') ?.value ?? '').trim();
-      const tecCedula = (document.getElementById('inp-tec-cedula')?.value ?? '').trim();
-      const tecTel    = (document.getElementById('inp-tec-tel')   ?.value ?? '').trim();
-      const tecCorreo = (document.getElementById('inp-tec-correo')?.value ?? '').trim();
+    // === Observaciones ===
+    const antesObs   = (document.getElementById('inp-antes-obs')  ?.value ?? '').trim();
+    const despuesObs = (document.getElementById('inp-despues-obs')?.value ?? '').trim();
 
-      // Firma técnico (imagen)
-      let firmaActaDataUrl = '';
-      const firmaInput = document.getElementById('inp-firma-tec');
-      const firmaFile = firmaInput?.files?.[0];
-      if (firmaFile) {
-        try { firmaActaDataUrl = await fileToDataURL(firmaFile); }
-        catch(e) { console.warn('Firma técnico: no se pudo leer la imagen:', e); }
-      }
+    // === Coordenadas ===
+    const latitud  = (document.getElementById('inp-lat')?.value ?? '').trim();
+    const longitud = (document.getElementById('inp-lon')?.value ?? '').trim();
 
-      // Datos ACTA
-      const departamento = (document.getElementById('inp-departamento')?.value ?? '').trim();
-      const municipio    = (document.getElementById('inp-municipio')?.value ?? '').trim();
-      const centroPoblado= (document.getElementById('inp-centro-poblado')?.value ?? '').trim();
-      const sede         = (document.getElementById('inp-sede')?.value ?? '').trim();
-      const correo       = (document.getElementById('inp-correo')?.value ?? '').trim();
-      const responsableNombre = (document.getElementById('inp-responsable')?.value ?? '').trim();
-      const cedula       = (document.getElementById('inp-cedula')?.value ?? '').trim();
-      const contacto     = (document.getElementById('inp-contacto')?.value ?? '').trim();
+    // === Declaración: acompañante ===
+    const acompNombre = (document.getElementById('inp-acomp-nombre')?.value ?? '').trim();
+    const acompCargo  = (document.getElementById('inp-acomp-cargo') ?.value ?? '').trim();
+    const acompCedula = (document.getElementById('inp-acomp-cedula')?.value ?? '').trim();
+    const acompTel1   = (document.getElementById('inp-acomp-tel1')  ?.value ?? '').trim();
+    const acompTel2   = (document.getElementById('inp-acomp-tel2')  ?.value ?? '').trim();
+    const acompCorreo = (document.getElementById('inp-acomp-correo')?.value ?? '').trim();
 
-      // 3. Descripción
-      const descripcion = (document.getElementById('inp-descripcion')?.value ?? '');
+    // === Declaración: técnico ===
+    const tecNombre = (document.getElementById('inp-tec-nombre')?.value ?? '').trim();
+    const tecCargo  = (document.getElementById('inp-tec-cargo') ?.value ?? '').trim();
+    const tecCedula = (document.getElementById('inp-tec-cedula')?.value ?? '').trim();
+    const tecTel    = (document.getElementById('inp-tec-tel')   ?.value ?? '').trim();
+    const tecCorreo = (document.getElementById('inp-tec-correo')?.value ?? '').trim();
 
-      // === NUEVO LECTOR DE FILAS (INSTALADO/RETIRADO + SERIAL) ===
-const filasEquipos = [];
-const errores = [];
+    // === Firma tecnico ===
+    let firmaActaDataUrl = '';
+    const firmaInput = document.getElementById('inp-firma-tec');
+    if (firmaInput?.files?.[0]) {
+        firmaActaDataUrl = await fileToDataURL(firmaInput.files[0]);
+    }
 
-document.querySelectorAll('#tbody-equipos tr').forEach(tr => {
-  const sapRaw = tr.querySelector('.inp-sap')?.value?.trim() ?? '';
-  if (!sapRaw) return; // ignorar filas vacías
+    // === Datos ACTA ===
+    const departamento = (document.getElementById('inp-departamento')?.value ?? '').trim();
+    const municipio    = (document.getElementById('inp-municipio')?.value ?? '').trim();
+    const centroPoblado= (document.getElementById('inp-centro-poblado')?.value ?? '').trim();
+    const sede         = (document.getElementById('inp-sede')?.value ?? '').trim();
+    const correo       = (document.getElementById('inp-correo')?.value ?? '').trim();
+    const responsableNombre = (document.getElementById('inp-responsable')?.value ?? '').trim();
+    const cedula       = (document.getElementById('inp-cedula')?.value ?? '').trim();
+    const contacto     = (document.getElementById('inp-contacto')?.value ?? '').trim();
 
-  // Extraer solo el código SAP (antes del ·)
-  const sap = sapRaw.includes('·') ? sapRaw.split('·')[0].trim() : sapRaw;
+    const descripcion = (document.getElementById('inp-descripcion')?.value ?? '');
 
-  // Tipo (radio)
-  const tipoInput = tr.querySelector('input.inp-tipo:checked');
-  const tipo = tipoInput ? tipoInput.value : '';
+    // === Equipos tabla ===
+    const filasEquipos = [];
+    document.querySelectorAll('#tbody-equipos tr').forEach(tr => {
+        const sapRaw = tr.querySelector('.inp-sap')?.value?.trim() ?? '';
+        if (!sapRaw) return;
 
-  // Serial obligatorio
-  const serial = tr.querySelector('.inp-serial')?.value?.trim() ?? '';
+        const sap = sapRaw.includes('·') ? sapRaw.split('·')[0].trim() : sapRaw;
 
-  // Validación: tipo + serial obligatorio
-  if (!tipo || !serial) {
-    errores.push('Hay filas sin tipo o sin serial.');
-    return;
-  }
+        const tipoInput = tr.querySelector('input.inp-tipo:checked');
+        const tipo = tipoInput ? tipoInput.value : '';
 
-  filasEquipos.push({
-    sap,
-    descripcion: sapMap.get(sap) ?? '',
-    tipo,
-    serial
-  });
-});
+        const serial = tr.querySelector('.inp-serial')?.value?.trim() ?? '';
+        if (!tipo || !serial) return;
 
+        filasEquipos.push({
+            sap,
+            descripcion: sapMap.get(sap) ?? '',
+            tipo,
+            serial
+        });
+    });
 
+    // === PRUEBAS ===
+    const imgsJson = {
+        gps        : await getFoto('img-gps-geo'),
+        apInt      : await getFoto('img-ap-int'),
+        apExt1     : await getFoto('img-ap-ext1'),
+        apExt2     : await getFoto('img-ap-ext2'),
+        pcInt      : await getFoto('img-pc-int'),
+        movilExt   : await getFoto('img-movil-ext'),
+        senalExt   : await getFoto('img-senal-ext'),
+        senalInt   : await getFoto('img-senal-int'),
+        respaldo   : await getFoto('img-respaldo'),
+        printUps   : await getFoto('img-print-ups'),
+        med1       : await getFoto('img-med1'),
+        med2       : await getFoto('img-med2'),
 
-      /// ====== NUEVO LECTOR DE MÚLTIPLES IMÁGENES ======
-async function pickMulti(id, maxPx=1600, quality=0.85) {
-  const el = document.getElementById(id);
-  const cell = el.closest('.photo-cell');
+        navIndoor: [
+          await getFoto('img-nav-indoor-0'),
+          await getFoto('img-nav-indoor-1'),
+          await getFoto('img-nav-indoor-2')
+        ],
 
-  if (!cell || !cell._files || cell._files.length === 0) return [];
+        navOutdoor: [
+          await getFoto('img-nav-outdoor-0'),
+          await getFoto('img-nav-outdoor-1'),
+          await getFoto('img-nav-outdoor-2')
+        ],
 
-  const arr = [];
-  for (let i = 0; i < cell._files.length; i++) {
-    const raw = await fileToDataURL(cell._files[i]);
-    const scaled = await downscaleDataUrl(raw, maxPx, quality);
-    arr.push(scaled);
-  }
-  return arr;
-}
+        speedtest  : await getFoto('img-speedtest'),
+        portal     : await getFoto('img-portal'),
+        block1     : await getFoto('img-block1'),
+        block2     : await getFoto('img-block2'),
 
+        despues    : fotosDespues
+    };
 
-// ========== PRUEBAS: imágenes (actualizado) ==========
-const imgsJson = {
-  gps        : await pickDataUrl('img-gps-geo'),
-  apInt      : await pickDataUrl('img-ap-int'),
-  apExt1     : await pickDataUrl('img-ap-ext1'),
-  apExt2     : await pickDataUrl('img-ap-ext2'),
-  pcInt      : await pickDataUrl('img-pc-int'),
-  movilExt   : await pickDataUrl('img-movil-ext'),
-  senalExt   : await pickDataUrl('img-senal-ext'),
-  senalInt   : await pickDataUrl('img-senal-int'),
-  respaldo   : await pickDataUrl('img-respaldo'),
-  printUps   : await pickDataUrl('img-print-ups'),
-  med1       : await pickDataUrl('img-med1'),
-  med2       : await pickDataUrl('img-med2'),
+    const pruebasObs = (document.getElementById('inp-pruebas-obs')?.value ?? '');
 
-  // ✅ LAS DOS TARJETAS DE 3 FOTOS
-  navIndoor: [
-   await pickDataUrl('img-nav-indoor-0') || "",
-   await pickDataUrl('img-nav-indoor-1') || "",
-   await pickDataUrl('img-nav-indoor-2') || ""
-],
+    // === PAYLOAD FINAL ===
+    const payloadJson = {
+        numeroCaso, fecha, idBen, insertImages: false,
 
-navOutdoor: [
-   await pickDataUrl('img-nav-outdoor-0') || "",
-   await pickDataUrl('img-nav-outdoor-1') || "",
-   await pickDataUrl('img-nav-outdoor-2') || ""
-],
+        departamento, municipio, centroPoblado, sede,
+        correo, responsableNombre, cedula, contacto,
 
-  speedtest  : await pickDataUrl('img-speedtest'),
-  portal     : await pickDataUrl('img-portal'),
-  block1     : await pickDataUrl('img-block1'),
-  block2     : await pickDataUrl('img-block2')
-};
+        descripcion,
 
-// ✅ Inyectar las 18 fotos de DESPUÉS en imgsJson
-imgsJson.despues = fotosDespues;
+        acompNombre, acompCargo, acompCedula, acompTel1, acompTel2, acompCorreo,
+        tecNombre, tecCargo, tecCedula, tecTel, tecCorreo,
 
-      const pruebasObs = (document.getElementById('inp-pruebas-obs')?.value ?? '');
+        firmaActaDataUrl,
 
-      // 2) Payload para el Flow
-const payloadJson = {
-  numeroCaso, fecha, idBen, insertImages: false,
-  departamento, municipio, centroPoblado, sede,
-  correo, responsableNombre, cedula, contacto,
-  descripcion,
-  acompNombre, acompCargo, acompCedula, acompTel1, acompTel2, acompCorreo,
-  tecNombre, tecCargo, tecCedula, tecTel, tecCorreo,
-  firmaActaDataUrl,
+        filasEquipos,
 
-  // 👇 ÚNICO arreglo válido del PASO 3
-  filasEquipos,
+        imgs: imgsJson,
 
-  imgs: {
-  gps: imgsJson.gps,
-  apInt: imgsJson.apInt,
-  apExt1: imgsJson.apExt1,
-  apExt2: imgsJson.apExt2,
-  pcInt: imgsJson.pcInt,
-  movilExt: imgsJson.movilExt,
-  senalExt: imgsJson.senalExt,
-  senalInt: imgsJson.senalInt,
-  respaldo: imgsJson.respaldo,
-  printUps: imgsJson.printUps,
-  med1: imgsJson.med1,
-  med2: imgsJson.med2,
-  navIndoor: imgsJson.navIndoor,
-  navOutdoor: imgsJson.navOutdoor,
-  speedtest: imgsJson.speedtest,
-  portal: imgsJson.portal,
-  block1: imgsJson.block1,
-  block2: imgsJson.block2,
+        pruebasObs,
+        latitud, longitud,
 
-  // ✅ ESTO ES LO QUE IMPORTA:
-  despues: fotosDespues
-},
-  pruebasObs,
-  latitud, longitud
-};
+        sapAntes1, sapAntes2, sapAntes3, sapAntes4, sapAntes5, sapAntes6,
 
+        fotoAntesSerial1, fotoAntesSerial2, fotoAntesSerial3,
+        fotoAntesSerial4, fotoAntesSerial5, fotoAntesSerial6,
 
-console.log("Indoor:", payloadJson.imgs.navIndoor);
-console.log("Outdoor:", payloadJson.imgs.navOutdoor);
+        fotoAntesDiag1, fotoAntesDiag2, fotoAntesDiag3,
+        fotoAntesDiag4, fotoAntesDiag5, fotoAntesDiag6,
+        fotoAntesDiag7, fotoAntesDiag8, fotoAntesDiag9,
+        fotoAntesDiag10, fotoAntesDiag11, fotoAntesDiag12,
 
+        antesObs,
+        despuesObs
+    };
 
-Object.assign(payloadJson, {
-  sapAntes1, sapAntes2, sapAntes3, sapAntes4, sapAntes5, sapAntes6,
-  fotoAntesSerial1, fotoAntesSerial2, fotoAntesSerial3,
-  fotoAntesSerial4, fotoAntesSerial5, fotoAntesSerial6,
-  fotoAntesDiag1, fotoAntesDiag2, fotoAntesDiag3, fotoAntesDiag4, fotoAntesDiag5, fotoAntesDiag6,
-  fotoAntesDiag7, fotoAntesDiag8, fotoAntesDiag9, fotoAntesDiag10, fotoAntesDiag11, fotoAntesDiag12,
-  antesObs
-});
-
-      try{
+    try{
         setStatus('Enviando al Flow…');
         setWorking(true, 'Enviando…');
-// --- Inyecta campos faltantes en los objetos a enviar ---
-if (typeof payloadJson === 'object' && payloadJson) {
-  // Observación de DESPUÉS al payload principal
-  payloadJson.despuesObs = despuesObs;
-}
-
 
         const resp = await fetch(FLOW_URL, {
-          method: 'POST',
-          headers: { 'Content-Type':'application/json' },
-          body: JSON.stringify({
-            payloadJson: JSON.stringify(payloadJson),
-            imgsJson: JSON.stringify({
-   ...imgsJson,
-   despues: JSON.stringify(fotosDespues)
-})
-
-          })
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({
+                payloadJson: JSON.stringify(payloadJson),
+                imgsJson: JSON.stringify(imgsJson)
+            })
         });
 
         if (!resp.ok){
-          const t = await resp.text().catch(()=> '');
-          throw new Error(`HTTP ${resp.status} ${resp.statusText} ${t}`);
+            const t = await resp.text().catch(()=> '');
+            throw new Error(`HTTP ${resp.status} ${resp.statusText} ${t}`);
         }
 
         const data = await resp.json();
@@ -6040,16 +5987,16 @@ if (typeof payloadJson === 'object' && payloadJson) {
         URL.revokeObjectURL(url);
 
         setStatus(result ? `Listo: ${result}` : 'Archivo generado correctamente ✔', 'ok');
-      }catch(err){
+
+    }catch(err){
         console.error(err);
         setStatus('Error al generar: ' + err.message, 'err');
         alert('No se pudo generar el Excel: ' + err.message);
-      }finally{
+    }finally{
         setWorking(false);
-clearDraft();
-      }
+        clearDraft();
     }
-
+}
 
 // === PASO 7: Propagar títulos de <label> a data-title en cada tarjeta de PRUEBAS ===
 // Ubicación recomendada: justo ANTES de document.getElementById('exportBtn')...
@@ -6334,6 +6281,8 @@ cargarFotoOffline(id, function(base64) {
   });
 }
 
+
+
   </script>
 <script>
 if ("serviceWorker" in navigator) {
@@ -6342,6 +6291,8 @@ if ("serviceWorker" in navigator) {
     .catch(err => console.log("❌ Error SW:", err));
 }
 </script>
+
+
 
 </body>
 </html>
