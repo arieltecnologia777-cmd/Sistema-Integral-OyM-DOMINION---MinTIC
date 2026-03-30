@@ -22,11 +22,9 @@ export const MODULOS = {
     id: "mci",
     nombre: "Auditor — MCI",
 
-    // 🔒 Las rutas se llenarán cuando tú me las pases
-    pendientes: null,
-    aprobados: null,
+    pendientes: "/drive/root:/Documents/Base MCI - Proyecto automatización/MCI_Salidas",
+    aprobados: null, // la llenaremos luego
 
-    // Columnas que van en la tabla del Panel Auditor
     columnas: [
       { id: "tecnico",     label: "Técnico" },
       { id: "fecha",       label: "Fecha" },
