@@ -23,7 +23,7 @@ export const MODULOS = {
     nombre: "Auditor — MCI",
 
     pendientes: "/drive/root:/Documents/Base MCI - Proyecto automatización/MCI_Salidas",
-    aprobados: "/drive/root:/Documents/Base MCI - Proyecto automatización/MCI_Aprobados",
+aprobados: "/drive/root:/Documents/Base MCI - Proyecto automatización/MCI_Aprobados",
 
     columnas: [
       { id: "tecnico",     label: "Técnico" },
