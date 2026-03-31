@@ -5,13 +5,13 @@
 export const MODULOS = {
 
   /* ============================================================
-     ✅ MÓDULO MCI (OneDrive con driveId real)
+     ✅ MÓDULO MCI (Drive personal con driveId real)
      ============================================================ */
   MCI: {
     id: "mci",
     nombre: "Auditor — MCI",
 
-    // ✅ Estas son las rutas correctas usando driveId real
+    // ✅ Rutas correctas con driveId real
     pendientes: "/drives/b!qDLeuVb8dE-_ocg255wGZSbL4Q0zxaNDvZnBorHVVnQq_CH66fH5Q6vXRgtmy0ua/root:/Documents/Base MCI - Proyecto automatización/MCI_Salidas",
     aprobados:  "/drives/b!qDLeuVb8dE-_ocg255wGZSbL4Q0zxaNDvZnBorHVVnQq_CH66fH5Q6vXRgtmy0ua/root:/Documents/Base MCI - Proyecto automatización/MCI_Aprobados",
 
@@ -39,7 +39,7 @@ export const MODULOS = {
   },
 
   /* ============================================================
-     ✅ MÓDULO MPR (cuando toque)
+     ✅ MPR (Placeholder)
      ============================================================ */
   MPR: {
     id: "mpr",
@@ -57,15 +57,15 @@ export const MODULOS = {
 
     normalizar(item) {
       return {
-        tecnico:   item.nombre ?? "—",
-        fecha:     item.modificado || "—",
-        proyecto:  "—",
-        zona:      "—",
+        tecnico: item.nombre ?? "—",
+        fecha: item.modificado ?? "—",
+        proyecto: "—",
+        zona: "—",
         archivo: {
           nombre: item.nombre,
-          ruta:   item.ruta,
+          ruta: item.ruta,
           tamano: item.tamano,
-          tipo:   item.tipo
+          tipo: item.tipo
         }
       };
     }
@@ -73,9 +73,6 @@ export const MODULOS = {
 
 };
 
-/* ============================================================
-   🔧 FUNCIÓN AUXILIAR
-   ============================================================ */
 export function obtenerModulo(id) {
   return MODULOS[id.toUpperCase()] ?? null;
 }
