@@ -50,7 +50,7 @@ export async function listarArchivos(rutaCarpeta) {
     return [];
   }
 
-  const url = `https://graph.microsoft.com/v1.0/me${rutaCarpeta}:/children`;
+  const url = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:${rutaCarpeta}:/children`;
 
   const data = await graphFetch(url);
   if (!data || !data.value) return [];
