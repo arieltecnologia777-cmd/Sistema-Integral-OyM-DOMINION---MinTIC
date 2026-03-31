@@ -212,6 +212,7 @@ async function cargarDatosDesdeFlow() {
         );
 
         const data = await resp.json();
+       console.log("DATOS DESDE FLOW:", data);
         return data.reportes;
 
     } catch (err) {
