@@ -42,7 +42,7 @@ export async function listarArchivos(rutaCarpeta) {
   }
 
   // ✅ Ruta correcta → Graph con driveId real
-  const url = `https://graph.microsoft.com/v1.0${rutaCarpeta}:/children`;
+  const url = `https://graph.microsoft.com/v1.0/drives/${DRIVE_ID}/items/${folderId}/children`;
 
   const data = await graphFetch(url);
   if (!data || !data.value) return [];
