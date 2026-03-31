@@ -232,14 +232,17 @@ async function verArchivo(item) {
     return;
   }
 
-  const urlTemp = await obtenerURLTemporal(item.archivo.ruta);
+  // ✅ obtener token válido REAL
+  const token = await obtenerToken();
+
+  // ✅ generar URL temporal correctamente
+  const urlTemp = await obtenerURLTemporal(item.archivo.ruta, token);
 
   if (!urlTemp) {
     alert("No se pudo obtener vista previa.");
     return;
   }
 
-  // Abrir en nueva pestaña
   window.open(urlTemp, "_blank");
 }
 
