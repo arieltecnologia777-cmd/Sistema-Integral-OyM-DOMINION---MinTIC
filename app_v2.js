@@ -10,9 +10,9 @@
    Ariel-friendly: limpio, comentado y escalable
    ====================================================================== */
 
-import { MODULOS, obtenerModulo } from "./modulos.js";
-import { iniciarSesion, usuarioActual, cerrarSesion } from "./auth.js";
-import { cargarDesdeCarpeta, obtenerURLTemporal, moverArchivo } from "./graph.js";
+import { MODULOS, obtenerModulo } from "./modulos_v2.js";
+import { cargarDesdeCarpeta, obtenerURLTemporal, moverArchivo } from "./graph_v2.js";
+import { cargarDesdeCarpeta, obtenerURLTemporal, moverArchivo } from "./graph_v2.js";
 
 /* ======================================================================
    ESTADO GLOBAL
