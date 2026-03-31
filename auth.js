@@ -71,22 +71,25 @@ export async function obtenerToken() {
   }
 
   try {
-    // Intento silencioso
     const silent = await msalInstance.acquireTokenSilent({
-  ...graphScopes,
-  account
-});
+      ...graphScopes,
+      account
+    });
 
-// ✅ GUARDAR TOKEN AQUÍ
-sessionStorage.setItem("token", silent.accessToken);
+    // ✅ GUARDAR TOKEN
+    sessionStorage.setItem("token", silent.accessToken);
 
-return silent.accessToken;
+    return silent.accessToken;
 
   } catch (e) {
     console.warn("🔄 Intento silencioso falló. Probando popup…");
 
     try {
       const popup = await msalInstance.acquireTokenPopup(graphScopes);
+
+      // ✅ GUARDAR TOKEN
+      sessionStorage.setItem("token", popup.accessToken);
+
       return popup.accessToken;
 
     } catch (err) {
