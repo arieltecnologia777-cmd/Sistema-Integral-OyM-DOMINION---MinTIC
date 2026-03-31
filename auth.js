@@ -73,11 +73,14 @@ export async function obtenerToken() {
   try {
     // Intento silencioso
     const silent = await msalInstance.acquireTokenSilent({
-      ...graphScopes,
-      account
-    });
+  ...graphScopes,
+  account
+});
 
-    return silent.accessToken;
+// ✅ GUARDAR TOKEN AQUÍ
+sessionStorage.setItem("token", silent.accessToken);
+
+return silent.accessToken;
 
   } catch (e) {
     console.warn("🔄 Intento silencioso falló. Probando popup…");
