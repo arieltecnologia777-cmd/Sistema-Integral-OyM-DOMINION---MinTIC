@@ -44,6 +44,7 @@ export async function iniciarSesion() {
 
     // Establecer cuenta activa
     msalInstance.setActiveAccount(loginResp.account);
+     sessionStorage.setItem("token", loginResp.accessToken);
 
     return loginResp.account;
   } catch (err) {
