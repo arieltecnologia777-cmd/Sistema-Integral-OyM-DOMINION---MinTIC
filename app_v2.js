@@ -227,43 +227,48 @@ function prepararEventosTabla() {
    ====================================================================== */
 async function verArchivo(item) {
 
-  // 1️⃣ Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-  // Guardar archivo actual globalmente (usaremos esto luego en Aprobar/Rechazar)
   window.__archivoActual = item;
 
-  // 2️⃣ Obtener token real
   const token = await obtenerToken();
   if (!token) {
     alert("Error obteniendo token.");
     return;
   }
 
-  // 3️⃣ Pedir enlace embed a Microsoft Graph
   const resp = await fetch(
-    `https://graph.microsoft.com/v1.0${item.archivo.ruta}/createLink`,
+    `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     {
-      method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        type: "embed",
-        scope: "anonymous"
-      })
+        "Authorization": `Bearer ${token}`
+      }
     }
   );
 
   const data = await resp.json();
 
-  if (!data?.link?.webHtml) {
-    alert("No se pudo obtener el visor embebido.");
+  if (!data?.webUrl) {
+    alert("No se pudo obtener URL del informe");
     return;
   }
 
+  const encoded = encodeURIComponent(data.webUrl);
+
+  const embedUrl =
+    `https://excel.officeapps.live.com/x/_layouts/15/WopiFrame2.aspx?embed=1&src=${encoded}`;
+
+  document.getElementById("visorIframe").innerHTML = `
+    <iframe 
+        src="${embedUrl}"
+        width="100%"
+        height="100%"
+        frameborder="0"
+        allowfullscreen
+    ></iframe>
+  `;
+}
   // 4️⃣ Insertar iframe
   document.getElementById("visorIframe").innerHTML = data.link.webHtml;
 }
