@@ -296,6 +296,81 @@
     </div>
 
   </main>
+  <!-- ===================================================
+     MODAL FULLSCREEN — VISOR DE INFORMES
+     =================================================== -->
+<div id="modalVisor" style="
+    display:none;
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    padding: 40px;
+    overflow: auto;
+">
+    <div style="
+        background:#fff;
+        width:100%;
+        max-width:1200px;
+        margin:0 auto;
+        border-radius:14px;
+        box-shadow:0 8px 24px rgba(0,0,0,.18);
+        padding:20px;
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+    ">
+        
+        <!-- Barra superior -->
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            
+            <button id="visorVolver" style="
+                background:#e2e8f8;
+                border:none;
+                padding:8px 16px;
+                border-radius:10px;
+                font-weight:700;
+                cursor:pointer;
+            ">⬅ Volver</button>
+
+            <div style="display:flex; gap:10px;">
+                <button id="visorDescargar" style="
+                    background:#0e4aa8; color:#fff;
+                    border:none; padding:8px 16px;
+                    border-radius:10px; cursor:pointer;
+                    font-weight:700;
+                ">Descargar</button>
+
+                <button id="visorAprobar" style="
+                    background:#16a34a; color:white;
+                    border:none; padding:8px 16px;
+                    border-radius:10px; cursor:pointer;
+                    font-weight:700;
+                ">Aprobar</button>
+
+                <button id="visorRechazar" style="
+                    background:#dc2626; color:white;
+                    border:none; padding:8px 16px;
+                    border-radius:10px; cursor:pointer;
+                    font-weight:700;
+                ">Rechazar</button>
+            </div>
+        </div>
+
+        <!-- Contenedor del iframe -->
+        <div id="visorIframe" style="
+            width:100%;
+            height:80vh;
+            border:1px solid #dce3f5;
+            border-radius:12px;
+            overflow:hidden;
+            background:#f8faff;
+        ">
+            <!-- Aquí se inyectará el IFRAME del Excel -->
+        </div>
+    </div>
+</div>
 
     <!-- Scripts obligatorios -->
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
