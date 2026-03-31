@@ -1,14 +1,13 @@
-import { obtenerToken } from "./auth.js";
+// ============================================================
+// ✅ IMPORTS NECESARIOS
+// ============================================================
+import { DRIVE_ID } from "./modulos_v2.js";
 
-/* ============================================================
-   Helper: Fetch autenticado a Microsoft Graph
-   ============================================================ */
-async function graphFetch(url, method = "GET", body = null) {
-  const token = await obtenerToken();
-  if (!token) {
-    console.error("❌ No se pudo obtener el token de acceso.");
-    return null;
-  }
+
+// ============================================================
+// ✅ FUNCIÓN BASE PARA LLAMAR A GRAPH
+// ============================================================
+async function graphFetch(url, token, method = "GET", body = null) {
 
   const options = {
     method,
@@ -18,116 +17,131 @@ async function graphFetch(url, method = "GET", body = null) {
     }
   };
 
-  if (body) options.body = JSON.stringify(body);
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
 
   const resp = await fetch(url, options);
 
   if (!resp.ok) {
-    console.error("❌ Error en Graph:", resp.status, await resp.text());
-    return null;
+    const errText = await resp.text();
+    console.error("❌ Error en Graph:", resp.status, errText);
+    throw new Error(`Graph error ${resp.status}: ${errText}`);
   }
 
-  // Graph retorna JSON
   return resp.json();
 }
 
-/* ============================================================
-   1) LISTAR ARCHIVOS — usando driveId  
-   (NO SE USA /me !!!)
-   ============================================================ */
-export async function listarArchivos(rutaCarpeta) {
-  if (!rutaCarpeta) {
-    console.warn("⚠️ Ruta vacía.");
+
+
+// ============================================================
+// ✅ 1) LISTAR ARCHIVOS DE UNA CARPETA (pendientes)
+// Siempre usa: drives/{driveId}/items/{folderId}/children
+// ============================================================
+export async function listarArchivos(folderId, token) {
+
+  if (!folderId) {
+    console.warn("⚠️ folderId vacío.");
     return [];
   }
 
-  // ✅ Ruta correcta → Graph con driveId real
   const url = `https://graph.microsoft.com/v1.0/drives/${DRIVE_ID}/items/${folderId}/children`;
 
-  const data = await graphFetch(url);
-  if (!data || !data.value) return [];
+  const data = await graphFetch(url, token);
 
-  return data.value.filter(item => item.file);
+  return data.value.map(item => ({
+    id: item.id,
+    nombre: item.name,
+    fecha: item.lastModifiedDateTime,
+    tamano: item.size,
+    archivo: {
+      ruta: `/drives/${DRIVE_ID}/items/${item.id}`,
+      nombre: item.name
+    }
+  }));
 }
 
-/* ============================================================
-   2) OBTENER ARCHIVO (Blob)
-   ============================================================ */
-export async function obtenerArchivo(rutaArchivo) {
-  const token = await obtenerToken();
-  if (!token) return null;
 
-  const url = `https://graph.microsoft.com/v1.0${rutaArchivo}:/content`;
 
-  const resp = await fetch(url, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
+// ============================================================
+// ✅ 2) OBTENER URL TEMPORAL PARA PREVIEW
+// ============================================================
+export async function obtenerURLTemporal(rutaArchivo, token) {
 
-  if (!resp.ok) {
-    console.error("❌ No se pudo obtener el archivo:", resp.status);
+  if (!rutaArchivo) {
+    console.error("❌ obtenerURLTemporal: rutaArchivo vacío.");
     return null;
   }
 
-  return resp.blob();
+  const url = `https://graph.microsoft.com/v1.0${rutaArchivo}`;
+
+  // Graph: /driveItem/createLink
+  const resp = await graphFetch(`${url}/createLink`, token, "POST", {
+    type: "view",
+    scope: "anonymous"
+  });
+
+  return resp?.link?.webUrl || null;
 }
 
-/* ============================================================
-   3) MOVER ARCHIVO (Aprobar)
-   ============================================================ */
-export async function moverArchivo(rutaOrigen, rutaDestino) {
 
-  // Nombre del archivo
-  const nombre = rutaDestino.split("/").pop();
 
-  // Carpeta destino → quitar el nombre del archivo
-  const carpetaDestino = rutaDestino.replace(`/${nombre}`, "");
+// ============================================================
+// ✅ 3) MOVER ARCHIVO ENTRE CARPETAS (aprobar)
+// ============================================================
+export async function moverArchivo(rutaOrigen, rutaDestino, token) {
 
-  const body = {
-    parentReference: {
-      path: carpetaDestino
-    },
-    name: nombre
-  };
-
-  const url = `https://graph.microsoft.com/v1.0${rutaOrigen}`;
-
-  const resp = await graphFetch(url, "PATCH", body);
-
-  if (!resp) {
-    console.error("❌ Error moviendo archivo.");
+  if (!rutaOrigen || !rutaDestino) {
+    console.error("❌ moverArchivo: rutas inválidas.");
     return false;
   }
 
-  console.log("✅ Archivo movido");
-  return true;
+  // Origen
+  const origenUrl = `https://graph.microsoft.com/v1.0${rutaOrigen}`;
+
+  // Carpeta destino
+  const nombreArchivo = rutaDestino.split("/").pop();
+  const carpetaDestino = rutaDestino.replace(`/${nombreArchivo}`, "");
+
+  const destinoFolderUrl =
+    `https://graph.microsoft.com/v1.0/drives/${DRIVE_ID}/items/${carpetaDestino}`;
+
+  // Ejecutar movimiento
+  const body = {
+    parentReference: {
+      driveId: DRIVE_ID,
+      id: carpetaDestino
+    },
+    name: nombreArchivo
+  };
+
+  try {
+    await graphFetch(origenUrl, token, "PATCH", body);
+    return true;
+
+  } catch (err) {
+    console.error("❌ Error moviendo archivo:", err);
+    return false;
+  }
 }
 
-/* ============================================================
-   4) CARGAR ARCHIVOS NORMALIZADOS
-   ============================================================ */
-export async function cargarDesdeCarpeta(modulo, esAprobados = false) {
-  const ruta = esAprobados ? modulo.aprobados : modulo.pendientes;
 
-  const archivos = await listarArchivos(ruta);
-  if (!archivos || archivos.length === 0) return [];
 
-  return archivos.map(file =>
-    modulo.normalizar({
-      nombre: file.name,
-      ruta: `${ruta}/${file.name}`,
-      modificado: file.lastModifiedDateTime ?? "—",
-      tamano: file.size ?? "—",
-      tipo: file.file?.mimeType ?? "—"
-    })
-  );
-}
+// ============================================================
+// ✅ 4) CARGA COMPLETA DESDE UNA CARPETA (NORMALIZADO)
+// ============================================================
+export async function cargarDesdeCarpeta(modulo, incluirAprobados = false) {
 
-/* ============================================================
-   5) URL TEMPORAL PARA PREVIEW
-   ============================================================ */
-export async function obtenerURLTemporal(rutaArchivo) {
-  const blob = await obtenerArchivo(rutaArchivo);
-  if (!blob) return null;
+  const token = sessionStorage.getItem("token");
 
-  return URL.createObjectURL(blob);
+  const folderId = incluirAprobados ? modulo.aprobados : modulo.pendientes;
+
+  const archivos = await listarArchivos(folderId, token);
+
+  return archivos.map(a => ({
+    nombre: a.nombre,
+    fecha: new Date(a.fecha).toLocaleString("es-CO"),
+    tamano: a.tamano,
+    archivo: a.archivo
+  }));
 }
