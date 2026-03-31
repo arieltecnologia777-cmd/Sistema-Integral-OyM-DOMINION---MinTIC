@@ -23,18 +23,19 @@ export const MODULOS = {
     ],
 
     normalizar(item) {
-      return {
-        tecnico: item.nombre ?? "—",
-        fecha: item.modificado ?? "—",
-        cliente: "—",
-        ubicacion: "—",
-        archivo: {
-          nombre: item.nombre,
-          ruta: item.ruta,
-          tipo: item.tipo
-        }
-      };
+  return {
+    tecnico: item.nombre ?? "—",
+    fecha: item.modificado || "—",
+    cliente: "—",
+    ubicacion: "—",
+    archivo: {
+      nombre: item.nombre,
+      ruta: item.ruta,
+      tamano: item.tamano,
+      tipo: item.tipo
     }
+  };
+}
   },
 
   /* ============================================================
@@ -55,19 +56,19 @@ export const MODULOS = {
     ],
 
     normalizar(item) {
-      return {
-        tecnico: item.nombre ?? "—",
-        fecha: item.modificado ?? "—",
-        proyecto: "—",
-        zona: "—",
-        archivo: {
-          nombre: item.nombre,
-          ruta: item.ruta,
-          tipo: item.tipo
-        }
-      };
+  return {
+    tecnico: item.nombre ?? "—",
+    fecha: item.modificado || "—",
+    cliente: "—",
+    ubicacion: "—",
+    archivo: {
+      nombre: item.nombre,
+      ruta: item.ruta,
+      tamano: item.tamano,
+      tipo: item.tipo
     }
-  }
+  };
+}
 
 };
 
