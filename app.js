@@ -131,10 +131,11 @@ function generarTablaHTML(modulo) {
 }
 
 /* ======================================================================
-   5) CARGAR DATOS DESDE ONE DRIVE
+   5) CARGAR DATOS DESDE POWER AUTOMATE
    ====================================================================== */
 async function cargarDatosModulo() {
 
+  // ✅ Si el módulo no tiene carpeta configurada, mensaje
   if (!moduloActivo.pendientes) {
     console.warn("⚠️ Aún no se ha configurado la carpeta de pendientes.");
     document.getElementById("tbodyDatos").innerHTML = `
@@ -146,9 +147,10 @@ async function cargarDatosModulo() {
     return;
   }
 
-  // Llamamos graph.js → carga normalizada
-  datosActuales = await cargarDesdeCarpeta(moduloActivo, false);
+  // ✅ NUEVO: Cargar desde el Flow de Power Automate
+  datosActuales = await cargarDatosDesdeFlow();
 
+  // ✅ Renderizar tabla
   renderTabla();
 }
 
@@ -191,6 +193,31 @@ function renderTabla() {
   });
 
   prepararEventosTabla();
+}
+
+// ========================================================
+// CARGAR DATOS DESDE POWER AUTOMATE (BACKEND DEL AUDITOR)
+// ========================================================
+async function cargarDatosDesdeFlow() {
+    try {
+        const resp = await fetch(
+            "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/57a653a32c5640e98f7c73c5fe33d71a/triggers/manual/paths/invoke?api-version=1",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ modulo: "MCI" })
+            }
+        );
+
+        const data = await resp.json();
+        return data.reportes;
+
+    } catch (err) {
+        console.error("Error leyendo data desde el Flow:", err);
+        return [];
+    }
 }
 
 /* ======================================================================
@@ -261,5 +288,3 @@ async function aprobarArchivo(item) {
   // Recargar datos
   await cargarDatosModulo();
 }
-
-``
