@@ -211,8 +211,9 @@ async function cargarDatosDesdeFlow() {
             }
         );
 
-        const data = await resp.json();
-       console.log("DATOS DESDE FLOW:", data.reportes);
+        const brutos = await cargarDatosDesdeFlow();
+datosActuales = brutos.map(item => moduloActivo.normalizar(item));
+        console.log("DATOS DESDE FLOW:", data);
         return data.reportes;
 
     } catch (err) {
