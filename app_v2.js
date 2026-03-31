@@ -223,18 +223,36 @@ function prepararEventosTabla() {
 }
 
 /* ======================================================================
-   8) VER ARCHIVO (Preview mediante URL temporal)
+   8) VER ARCHIVO (PASO 1 — OBTENER webUrl DESDE GRAPH)
    ====================================================================== */
 async function verArchivo(item) {
 
-  if (!item?.archivo?.webUrl) {
-    alert("No se pudo obtener la URL del archivo.");
+  const token = await obtenerToken();
+  if (!token) {
+    alert("No se pudo obtener token.");
     return;
   }
 
-  // ✅ Abrir archivo usando la URL nativa de OneDrive
-  window.open(item.archivo.webUrl, "_blank");
+  const resp = await fetch(
+    `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await resp.json();
+
+  if (!data?.webUrl) {
+    alert("No se pudo obtener la URL del informe.");
+    return;
+  }
+
+  console.log("✅ URL obtenida desde Graph:", data.webUrl);
+  alert("✅ URL obtenida correctamente. Revisa la consola.");
 }
+
 
 /* ======================================================================
    9) APROBAR (mover archivo OneDrive)
