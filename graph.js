@@ -1,18 +1,8 @@
-/* ======================================================================
-   GRAPH.JS — Panel Auditor
-   Acceso a OneDrive usando Microsoft Graph API.
-   Funciones esenciales:
-    - listar archivos de una carpeta
-    - obtener metadata
-    - descargar archivo
-    - mover archivo (aprobar)
-   ====================================================================== */
-
 import { obtenerToken } from "./auth.js";
 
-/* ======================================================================
-   Helper: Peticiones a Graph
-   ====================================================================== */
+/* ============================================================
+   Helper: Fetch autenticado a Microsoft Graph
+   ============================================================ */
 async function graphFetch(url, method = "GET", body = null) {
   const token = await obtenerToken();
   if (!token) {
@@ -31,6 +21,7 @@ async function graphFetch(url, method = "GET", body = null) {
   if (body) options.body = JSON.stringify(body);
 
   const resp = await fetch(url, options);
+
   if (!resp.ok) {
     console.error("❌ Error en Graph:", resp.status, await resp.text());
     return null;
@@ -39,17 +30,16 @@ async function graphFetch(url, method = "GET", body = null) {
   return resp.json();
 }
 
-/* ======================================================================
-   1) LISTAR ARCHIVOS EN UNA CARPETA
-   input: ruta → "/drive/root:/Carpeta/Subcarpeta"
-   ====================================================================== */
+/* ============================================================
+   1) LISTAR ARCHIVOS — USANDO driveId REAL
+   ============================================================ */
 export async function listarArchivos(rutaCarpeta) {
   if (!rutaCarpeta) {
-    console.warn("⚠️ Ruta vacía. Aún no configurada.");
+    console.warn("⚠️ Ruta vacía.");
     return [];
   }
 
-  // ✅ Usamos la ruta EXACTA del módulo (ya incluye /drives/{id})
+  // ✅ Ruta correcta sin /me
   const url = `https://graph.microsoft.com/v1.0${rutaCarpeta}:/children`;
 
   const data = await graphFetch(url);
@@ -58,51 +48,41 @@ export async function listarArchivos(rutaCarpeta) {
   return data.value.filter(item => item.file);
 }
 
-/* ======================================================================
-   2) OBTENER CONTENIDO/METADATA DE UN ARCHIVO
-   input: rutaArchivo → "/drive/root:/Carpeta/file.json"
-   ====================================================================== */
+/* ============================================================
+   2) OBTENER ARCHIVO (blob)
+   ============================================================ */
 export async function obtenerArchivo(rutaArchivo) {
-
   const token = await obtenerToken();
   if (!token) return null;
 
-  const url = `https://graph.microsoft.com/v1.0/me${rutaArchivo}:/content`;
+  const url = `https://graph.microsoft.com/v1.0${rutaArchivo}:/content`;
 
   const resp = await fetch(url, {
     headers: { "Authorization": `Bearer ${token}` }
   });
 
   if (!resp.ok) {
-    console.error("❌ No se pudo obtener el archivo:", resp.status);
+    console.error("❌ No se pudo descargar archivo:", resp.status);
     return null;
   }
 
-  // Retorna Blob (PDF, XLSX, JSON, etc.)
-  const blob = await resp.blob();
-  return blob;
+  return resp.blob();
 }
 
-/* ======================================================================
-   3) MOVER ARCHIVO (Aprobar)
-   input:
-    - rutaOrigen  → "/drive/root:/MCI/pendientes/archivo.pdf"
-    - rutaDestino → "/drive/root:/MCI/aprobados/archivo.pdf"
-   ====================================================================== */
+/* ============================================================
+   3) MOVER ARCHIVO (APROBAR)
+   ============================================================ */
 export async function moverArchivo(rutaOrigen, rutaDestino) {
 
-  const partes = rutaDestino.split("/");
-  const nombreArchivo = partes.pop();
-  const carpetaDestino = partes.join("/");
+  const nombre = rutaDestino.split("/").pop();
+  const carpetaDestino = rutaDestino.replace(`/${nombre}`, "");
 
   const body = {
-    parentReference: {
-      path: `/drive/root:${carpetaDestino}`
-    },
-    name: nombreArchivo
+    parentReference: { path: carpetaDestino },
+    name: nombre
   };
 
-  const url = `https://graph.microsoft.com/v1.0/me${rutaOrigen}`;
+  const url = `https://graph.microsoft.com/v1.0${rutaOrigen}`;
 
   const resp = await graphFetch(url, "PATCH", body);
 
@@ -111,50 +91,34 @@ export async function moverArchivo(rutaOrigen, rutaDestino) {
     return false;
   }
 
-  console.log("✅ Archivo movido correctamente.");
+  console.log("✅ Archivo movido");
   return true;
 }
 
-/* ======================================================================
-   4) LEER ARCHIVOS Y RETORNAR OBJETOS NORMALIZADOS PARA LA TABLA
-      - módulo = MODULOS.MCI o MODULOS.MPR
-      - ruta = módulo.pendientes o módulo.aprobados
-   ====================================================================== */
+/* ============================================================
+   4) CARGAR ARCHIVOS NORMALIZADOS
+   ============================================================ */
 export async function cargarDesdeCarpeta(modulo, esAprobados = false) {
-
   const ruta = esAprobados ? modulo.aprobados : modulo.pendientes;
 
   const archivos = await listarArchivos(ruta);
-  if (!archivos || archivos.length === 0) {
-    return [];
-  }
+  if (!archivos || archivos.length === 0) return [];
 
-  // Construimos array limpio para la tabla
-  const resultados = archivos.map(file => {
-    return modulo.normalizar({
-      tecnico: file?.lastModifiedBy?.user?.displayName ?? "—",
-      fecha: file?.lastModifiedDateTime ?? "—",
-      cliente: file?.description ?? "—",
-      ubicacion: "—",
-      proyecto: file?.description ?? "—",
-      zona: "—",
-      archivo: {
-        nombre: file.name,
-        id: file.id,
-        tipo: file.file.mimeType,
-        ruta: `${ruta}/${file.name}`   // RUTA COMPLETA
-      }
-    });
-  });
-
-  return resultados;
+  return archivos.map(file =>
+    modulo.normalizar({
+      nombre: file.name,
+      ruta: `${ruta}/${file.name}`,
+      modificado: file.lastModifiedDateTime ?? "—",
+      tamano: file.size ?? "—",
+      tipo: file.file?.mimeType ?? "—"
+    })
+  );
 }
 
-/* ======================================================================
-   5) DESCARGAR ARCHIVO COMO URL TEMPORAL (para vista previa PDF/Img)
-   ====================================================================== */
+/* ============================================================
+   5) URL TEMPORAL PARA PREVIEW
+   ============================================================ */
 export async function obtenerURLTemporal(rutaArchivo) {
-
   const blob = await obtenerArchivo(rutaArchivo);
   if (!blob) return null;
 
