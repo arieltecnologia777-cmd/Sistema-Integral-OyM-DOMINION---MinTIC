@@ -31,7 +31,8 @@ async function graphFetch(url, method = "GET", body = null) {
 }
 
 /* ============================================================
-   1) LISTAR ARCHIVOS — USANDO driveId REAL
+   1) LISTAR ARCHIVOS — usando driveId  
+   NOTA: ¡NO SE USA /me!
    ============================================================ */
 export async function listarArchivos(rutaCarpeta) {
   if (!rutaCarpeta) {
@@ -39,7 +40,7 @@ export async function listarArchivos(rutaCarpeta) {
     return [];
   }
 
-  // ✅ Ruta correcta sin /me
+  // ✅ Ruta correcta
   const url = `https://graph.microsoft.com/v1.0${rutaCarpeta}:/children`;
 
   const data = await graphFetch(url);
@@ -49,7 +50,7 @@ export async function listarArchivos(rutaCarpeta) {
 }
 
 /* ============================================================
-   2) OBTENER ARCHIVO (blob)
+   2) OBTENER ARCHIVO
    ============================================================ */
 export async function obtenerArchivo(rutaArchivo) {
   const token = await obtenerToken();
@@ -62,7 +63,7 @@ export async function obtenerArchivo(rutaArchivo) {
   });
 
   if (!resp.ok) {
-    console.error("❌ No se pudo descargar archivo:", resp.status);
+    console.error("❌ No se pudo obtener el archivo:", resp.status);
     return null;
   }
 
@@ -74,53 +75,4 @@ export async function obtenerArchivo(rutaArchivo) {
    ============================================================ */
 export async function moverArchivo(rutaOrigen, rutaDestino) {
 
-  const nombre = rutaDestino.split("/").pop();
-  const carpetaDestino = rutaDestino.replace(`/${nombre}`, "");
-
-  const body = {
-    parentReference: { path: carpetaDestino },
-    name: nombre
-  };
-
-  const url = `https://graph.microsoft.com/v1.0${rutaOrigen}`;
-
-  const resp = await graphFetch(url, "PATCH", body);
-
-  if (!resp) {
-    console.error("❌ Error moviendo archivo.");
-    return false;
-  }
-
-  console.log("✅ Archivo movido");
-  return true;
-}
-
-/* ============================================================
-   4) CARGAR ARCHIVOS NORMALIZADOS
-   ============================================================ */
-export async function cargarDesdeCarpeta(modulo, esAprobados = false) {
-  const ruta = esAprobados ? modulo.aprobados : modulo.pendientes;
-
-  const archivos = await listarArchivos(ruta);
-  if (!archivos || archivos.length === 0) return [];
-
-  return archivos.map(file =>
-    modulo.normalizar({
-      nombre: file.name,
-      ruta: `${ruta}/${file.name}`,
-      modificado: file.lastModifiedDateTime ?? "—",
-      tamano: file.size ?? "—",
-      tipo: file.file?.mimeType ?? "—"
-    })
-  );
-}
-
-/* ============================================================
-   5) URL TEMPORAL PARA PREVIEW
-   ============================================================ */
-export async function obtenerURLTemporal(rutaArchivo) {
-  const blob = await obtenerArchivo(rutaArchivo);
-  if (!blob) return null;
-
-  return URL.createObjectURL(blob);
-}
+  const nombre = rutaDestino.split("/").
