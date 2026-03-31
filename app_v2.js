@@ -250,20 +250,21 @@ async function verArchivo(item) {
     return;
   }
 
-  // ✅ Visor nativo de SharePoint (funciona SIEMPRE en OneDrive empresarial)
-  const embedUrl = `${data.webUrl}?web=1&action=embedview`;
+  // ✅ Visor nativo de SharePoint (compatible con archivos privados)
+const embedUrl = `${data.webUrl}?web=1&action=embedview`;
 
-  // Insertar iframe
-  document.getElementById("visorIframe").innerHTML = `
-    <iframe
-        src="${embedUrl}"
-        width="100%"
-        height="100%"
-        frameborder="0"
-        allowfullscreen
-        style="border:0; background:white;"
-    ></iframe>
-  `;
+// Insertar iframe real (sin caracteres HTML escapados)
+document.getElementById("visorIframe").innerHTML = `
+  <iframe
+      src="${embedUrl}"
+      width="100%"
+      height="100%"
+      frameborder="0"
+      allowfullscreen
+      style="border:0; background:white;"
+  ></iframe>
+`;
+
 }
 
 
