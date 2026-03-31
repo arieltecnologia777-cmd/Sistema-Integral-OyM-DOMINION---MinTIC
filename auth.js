@@ -1,6 +1,13 @@
-/* ============================================================
-   AUTH.JS — Login simple sin scopes (NO pide consentimiento)
-   ============================================================ */
+/* ======================================================================
+   AUTH.JS — Panel Auditor
+   Gestión de sesión usando MSAL 2.0 (SPA)
+   Autenticación contra Azure AD (tu tenant Dominion)
+   Ariel-friendly: limpio, comentado y modular
+   ====================================================================== */
+
+// =====================================================================
+// CONFIGURACIÓN MSAL
+// =====================================================================
 
 const msalConfig = {
   auth: {
@@ -14,32 +21,98 @@ const msalConfig = {
   }
 };
 
+// Scopes necesarios para leer/mover archivos de OneDrive
+export const graphScopes = {
+  scopes: ["Files.ReadWrite.All", "User.Read"]
+};
+
+// Inicializa MSAL
 export const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-/* ✅ Login sin scopes, sin User.Read */
+
+// =====================================================================
+// LOGIN
+// =====================================================================
+
+/**
+ * Mostrar popup de login
+ */
 export async function iniciarSesion() {
   try {
-    const resp = await msalInstance.loginPopup({
-      scopes: []   // <— SIN User.Read NI GRAPH NI NADA
-    });
+    const loginResp = await msalInstance.loginPopup(graphScopes);
+    console.log("✅ Sesión iniciada:", loginResp.account.username);
 
-    msalInstance.setActiveAccount(resp.account);
-    return resp.account;
+    // Establecer cuenta activa
+    msalInstance.setActiveAccount(loginResp.account);
 
+    return loginResp.account;
   } catch (err) {
-    console.error("Error al iniciar sesión:", err);
+    console.error("❌ Error al iniciar sesión:", err);
+    alert("No se pudo iniciar sesión en el Panel Auditor.");
   }
 }
+
+
+// =====================================================================
+// OBTENER TOKEN DE ACCESO
+// =====================================================================
+
+/**
+ * Devuelve un token válido para consumir Microsoft Graph.
+ * Intenta primero renovar en silencio → si falla, usa popup.
+ */
+export async function obtenerToken() {
+  const account = msalInstance.getActiveAccount();
+
+  if (!account) {
+    console.warn("⚠️ No hay usuario activo. Debes iniciar sesión.");
+    return null;
+  }
+
+  try {
+    // Intento silencioso
+    const silent = await msalInstance.acquireTokenSilent({
+      ...graphScopes,
+      account
+    });
+
+    return silent.accessToken;
+
+  } catch (e) {
+    console.warn("🔄 Intento silencioso falló. Probando popup…");
+
+    try {
+      const popup = await msalInstance.acquireTokenPopup(graphScopes);
+      return popup.accessToken;
+
+    } catch (err) {
+      console.error("❌ Error al obtener token:", err);
+      return null;
+    }
+  }
+}
+
+
+// =====================================================================
+// OBTENER USUARIO ACTIVO
+// =====================================================================
 
 export function usuarioActual() {
   return msalInstance.getActiveAccount();
 }
 
+
+// =====================================================================
+// LOGOUT
+// =====================================================================
+
 export function cerrarSesion() {
-  const acc = msalInstance.getActiveAccount();
-  if (!acc) return;
+  const account = msalInstance.getActiveAccount();
+  if (!account) return;
 
   msalInstance.logoutPopup({
-    account: acc
+    account,
+    postLogoutRedirectUri: window.location.origin
   });
 }
+
