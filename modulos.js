@@ -1,22 +1,12 @@
 /* ============================================================
    MODULOS.JS
    Configuración de módulos del Panel Auditor
-   Sistema escalable sin tocar flows actuales
-
-   Cada módulo define:
-   - Nombre visible
-   - Carpetas en OneDrive (pendientes/aprobados)
-   - Columnas a mostrar en la tabla
-   - Normalización opcional (si un módulo usa campos distintos)
    ============================================================ */
 
 export const MODULOS = {
 
   /* ============================================================
      ✅ MÓDULO MCI
-     ------------------------------------------------------------
-     Este módulo debe respetar EXACTAMENTE las rutas existentes
-     que usa tu Power Automate. NO las llenamos aquí aún.
      ============================================================ */
   MCI: {
     id: "mci",
@@ -26,39 +16,35 @@ export const MODULOS = {
     aprobados: "/drive/root:/Documents/Base MCI - Proyecto automatización/MCI_Aprobados",
 
     columnas: [
-      { id: "tecnico",     label: "Técnico" },
-      { id: "fecha",       label: "Fecha" },
-      { id: "cliente",     label: "Cliente" },
-      { id: "ubicacion",   label: "Ubicación" }
+      { id: "tecnico",   label: "Técnico" },
+      { id: "fecha",     label: "Fecha" },
+      { id: "cliente",   label: "Cliente" },
+      { id: "ubicacion", label: "Ubicación" }
     ],
 
-    // Normalización de datos (placeholder)
     normalizar(item) {
-  return {
-    tecnico: item.nombre ?? "—",
-    fecha: item.modificado ?? "—",
-    cliente: "—",
-    ubicacion: "—",
-    archivo: {
-      nombre: item.nombre,
-      ruta: item.ruta,
-      tipo: item.tipo
+      return {
+        tecnico: item.nombre ?? "—",
+        fecha: item.modificado ?? "—",
+        cliente: "—",
+        ubicacion: "—",
+        archivo: {
+          nombre: item.nombre,
+          ruta: item.ruta,
+          tipo: item.tipo
+        }
+      };
     }
-  };
-}
-
   },
 
   /* ============================================================
      ✅ MÓDULO MPR
-     ------------------------------------------------------------
-     Similar a MCI. Aún sin rutas reales.
      ============================================================ */
   MPR: {
     id: "mpr",
     nombre: "Auditor — MPR",
 
-    pendientes: null, // las pediré cuando toque
+    pendientes: null,
     aprobados: null,
 
     columnas: [
@@ -69,24 +55,24 @@ export const MODULOS = {
     ],
 
     normalizar(item) {
-  return {
-    tecnico: item.nombre ?? "—",
-    fecha: item.modificado ?? "—",
-    cliente: "—",
-    ubicacion: "—",
-    archivo: {
-      nombre: item.nombre,
-      ruta: item.ruta,
-      tipo: item.tipo
+      return {
+        tecnico: item.nombre ?? "—",
+        fecha: item.modificado ?? "—",
+        proyecto: "—",
+        zona: "—",
+        archivo: {
+          nombre: item.nombre,
+          ruta: item.ruta,
+          tipo: item.tipo
+        }
+      };
     }
-  };
-}
+  }
 
 };
 
 /* ============================================================
-   🔧 FUNCIÓN AUXILIAR: obtener módulo activo
-   (Se usará desde app.js)
+   🔧 FUNCIÓN AUXILIAR
    ============================================================ */
 export function obtenerModulo(id) {
   return MODULOS[id.toUpperCase()] ?? null;
