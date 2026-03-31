@@ -34,14 +34,19 @@ export const MODULOS = {
 
     // Normalización de datos (placeholder)
     normalizar(item) {
-      return {
-        tecnico:   item?.tecnico ?? "—",
-        fecha:     item?.fecha ?? "—",
-        cliente:   item?.cliente ?? "—",
-        ubicacion: item?.ubicacion ?? "—",
-        archivo:   item?.archivo ?? null
-      };
+  return {
+    tecnico: item.nombre ?? "—",
+    fecha: item.modificado ?? "—",
+    cliente: "—",
+    ubicacion: "—",
+    archivo: {
+      nombre: item.nombre,
+      ruta: item.ruta,
+      tipo: item.tipo
     }
+  };
+}
+
   },
 
   /* ============================================================
@@ -64,15 +69,18 @@ export const MODULOS = {
     ],
 
     normalizar(item) {
-      return {
-        tecnico:  item?.tecnico ?? "—",
-        fecha:    item?.fecha ?? "—",
-        proyecto: item?.proyecto ?? "—",
-        zona:     item?.zona ?? "—",
-        archivo:  item?.archivo ?? null
-      };
+  return {
+    tecnico: item.nombre ?? "—",
+    fecha: item.modificado ?? "—",
+    cliente: "—",
+    ubicacion: "—",
+    archivo: {
+      nombre: item.nombre,
+      ruta: item.ruta,
+      tipo: item.tipo
     }
-  }
+  };
+}
 
 };
 
