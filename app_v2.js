@@ -212,7 +212,7 @@ async function verArchivo(item) {
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-  // Guardamos qué archivo se está viendo
+  // Guardar archivo actual (para descargar / aprobar)
   window.__archivoActual = item;
 
   // Obtener token para leer metadata del archivo
@@ -222,7 +222,7 @@ async function verArchivo(item) {
     return;
   }
 
-  // Obtener información del archivo (especialmente webUrl)
+  // Obtener metadata desde Graph (NECESARIO para obtener webUrl)
   const resp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     { headers: { "Authorization": `Bearer ${token}` } }
@@ -234,26 +234,29 @@ async function verArchivo(item) {
     return;
   }
 
-  // Crear URL para visor embebido de SharePoint
+  // Crear URL para visor de SharePoint (embedview)
   let embedUrl = data.webUrl;
+
+  // Limpiar parámetros previos
   if (embedUrl.includes("?")) {
     embedUrl = embedUrl.split("?")[0];
   }
+
+  // Agregar parámetros correctos
   embedUrl = `${embedUrl}?web=1&action=embedview`;
 
-  // Insertar IFRAME real en el contenedor del modal
+  // Insertar IFRAME correctamente
   document.getElementById("visorIframe").innerHTML = `
-    <iframe
+    <iframe 
       src="${embedUrl}"
-      width="100%"
-      height="100%"
-      frameborder="0"
+      width="100%" 
+      height="100%" 
+      frameborder="0" 
       allowfullscreen
-      style="border:0; background:white;"
-    ></iframe>
+      style="border:0; background:white;">
+    </iframe>
   `;
 }
-
 /* ======================================================================
    9) APROBAR (MOVER ARCHIVO)
    ====================================================================== */
