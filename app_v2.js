@@ -323,3 +323,47 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
 document.getElementById("visorRechazar").addEventListener("click", () => {
   alert("Función de rechazo pendiente.");
 });
+
+/* ======================================================================
+   10) EVENTOS DEL MODAL (Cerrar / Descargar / Aprobar / Rechazar)
+   ====================================================================== */
+
+// ✅ Cerrar visor
+document.getElementById("visorVolver").addEventListener("click", () => {
+  document.getElementById("modalVisor").style.display = "none";
+  document.getElementById("contenedor-modulo").style.display = "block";
+  document.getElementById("visorIframe").innerHTML = "";
+});
+
+// ✅ Descargar archivo desde modal
+document.getElementById("visorDescargar").addEventListener("click", async () => {
+  const item = window.__archivoActual;
+  if (!item) return;
+
+  const token = await obtenerToken();
+  const url = `https://graph.microsoft.com/v1.0${item.archivo.ruta}/content`;
+
+  const resp = await fetch(url, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+
+  const blob = await resp.blob();
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = item.archivo.nombre;
+  link.click();
+});
+
+// ✅ Aprobar desde modal
+document.getElementById("visorAprobar").addEventListener("click", async () => {
+  const item = window.__archivoActual;
+  if (!item) return;
+
+  await aprobarArchivo(item);
+  document.getElementById("visorVolver").click();
+});
+
+// ✅ Rechazar (placeholder)
+document.getElementById("visorRechazar").addEventListener("click", () => {
+  alert("Función de rechazo pendiente.");
+});
