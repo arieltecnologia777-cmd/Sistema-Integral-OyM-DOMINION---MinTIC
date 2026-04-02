@@ -237,7 +237,18 @@ async function verArchivo(item) {
   const wb = XLSX.read(arrayBuffer);
 
   // Obtiene la hoja
-const sheet = wb.Sheets[wb.SheetNames[0]];
+// === ELIMINAR SECCIÓN 2 (SAP) — filas 21 a 80 ===
+const eliminarFilas = (sheet, desde, hasta) => {
+  for (let r = desde; r <= hasta; r++) {
+    for (let c = 65; c <= 90; c++) { // A-Z
+      const celda = String.fromCharCode(c) + r;
+      delete sheet[celda];
+    }
+  }
+};
+
+// ❌ eliminar SAP (filas 21 a 80)
+eliminarFilas(sheet, 21, 80);
 
 // === 1. Rango 1: 1. Datos Generales ===
 const rango1 = XLSX.utils.sheet_to_html({
