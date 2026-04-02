@@ -266,19 +266,6 @@ async function verArchivo(item) {
     ${rango3}
   `;
 
-  // === Marcar encabezados internos del Excel ===
-// (busca spans cuyo texto sea totalmente en MAYÚSCULAS y agrega una clase)
-htmlPreview = htmlPreview.replace(
-  /<span([^>]*)>([^<]{3,})<\/span>/g,
-  (match, attrs, texto) => {
-    const esMayuscula = /^[A-ZÁÉÍÓÚÑ0-9 \/()\-]+$/.test(texto.trim());
-    if (esMayuscula) {
-      return `<span class="encabezado-interno"${attrs}>${texto}</span>`;
-    }
-    return match;
-  }
-);
-   
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     { headers: { "Authorization": `Bearer ${token}` } }
@@ -288,31 +275,18 @@ htmlPreview = htmlPreview.replace(
 
   const visor = document.getElementById("visorIframe");
 
-const cssEncabezados = `
-  <style>
-
-    /* NO aplicar gris a los títulos principales */
-    h3 { background: transparent !important; }
-
-    /* Encabezados internos: texto totalmente en MAYÚSCULAS */
-    td {
-      padding: 4px 6px;
-    }
-
-    td > * {
-      display: inline-block;
-    }
-
-    /* Fondo gris SOLO a títulos detectados por la clase */
-    .encabezado-interno {
-      background-color: #e6e6e6 !important;
-      font-weight: 700 !important;
-      padding: 4px 6px;
-      display: inline-block;
-    }
-
-  </style>
-`;
+  const cssEncabezados = `
+    <style>
+      td[class^="s"] {
+        background-color: #e6e6e6 !important;
+        font-weight: 600 !important;
+      }
+      td.s0, td.s1 {
+        background-color: transparent !important;
+        font-weight: 900 !important;
+      }
+    </style>
+  `;
 
   visor.innerHTML = `
     ${cssEncabezados}
