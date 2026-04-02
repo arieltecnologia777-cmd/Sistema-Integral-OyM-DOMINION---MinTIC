@@ -236,40 +236,58 @@ async function verArchivo(item) {
   const arrayBuffer = await blob.arrayBuffer();
   const wb = XLSX.read(arrayBuffer);
 
-  // Obtiene la hoja
-// === ELIMINAR SECCIÓN 2 (SAP) — filas 21 a 80 ===
-const eliminarFilas = (sheet, desde, hasta) => {
-  for (let r = desde; r <= hasta; r++) {
-    for (let c = 65; c <= 90; c++) { // A-Z
-      const celda = String.fromCharCode(c) + r;
-      delete sheet[celda];
+  // === OBTENER HOJA ===
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+
+  // === ELIMINAR COMPLETAMENTE SECCIÓN 2 (SAP) — filas 22 a 120 ===
+  const eliminarFilas = (sheet, desde, hasta) => {
+    for (let r = desde; r <= hasta; r++) {
+      for (let c = 65; c <= 90; c++) { // A-Z
+        const celda = String.fromCharCode(c) + r;
+        delete sheet[celda];
+      }
     }
-  }
-};
+  };
 
-// ❌ eliminar SAP (filas 21 a 80)
-eliminarFilas(sheet, 21, 80);
+  // ❌ eliminar SAP, seriales, equipos instalados/retirados
+  eliminarFilas(sheet, 22, 120);
 
-// === 1. Rango 1: 1. Datos Generales ===
-const rango1 = XLSX.utils.sheet_to_html({
+  // ================================
+  // ✅ 1. Datos Generales
+  // ================================
+  const rango1 = XLSX.utils.sheet_to_html({
     ...sheet,
     '!ref': "A5:H20"
-});
+  });
 
-// === 2. Rango 2: 3. Descripción de la falla / 4. Declaración ===
-const rango2 = XLSX.utils.sheet_to_html({
+  // ================================
+  // ✅ 3. Descripción de la falla / hallazgos
+  // ================================
+  const rango2 = XLSX.utils.sheet_to_html({
     ...sheet,
-    '!ref': "A81:H100"
-});
+    '!ref': "A78:H84"
+  });
 
-// === 3. Unir los 2 rangos (omitiendo SAP) ===
-const htmlPreview = `
+  // ================================
+  // ✅ 4. Declaración (completa)
+  // ================================
+  const rango3 = XLSX.utils.sheet_to_html({
+    ...sheet,
+    '!ref': "A86:H110"
+  });
+
+  // ✅ Unir los 3 bloques
+  const htmlPreview = `
     <h3 style="font-weight:800; margin-bottom:8px;">1. Datos generales</h3>
     ${rango1}
+
     <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
     ${rango2}
-`;
 
+    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
+    ${rango3}
+  `;
+   
   // Obtener webUrl para “Abrir completo”
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
