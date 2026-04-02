@@ -1,13 +1,6 @@
 /* ======================================================================
    APP.JS — Panel Auditor
    Controlador principal del sistema
-   - Cambio entre módulos
-   - Carga de datos
-   - Render de tabla
-   - Acciones: ver, aprobar
-   - Uso de modulos.js, auth.js y graph.js
-
-   Ariel-friendly: limpio, comentado y escalable
    ====================================================================== */
 
 import {
@@ -20,7 +13,6 @@ import {
 } from './modulos_v2.js';
 
 import { cargarDesdeCarpeta, obtenerURLTemporal, moverArchivo } from "./graph_v2.js";
-
 import { iniciarSesion, usuarioActual, cerrarSesion, obtenerToken } from "./auth.js";
 
 /* ======================================================================
@@ -142,7 +134,7 @@ async function cargarDatosModulo() {
 }
 
 /* ======================================================================
-   6) RENDER DE TABLA  ✅ (VERSION FILTRADA)
+   6) RENDER DE TABLA  
    ====================================================================== */
 function renderTabla() {
 
@@ -161,14 +153,11 @@ function renderTabla() {
 
   tbody.innerHTML = "";
 
-  // ✅ FILTRO: solo mostrar los Excel reales (.xlsx)
-  // ✅ FILTRO: ocultar cualquier archivo PreviewFotos.json
   const filtrados = datosActuales.filter(item =>
     item.archivo.nombre.endsWith(".xlsx") &&
     !item.archivo.nombre.includes("PreviewFotos")
   );
 
-  // ✅ Renderizar únicamente los archivos filtrados
   filtrados.forEach((item) => {
 
     const idxReal = datosActuales.indexOf(item);
@@ -192,6 +181,7 @@ function renderTabla() {
 
   prepararEventosTabla();
 }
+
 /* ======================================================================
    7) EVENTOS DE TABLA
    ====================================================================== */
@@ -212,22 +202,17 @@ function prepararEventosTabla() {
   });
 }
 
-/* ============================================================================
-   8) VER ARCHIVO — Vista previa del Excel + Fotos del informe
-   ============================================================================ */
+/* ======================================================================
+   8) VER ARCHIVO — Vista previa del Excel + Fotos
+   ====================================================================== */
 async function verArchivo(item) {
 
-  // 1) Mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
   window.__archivoActual = item;
 
-  // 2) Obtener token
   const token = await obtenerToken();
 
-  // ------------------------------------------------------------
-  // (A) DESCARGAR EXCEL Y RENDERIZAR PREVIEW (HTML)
-  // ------------------------------------------------------------
   const urlDescarga = `https://graph.microsoft.com/v1.0${item.archivo.ruta}/content`;
   const resp = await fetch(urlDescarga, {
     headers: { "Authorization": `Bearer ${token}` }
@@ -236,72 +221,51 @@ async function verArchivo(item) {
   const arrayBuffer = await blob.arrayBuffer();
   const wb = XLSX.read(arrayBuffer);
 
-  // === OBTENER HOJA ===
-const sheet = wb.Sheets[wb.SheetNames[0]];
+  const sheet = wb.Sheets[wb.SheetNames[0]];
 
-// =====================================================
-// ✅ 1) ELIMINAR SECCIÓN 2 COMPLETA (SAP, EQUIPOS, SERIALES)
-//    Tu Excel real muestra esta sección entre filas 16 y 73
-// =====================================================
-const eliminarFilas = (sheet, desde, hasta) => {
-  for (let r = desde; r <= hasta; r++) {
-    for (let c = 65; c <= 90; c++) { // A–Z
-      const celda = String.fromCharCode(c) + r;
-      delete sheet[celda];
+  // === ELIMINAR SAP, EQUIPOS, SERIALES ===
+  const eliminarFilas = (sheet, desde, hasta) => {
+    for (let r = desde; r <= hasta; r++) {
+      for (let c = 65; c <= 90; c++) {
+        const celda = String.fromCharCode(c) + r;
+        delete sheet[celda];
+      }
     }
+  };
+
+  eliminarFilas(sheet, 19, 67);
+
+  // === OCULTAR TÍTULO DUPLICADO DE SECCIÓN 1 (FILA 10) ===
+  for (let c = 66; c <= 80; c++) {
+    delete sheet[String.fromCharCode(c) + 10];
   }
-};
 
-// ❌ Eliminar SAP / Equipos / Seriales
-eliminarFilas(sheet, 19, 67);
+  const rango1 = XLSX.utils.sheet_to_html({
+    ...sheet,
+    '!ref': "B9:P18"
+  });
 
-// =====================================================
-// ✅ 2) SECCIÓN 1 — INFORMACIÓN GENERAL
-//    Rango real: B9:P18
-//    Pero ocultamos la fila del título (fila 10)
-// =====================================================
+  const rango2 = XLSX.utils.sheet_to_html({
+    ...sheet,
+    '!ref': "B69:P69"
+  });
 
-// ❌ Eliminar solo la fila del título "1. INFORMACIÓN GENERAL" (fila 10)
-for (let c = 66; c <= 80; c++) { // B (66) a P (80)
-  const celda = String.fromCharCode(c) + 10;
-  delete sheet[celda];
-}
+  const rango3 = XLSX.utils.sheet_to_html({
+    ...sheet,
+    '!ref': "B71:M77"
+  });
 
-// ✅ Generar preview SIN la fila de título duplicada
-const rango1 = XLSX.utils.sheet_to_html({
-  ...sheet,
-  '!ref': "B9:P18"
-});
+  const htmlPreview = `
+    <h3 style="font-weight:800; margin-bottom:8px;">1. Información General</h3>
+    ${rango1}
 
-// ✅ 3) SECCIÓN 3 — DESCRIPCIÓN DE LA FALLA / HALLAZGOS
-// Rango real según tu Excel: B69:P69
-const rango2 = XLSX.utils.sheet_to_html({
-  ...sheet,
-  '!ref': "B69:P69"
-});
+    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
+    ${rango2}
 
-// ✅ 4) SECCIÓN 4 — DECLARACIÓN
-// Rango real según tu Excel: B70:M77
-const rango3 = XLSX.utils.sheet_to_html({
-  ...sheet,
-  '!ref': "B71:M77"
-});
+    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
+    ${rango3}
+  `;
 
-// =====================================================
-// ✅ 5) UNIR LAS 3 SECCIONES EN EL PREVIEW
-// =====================================================
-const htmlPreview = `
-  <h3 style="font-weight:800; margin-bottom:8px;">1. Información General</h3>
-  ${rango1}
-
-  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
-  ${rango2}
-
-  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
-  ${rango3}
-`;
-   
-  // Obtener webUrl para “Abrir completo”
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     { headers: { "Authorization": `Bearer ${token}` } }
@@ -309,177 +273,114 @@ const htmlPreview = `
   const meta = await metaResp.json();
   const webUrl = meta.webUrl;
 
-  // ------------------------------------------------------------
-// (B) ARMAR CONTENIDO BASE DEL MODAL
-// ------------------------------------------------------------
-const visor = document.getElementById("visorIframe");
+  const visor = document.getElementById("visorIframe");
 
-// ------------------------------------------------------------
-// (B) ARMAR CONTENIDO BASE DEL MODAL
-// ------------------------------------------------------------
-const visor = document.getElementById("visorIframe");
+  const cssEncabezados = `
+    <style>
+      td[class^="s"] {
+        background-color: #e6e6e6 !important;
+        font-weight: 600 !important;
+      }
+      td.s0, td.s1 {
+        background-color: transparent !important;
+        font-weight: 900 !important;
+      }
+    </style>
+  `;
 
-// ✅ CSS real y funcional basado en clases de SheetJS
-// SheetJS siempre genera clases s0, s1, s2... para estilos de Excel.
-const cssEncabezados = `
-  <style>
+  visor.innerHTML = `
+    ${cssEncabezados}
+    <div style="padding:20px; overflow:auto;">
 
-    /* ✅ NO pintar títulos principales (1., 3., 4.) */
-    td[class^="s"] span::before {
-      content: "";
-    }
+      <div style="text-align:center; margin-bottom:20px;">
+        <button id="btnExcelOnline" style="
+          background:#0d6efd;
+          color:white;
+          border:none;
+          padding:10px 20px;
+          border-radius:8px;
+          font-size:16px;
+          cursor:pointer;
+          font-weight:700;">
+          🔵 Abrir versión completa en Excel Online
+        </button>
+      </div>
 
-    td[class^="s"] span {
-      display: inline-block;
-    }
+      <h3 style="font-weight:800; margin-bottom:10px;">Vista previa del archivo</h3>
 
-    /* ❌ Si el texto empieza con "1.", "3.", o "4." → NO aplicar gris */
-    td[class^="s"] span {
-      background-color: transparent !important;
-    }
-
-    /* ✅ Pintar de gris solo las celdas de encabezado interno
-       (estas clases provienen directamente de estilos Excel) */
-    td.s3, td.s4, td.s5, td.s6, td.s7, td.s8, td.s9, td.s10,
-    td.s11, td.s12, td.s13, td.s14, td.s15, td.s16, td.s17, td.s18 {
-      background-color: #e6e6e6 !important;
-      font-weight: 700 !important;
-    }
-
-  </style>
-`;
-
-visor.innerHTML = `
-  ${cssEncabezados}
-
-  <div style="padding:20px; overflow:auto;">
-
-    <div style="text-align:center; margin-bottom:20px;">
-      <button id="btnExcelOnline" style="
-        background:#0d6efd;
-        color:white;
-        border:none;
-        padding:10px 20px;
+      <div style="
+        border:1px solid #dce3f5;
+        background:white;
         border-radius:8px;
-        font-size:16px;
-        cursor:pointer;
-        font-weight:700;">
-        🔵 Abrir versión completa en Excel Online
-      </button>
+        padding:20px;
+        margin-bottom:30px;">
+        ${htmlPreview}
+      </div>
+
+      <h3 style="font-weight:800; margin-top:20px;">Fotos del informe (vista previa)</h3>
+
+      <div id="galeriaPreview" style="
+        margin-top:15px;
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap:14px;">
+      </div>
+
     </div>
-
-    <h3 style="font-weight:800; margin-bottom:10px;">Vista previa del archivo</h3>
-
-    <div style="
-      border:1px solid #dce3f5;
-      background:white;
-      border-radius:8px;
-      padding:20px;
-      margin-bottom:30px;">
-      ${htmlPreview}
-    </div>
-
-    <h3 style="font-weight:800; margin-top:20px;">Fotos del informe (vista previa)</h3>
-
-    <div id="galeriaPreview" style="
-      margin-top:15px;
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap:14px;">
-    </div>
-
-  </div>
-`;
-
-
-    <div style="text-align:center; margin-bottom:20px;">
-      <button id="btnExcelOnline" style="
-        background:#0d6efd;
-        color:white;
-        border:none;
-        padding:10px 20px;
-        border-radius:8px;
-        font-size:16px;
-        cursor:pointer;
-        font-weight:700;">
-        🔵 Abrir versión completa en Excel Online
-      </button>
-    </div>
-
-    <h3 style="font-weight:800; margin-bottom:10px;">Vista previa del archivo</h3>
-
-    <div style="
-      border:1px solid #dce3f5;
-      background:white;
-      border-radius:8px;
-      padding:20px;
-      margin-bottom:30px;">
-      ${htmlPreview}
-    </div>
-
-    <h3 style="font-weight:800; margin-top:20px;">Fotos del informe (vista previa)</h3>
-
-    <div id="galeriaPreview" style="
-      margin-top:15px;
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap:14px;">
-    </div>
-
-  </div>
-`;
+  `;
 
   document.getElementById("btnExcelOnline").onclick = () => {
     window.open(webUrl, "_blank");
   };
-// === Mostrar las 8 fotos reales del preview ===
-const fotos = item.fotosPreview;
-const galeria = document.getElementById("galeriaPreview");
 
-if (fotos) {
+  // === FOTOS ===
+  const fotos = item.fotosPreview;
+  const galeria = document.getElementById("galeriaPreview");
 
-  const orden = [
-    { key: "gps", titulo: "GPS" },
-    { key: "apInt", titulo: "AP Interior" },
-    { key: "apExt1", titulo: "AP Exterior 1" },
-    { key: "apExt2", titulo: "AP Exterior 2" },
-    { key: "pcInt", titulo: "PC Interior" },
-    { key: "movilExt", titulo: "Móvil Exterior" },
-    { key: "senal", titulo: "Señalética" },
-    { key: "med1", titulo: "Medición Eléctrica 1" }
-  ];
+  if (fotos) {
 
-  orden.forEach(f => {
-    const base64 = fotos[f.key];
-    if (!base64) return;
+    const orden = [
+      { key: "gps", titulo: "GPS" },
+      { key: "apInt", titulo: "AP Interior" },
+      { key: "apExt1", titulo: "AP Exterior 1" },
+      { key: "apExt2", titulo: "AP Exterior 2" },
+      { key: "pcInt", titulo: "PC Interior" },
+      { key: "movilExt", titulo: "Móvil Exterior" },
+      { key: "senal", titulo: "Señalética" },
+      { key: "med1", titulo: "Medición Eléctrica 1" }
+    ];
 
-    const cont = document.createElement("div");
-    cont.style.border = "1px solid #dce3f5";
-    cont.style.borderRadius = "10px";
-    cont.style.overflow = "hidden";
-    cont.style.background = "#fff";
-    cont.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-    cont.style.cursor = "pointer";
-    cont.style.display = "flex";
-    cont.style.flexDirection = "column";
+    orden.forEach(f => {
+      const base64 = fotos[f.key];
+      if (!base64) return;
 
-    cont.innerHTML = `
-      <div style="padding:6px 10px; font-weight:700; font-size:14px; border-bottom:1px solid #eee;">
-        ${f.titulo}
-      </div>
-      <img src="${base64}" style="width:100%; height:180px; object-fit:cover;">
-    `;
+      const cont = document.createElement("div");
+      cont.style.border = "1px solid #dce3f5";
+      cont.style.borderRadius = "10px";
+      cont.style.overflow = "hidden";
+      cont.style.background = "#fff";
+      cont.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+      cont.style.cursor = "pointer";
+      cont.style.display = "flex";
+      cont.style.flexDirection = "column";
 
-    cont.onclick = () => window.open(base64, "_blank");
+      cont.innerHTML = `
+        <div style="padding:6px 10px; font-weight:700; font-size:14px; border-bottom:1px solid #eee;">
+          ${f.titulo}
+        </div>
+        <img src="${base64}" style="width:100%; height:180px; object-fit:cover;">
+      `;
 
-    galeria.appendChild(cont);
-  });
+      cont.onclick = () => window.open(base64, "_blank");
 
-} else {
-  galeria.innerHTML = "<p style='color:#666;'>Sin fotos en preview.</p>";
+      galeria.appendChild(cont);
+    });
+
+  } else {
+    galeria.innerHTML = "<p style='color:#666;'>Sin fotos en preview.</p>";
+  }
 }
-  
-}
+
 /* ======================================================================
    9) APROBAR (MOVER ARCHIVO)
    ====================================================================== */
@@ -506,17 +407,15 @@ async function aprobarArchivo(item) {
 }
 
 /* ======================================================================
-   10) EVENTOS DEL MODAL (Cerrar / Descargar / Aprobar / Rechazar)
+   10) EVENTOS DEL MODAL
    ====================================================================== */
 
-// ✅ Cerrar visor
 document.getElementById("visorVolver").addEventListener("click", () => {
   document.getElementById("modalVisor").style.display = "none";
   document.getElementById("contenedor-modulo").style.display = "block";
   document.getElementById("visorIframe").innerHTML = "";
 });
 
-// ✅ Descargar archivo desde modal
 document.getElementById("visorDescargar").addEventListener("click", async () => {
   const item = window.__archivoActual;
   if (!item) return;
@@ -535,7 +434,6 @@ document.getElementById("visorDescargar").addEventListener("click", async () => 
   link.click();
 });
 
-// ✅ Aprobar desde modal
 document.getElementById("visorAprobar").addEventListener("click", async () => {
   const item = window.__archivoActual;
   if (!item) return;
@@ -544,7 +442,6 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   document.getElementById("visorVolver").click();
 });
 
-// ✅ Rechazar (placeholder)
 document.getElementById("visorRechazar").addEventListener("click", () => {
   alert("Función de rechazo pendiente.");
 });
