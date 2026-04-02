@@ -41,6 +41,7 @@ export function obtenerModulo(nombre) {
 // ======================================================
 
 export async function listarArchivosMCI(token) {
+    
     const url = `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${FOLDERS.pendientes}/children`;
 
     const res = await fetch(url, {
@@ -49,16 +50,46 @@ export async function listarArchivosMCI(token) {
 
     const data = await res.json();
 
-    return data.value.map(x => ({
-        id: x.id,
-        nombre: x.name,
-        fecha: formatearFecha(x.lastModifiedDateTime),
-        tamano: formatearTamano(x.size),
-        archivo: {
-            ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
-            nombre: x.name
+    // === 1) Separar excels y previewFotos ===
+    const excels = data.value.filter(f => f.name.endsWith(".xlsx"));
+    const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
+
+    const lista = [];
+
+    for (const x of excels) {
+        const item = {
+            id: x.id,
+            nombre: x.name,
+            fecha: formatearFecha(x.lastModifiedDateTime),
+            tamano: formatearTamano(x.size),
+            archivo: {
+                ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
+                nombre: x.name
+            },
+            fotosPreview: null
+        };
+
+        // Buscar su archivo JSON correspondiente
+        const base = x.name.replace(".xlsx", "");
+        const jsonMatch = previews.find(p => p.name.startsWith(base));
+
+        if (jsonMatch) {
+            try {
+                const urlJ = `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${jsonMatch.id}/content`;
+                const respJ = await fetch(urlJ, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const texto = await respJ.text();
+                item.fotosPreview = JSON.parse(texto);
+            } catch(e) {
+                console.error("Error leyendo fotosPreview:", e);
+            }
         }
-    }));
+
+        lista.push(item);
+    }
+
+    return lista;
 }
 
 // ======================================================
