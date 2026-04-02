@@ -266,10 +266,17 @@ async function verArchivo(item) {
     ${rango3}
   `;
 
-   // ✅ Detectar textos en MAYÚSCULAS dentro del HTML y marcarlos como encabezados internos
+  // === Marcar encabezados internos del Excel ===
+// (busca spans cuyo texto sea totalmente en MAYÚSCULAS y agrega una clase)
 htmlPreview = htmlPreview.replace(
-  /<span>([A-ZÁÉÍÓÚÑ 0-9\/()\-]{3,})<\/span>/g,
-  '<span class="encabezado-interno">$1</span>'
+  /<span([^>]*)>([^<]{3,})<\/span>/g,
+  (match, attrs, texto) => {
+    const esMayuscula = /^[A-ZÁÉÍÓÚÑ0-9 \/()\-]+$/.test(texto.trim());
+    if (esMayuscula) {
+      return `<span class="encabezado-interno"${attrs}>${texto}</span>`;
+    }
+    return match;
+  }
 );
    
   const metaResp = await fetch(
