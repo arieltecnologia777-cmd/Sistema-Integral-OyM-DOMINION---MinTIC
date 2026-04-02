@@ -109,19 +109,48 @@ export async function moverArchivo(rutaOrigen, rutaDestino) {
 // CARGA CENTRAL
 // ============================================================
 export async function cargarDesdeCarpeta(modulo) {
+
+  const token = await obtenerToken();
   const archivos = await listarArchivos(modulo.pendientes);
 
-  return archivos.map(a => ({
-    nombre: a.nombre,
-    fecha: new Date(a.fecha).toLocaleString("es-CO"),
-    tamano: a.tamano,
-    archivo: a.archivo
-  }));
-}
-export async function descargarFoto(ruta) {
-  const token = await obtenerToken();
-  const resp = await fetch(`https://graph.microsoft.com/v1.0${ruta}/content`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  return resp.blob();
+  // Vamos a construir item por item manualmente
+  const items = [];
+
+  for (const a of archivos) {
+
+    // 1. Construimos el item base (como antes)
+    const item = {
+      nombre: a.nombre,
+      fecha: new Date(a.fecha).toLocaleString("es-CO"),
+      tamano: a.tamano,
+      archivo: a.archivo,
+      fotosPreview: null  // <-- aquí guardaremos las 8 fotos
+    };
+
+    // 2. Nombre esperado del archivo JSON
+    const previewJsonName = a.nombre.replace(".xlsx", "_PreviewFotos.json");
+
+    // 3. Buscar archivo JSON entre los archivos listados
+    const previewEntry = archivos.find(f => f.nombre === previewJsonName);
+
+    if (previewEntry) {
+      try {
+        const resp = await fetch(
+          `https://graph.microsoft.com/v1.0${previewEntry.archivo.ruta}/content`,
+          { headers: { "Authorization": `Bearer ${token}` } }
+        );
+
+        const jsonText = await resp.text();
+        item.fotosPreview = JSON.parse(jsonText);
+
+      } catch (err) {
+        console.error("❌ Error cargando PreviewFotos.json:", err);
+      }
+    }
+
+    // 4. Guardamos este item completo
+    items.push(item);
+  }
+
+  return items;
 }
