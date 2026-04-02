@@ -265,13 +265,6 @@ async function verArchivo(item) {
   <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
   ${rango3}
 `;
-
-  // === Marcar encabezados internos del Excel ===
-// Detecta <span ...>TEXTO</span> aunque tenga atributos
-htmlPreview = htmlPreview.replace(
-  /<span[^>]*>([A-ZÁÉÍÓÚÑ 0-9\/()\-]{3,})<\/span>/g,
-  '<span class="encabezado-interno">$1</span>'
-);
    
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
