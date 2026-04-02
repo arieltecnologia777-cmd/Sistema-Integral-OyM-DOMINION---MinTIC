@@ -237,56 +237,64 @@ async function verArchivo(item) {
   const wb = XLSX.read(arrayBuffer);
 
   // === OBTENER HOJA ===
-  const sheet = wb.Sheets[wb.SheetNames[0]];
+const sheet = wb.Sheets[wb.SheetNames[0]];
 
-  // === ELIMINAR COMPLETAMENTE SECCIÓN 2 (SAP) — filas 22 a 120 ===
-  const eliminarFilas = (sheet, desde, hasta) => {
-    for (let r = desde; r <= hasta; r++) {
-      for (let c = 65; c <= 90; c++) { // A-Z
-        const celda = String.fromCharCode(c) + r;
-        delete sheet[celda];
-      }
+// =====================================================
+// ✅ 1) ELIMINAR SECCIÓN 2 COMPLETA (SAP, EQUIPOS, SERIALES)
+//    Tu Excel real muestra esta sección entre filas 16 y 73
+// =====================================================
+const eliminarFilas = (sheet, desde, hasta) => {
+  for (let r = desde; r <= hasta; r++) {
+    for (let c = 65; c <= 90; c++) { // A–Z
+      const celda = String.fromCharCode(c) + r;
+      delete sheet[celda];
     }
-  };
+  }
+};
 
-  // ❌ eliminar SAP, seriales, equipos instalados/retirados
-  eliminarFilas(sheet, 22, 120);
+// ❌ Eliminar SAP / Equipos / Seriales
+eliminarFilas(sheet, 16, 73);
 
-  // ================================
-  // ✅ 1. Datos Generales
-  // ================================
-  const rango1 = XLSX.utils.sheet_to_html({
-    ...sheet,
-    '!ref': "A5:H20"
-  });
+// =====================================================
+// ✅ 2) SECCIÓN 1 — INFORMACIÓN GENERAL
+//    (Filas reales en tu Excel: 4 a 15)
+// =====================================================
+const rango1 = XLSX.utils.sheet_to_html({
+  ...sheet,
+  '!ref': "A4:H15"
+});
 
-  // ================================
-  // ✅ 3. Descripción de la falla / hallazgos
-  // ================================
-  const rango2 = XLSX.utils.sheet_to_html({
-    ...sheet,
-    '!ref': "A78:H84"
-  });
+// =====================================================
+// ✅ 3) SECCIÓN 3 — DESCRIPCIÓN DE LA FALLA / HALLAZGOS
+//    (Filas reales en tu Excel: 74 a 75)
+// =====================================================
+const rango2 = XLSX.utils.sheet_to_html({
+  ...sheet,
+  '!ref': "A74:H75"
+});
 
-  // ================================
-  // ✅ 4. Declaración (completa)
-  // ================================
-  const rango3 = XLSX.utils.sheet_to_html({
-    ...sheet,
-    '!ref': "A86:H110"
-  });
+// =====================================================
+// ✅ 4) SECCIÓN 4 — DECLARACIÓN
+//    (Filas reales en tu Excel: 76 a 90)
+// =====================================================
+const rango3 = XLSX.utils.sheet_to_html({
+  ...sheet,
+  '!ref': "A76:H90"
+});
 
-  // ✅ Unir los 3 bloques
-  const htmlPreview = `
-    <h3 style="font-weight:800; margin-bottom:8px;">1. Datos generales</h3>
-    ${rango1}
+// =====================================================
+// ✅ 5) UNIR LAS 3 SECCIONES EN EL PREVIEW
+// =====================================================
+const htmlPreview = `
+  <h3 style="font-weight:800; margin-bottom:8px;">1. Información General</h3>
+  ${rango1}
 
-    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
-    ${rango2}
+  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
+  ${rango2}
 
-    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
-    ${rango3}
-  `;
+  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
+  ${rango3}
+`;
    
   // Obtener webUrl para “Abrir completo”
   const metaResp = await fetch(
