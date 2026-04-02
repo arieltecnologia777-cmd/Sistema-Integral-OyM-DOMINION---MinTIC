@@ -286,49 +286,53 @@ async function verArchivo(item) {
   document.getElementById("btnExcelOnline").onclick = () => {
     window.open(webUrl, "_blank");
   };
+// === Mostrar las 8 fotos reales del preview ===
+const fotos = item.fotosPreview;
+const galeria = document.getElementById("galeriaPreview");
 
-  // ------------------------------------------------------------
-  // (C) CARGAR FOTOS REALES DEL INFORME
-  // ------------------------------------------------------------
+if (fotos) {
 
-  // Si no hay fotos:
-  if (!item.fotos || item.fotos.length === 0) {
-    document.getElementById("galeriaFotos").innerHTML =
-      "<p style='color:#888;'>Este informe no tiene fotos adjuntas.</p>";
-    return;
-  }
+  const orden = [
+    { key: "gps", titulo: "GPS" },
+    { key: "apInt", titulo: "AP Interior" },
+    { key: "apExt1", titulo: "AP Exterior 1" },
+    { key: "apExt2", titulo: "AP Exterior 2" },
+    { key: "pcInt", titulo: "PC Interior" },
+    { key: "movilExt", titulo: "Móvil Exterior" },
+    { key: "senal", titulo: "Señalética" },
+    { key: "med1", titulo: "Medición Eléctrica 1" }
+  ];
 
-  const galeria = document.getElementById("galeriaFotos");
-  galeria.innerHTML = ""; // limpiar “cargando...”
+  orden.forEach(f => {
+    const base64 = fotos[f.key];
+    if (!base64) return;
 
-  for (const foto of item.fotos) {
-    try {
-      const respFoto = await fetch(
-        `https://graph.microsoft.com/v1.0${foto.ruta}/content`,
-        { headers: { "Authorization": `Bearer ${token}` } }
-      );
+    const cont = document.createElement("div");
+    cont.style.border = "1px solid #dce3f5";
+    cont.style.borderRadius = "10px";
+    cont.style.overflow = "hidden";
+    cont.style.background = "#fff";
+    cont.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+    cont.style.cursor = "pointer";
+    cont.style.display = "flex";
+    cont.style.flexDirection = "column";
 
-      const blobFoto = await respFoto.blob();
-      const urlFoto = URL.createObjectURL(blobFoto);
+    cont.innerHTML = `
+      <div style="padding:6px 10px; font-weight:700; font-size:14px; border-bottom:1px solid #eee;">
+        ${f.titulo}
+      </div>
+      <img src="${base64}" style="width:100%; height:180px; object-fit:cover;">
+    `;
 
-      const img = document.createElement("img");
-      img.src = urlFoto;
-      img.style.width = "220px";
-      img.style.height = "180px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "10px";
-      img.style.boxShadow = "0 4px 10px rgba(0,0,0,.15)";
-      img.style.cursor = "pointer";
+    cont.onclick = () => window.open(base64, "_blank");
 
-      // Zoom al hacer clic
-      img.onclick = () => window.open(urlFoto, "_blank");
+    galeria.appendChild(cont);
+  });
 
-      galeria.appendChild(img);
-
-    } catch (e) {
-      console.error("Error cargando foto:", foto, e);
-    }
-  }
+} else {
+  galeria.innerHTML = "<p style='color:#666;'>Sin fotos en preview.</p>";
+}
+  
 }
 /* ======================================================================
    9) APROBAR (MOVER ARCHIVO)
