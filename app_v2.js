@@ -244,45 +244,44 @@ async function verArchivo(item) {
   const visor = document.getElementById("visorIframe");
 
   visor.innerHTML = `
-    <div style="padding:20px; overflow:auto;">
+  <div style="padding:20px; overflow:auto;">
 
-      <div style="text-align:center; margin-bottom:20px;">
-        <button id="btnExcelOnline" style="
-          background:#0d6efd;
-          color:white;
-          border:none;
-          padding:10px 20px;
-          border-radius:8px;
-          font-size:16px;
-          cursor:pointer;
-          font-weight:700;">
-          🔵 Abrir versión completa en Excel Online
-        </button>
-      </div>
-
-      <h3 style="font-weight:800; margin-bottom:10px;">Vista previa del archivo</h3>
-
-      <div style="
-        border:1px solid #dce3f5;
-        background:white;
+    <div style="text-align:center; margin-bottom:20px;">
+      <button id="btnExcelOnline" style="
+        background:#0d6efd;
+        color:white;
+        border:none;
+        padding:10px 20px;
         border-radius:8px;
-        padding:20px;
-        margin-bottom:30px;">
-        ${htmlPreview}
-      </div>
-
-      <h3 style="font-weight:800;">Fotos del informe</h3>
-      <div id="galeriaFotos" style="
-        display:flex;
-        gap:14px;
-        flex-wrap:wrap;
-        margin-top:15px;
-      ">
-        <p style="color:#666;">Cargando fotos…</p>
-      </div>
-
+        font-size:16px;
+        cursor:pointer;
+        font-weight:700;">
+        🔵 Abrir versión completa en Excel Online
+      </button>
     </div>
-  `;
+
+    <h3 style="font-weight:800; margin-bottom:10px;">Vista previa del archivo</h3>
+
+    <div style="
+      border:1px solid #dce3f5;
+      background:white;
+      border-radius:8px;
+      padding:20px;
+      margin-bottom:30px;">
+      ${htmlPreview}
+    </div>
+
+    <h3 style="font-weight:800; margin-top:20px;">Fotos del informe (vista previa)</h3>
+
+    <div id="galeriaPreview" style="
+      margin-top:15px;
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap:14px;">
+    </div>
+
+  </div>
+`;
 
   document.getElementById("btnExcelOnline").onclick = () => {
     window.open(webUrl, "_blank");
