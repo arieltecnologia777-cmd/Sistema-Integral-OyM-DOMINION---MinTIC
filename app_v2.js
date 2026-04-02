@@ -253,7 +253,7 @@ const eliminarFilas = (sheet, desde, hasta) => {
 };
 
 // ❌ Eliminar SAP / Equipos / Seriales
-eliminarFilas(sheet, 19, 69);
+eliminarFilas(sheet, 19, 67);
 
 // =====================================================
 // ✅ 2) SECCIÓN 1 — INFORMACIÓN GENERAL
