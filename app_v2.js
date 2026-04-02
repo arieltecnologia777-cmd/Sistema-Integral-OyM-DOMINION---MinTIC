@@ -277,7 +277,7 @@ const rango2 = XLSX.utils.sheet_to_html({
 // =====================================================
 const rango3 = XLSX.utils.sheet_to_html({
   ...sheet,
-  '!ref': "A76:H90"
+  '!ref': "B70:P77"
 });
 
 // =====================================================
