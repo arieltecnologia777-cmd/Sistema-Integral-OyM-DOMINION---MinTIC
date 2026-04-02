@@ -266,6 +266,12 @@ async function verArchivo(item) {
     ${rango3}
   `;
 
+   // ✅ Detectar textos en MAYÚSCULAS dentro del HTML y marcarlos como encabezados
+htmlPreview = htmlPreview.replace(
+  /<span>([A-ZÁÉÍÓÚÑ 0-9\/()\-]{3,})<\/span>/g,
+  '<span data-header="1">$1</span>'
+);
+   
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     { headers: { "Authorization": `Bearer ${token}` } }
