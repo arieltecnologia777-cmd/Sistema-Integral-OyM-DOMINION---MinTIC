@@ -256,16 +256,22 @@ async function verArchivo(item) {
   });
 
   const htmlPreview = `
-    <h3 style="font-weight:800; margin-bottom:8px;">1. Información General</h3>
-    ${rango1}
+  <h3 style="font-weight:800; margin-bottom:8px;">1. Información General</h3>
+  ${rango1}
 
-    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
-    ${rango2}
+  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">3. Descripción de la falla / hallazgos</h3>
+  ${rango2}
 
-    <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
-    ${rango3}
-  `;
+  <h3 style="font-weight:800; margin-top:20px; margin-bottom:8px;">4. Declaración</h3>
+  ${rango3}
+`;
 
+  // === Marcar encabezados internos del Excel ===
+htmlPreview = htmlPreview.replace(
+  /<span>([A-ZÁÉÍÓÚÑ 0-9\/()\-]{3,})<\/span>/g,
+  '<span class="encabezado-interno">$1</span>'
+);
+   
   const metaResp = await fetch(
     `https://graph.microsoft.com/v1.0${item.archivo.ruta}`,
     { headers: { "Authorization": `Bearer ${token}` } }
@@ -275,18 +281,31 @@ async function verArchivo(item) {
 
   const visor = document.getElementById("visorIframe");
 
-  const cssEncabezados = `
-    <style>
-      td[class^="s"] {
-        background-color: #e6e6e6 !important;
-        font-weight: 600 !important;
-      }
-      td.s0, td.s1 {
-        background-color: transparent !important;
-        font-weight: 900 !important;
-      }
-    </style>
-  `;
+const cssEncabezados = `
+  <style>
+
+    /* NO aplicar gris a los títulos principales */
+    h3 { background: transparent !important; }
+
+    /* Encabezados internos: texto totalmente en MAYÚSCULAS */
+    td {
+      padding: 4px 6px;
+    }
+
+    td > * {
+      display: inline-block;
+    }
+
+    /* Fondo gris SOLO a títulos detectados por la clase */
+    .encabezado-interno {
+      background-color: #e6e6e6 !important;
+      font-weight: 700 !important;
+      padding: 4px 6px;
+      display: inline-block;
+    }
+
+  </style>
+`;
 
   visor.innerHTML = `
     ${cssEncabezados}
@@ -445,3 +464,4 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
 document.getElementById("visorRechazar").addEventListener("click", () => {
   alert("Función de rechazo pendiente.");
 });
+
