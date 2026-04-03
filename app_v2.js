@@ -342,6 +342,53 @@ const cssEncabezados = `
     </div>
   `;
 
+// ✅ Después de renderizar el HTML, pintar encabezados exactos en gris
+setTimeout(() => {
+
+  const headersGrises = [
+    "N° DE CASO:",
+    "FECHA:",
+    "CONTRATO No.",
+    "CONTRATISTA",
+    "DEPARTAMENTO",
+    "MUNICIPIO",
+    "CENTRO POBLADO",
+    "SEDE INSTITUCIÓN EDUCATIVA O CASO ESPECIAL",
+    "ID BENEFICIARIO",
+    "NOMBRE DEL RESPONSABLE (RESPONSABLE DE LA INSTITUCIÓN EDUCATIVA / AUTORIDAD COMPETENTE)",
+    "NÚMERO DE CEDULA",
+    "NÚMERO DE CONTACTO",
+    "3. DESCRIPCIÓN DE LA FALLA / HALLAZGOS",
+    "4. DECLARACIÓN",
+    "DATOS DE QUIEN ACOMPAÑA EN EL CENTRO DIGITAL (RECTOR, DOCENTE, AUTORIDAD COMPETENTE)",
+    "NOMBRES Y APELLIDOS:",
+    "CARGO:",
+    "NÚMERO DE CEDULA:",
+    "NÚMERO DE TELÉFONO O CELULAR 1:",
+    "NÚMERO DE TELÉFONO O CELULAR 2:",
+    "CORREO ELECTRÓNICO:",
+    "DATOS DE QUIEN REPARA EL SERVICIO EN EL CENTRO DIGITAL",
+    "NOMBRES Y APELLIDOS:",
+    "CARGO:",
+    "NÚMERO DE CEDULA:",
+    "NÚMERO DE TELÉFONO O  CELULAR:",
+    "CORREO ELECTRÓNICO:",
+    "FIRMA:"
+  ];
+
+  const celdas = visor.querySelectorAll("td");
+
+  celdas.forEach(td => {
+    const texto = td.innerText.trim();
+
+    if (headersGrises.includes(texto)) {
+      td.style.backgroundColor = "#e6e6e6";
+      td.style.fontWeight = "700";
+    }
+  });
+
+}, 80);
+
   document.getElementById("btnExcelOnline").onclick = () => {
     window.open(webUrl, "_blank");
   };
