@@ -151,25 +151,28 @@ async function cargarDatosModulo() {
     return;
   }
 
-  datosActuales = await cargarDesdeCarpeta(moduloActivo, false);
-  console.log("=== FECHAS REALES RECIBIDAS ===");
+  // ✅ Cargar archivos usando listarArchivosMCI (esto sí trae la fecha real del archivo)
+const token = await obtenerToken();
+datosActuales = await listarArchivosMCI(token);
+
+// ✅ Debug para verificar fechas reales
+console.log("=== FECHAS REALES RECIBIDAS ===");
 datosActuales.forEach(x => {
   console.log(x.nombre, " → fechaReal:", x.fechaReal, " | fecha:", x.fecha);
-  console.log("Objeto completo x:", x);   // ✅ AÑÁDE ESTO
 });
 console.log("================================");
 
-// ✅ ORDENAR POR FECHA REAL — MÁS RECIENTE PRIMERO
+// ✅ Ordenar por FECHA REAL — más reciente primero
 datosActuales.sort((a, b) => {
   const fechaA = new Date(a.fechaReal);
   const fechaB = new Date(b.fechaReal);
   return fechaB - fechaA;
 });
 
-// ✅ Renderizar tabla
+// ✅ Renderizar la tabla
 renderTabla();
 
-// ✅ Activar ordenamiento una vez el DOM esté construido
+// ✅ Activar el ordenamiento después de que la tabla exista en el DOM
 setTimeout(() => activarOrdenamientoFecha(), 0);
 }
 
