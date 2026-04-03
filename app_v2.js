@@ -369,8 +369,10 @@ setTimeout(() => {
     "TELÉFONO",
     "CELULAR",
     "CORREO ELECTRÓNICO",
+    "CORREO ELECTRONICO",   // ✅ ESTA ES LA NUEVA
     "FIRMA"
   ];
+
 
   const celdas = visor.querySelectorAll("td");
 
