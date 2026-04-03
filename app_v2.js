@@ -130,7 +130,14 @@ async function cargarDatosModulo() {
 
   datosActuales = await cargarDesdeCarpeta(moduloActivo, false);
 
-  renderTabla();
+// ✅ ORDENAR POR FECHA — MÁS RECIENTE PRIMERO
+datosActuales.sort((a, b) => {
+  const fechaA = new Date(a.fecha);
+  const fechaB = new Date(b.fecha);
+  return fechaB - fechaA;
+});
+
+renderTabla();
 }
 
 /* ======================================================================
