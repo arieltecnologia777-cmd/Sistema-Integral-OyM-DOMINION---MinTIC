@@ -469,57 +469,7 @@ const cssEncabezados = `
       padding: 4px 6px;
       display: inline-block;
     }
-/* === ESTADOS DEL BOTÓN (estilo tipo Gestor_Exclusiones) === */
-.btn-estado {
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 14px;
-  border-radius:12px;
-  font-size:14px;
-  font-weight:700;
-  border:1px solid transparent;
-  cursor:pointer;
-  transition:0.18s;
-}
 
-/* Estado: Revisar (gris) */
-.btn-gris {
-  background:#eef3ff;
-  color:#0e4aa8;
-  border-color:#cfe0ff;
-}
-.btn-gris:hover {
-  background:#e2ebff;
-}
-
-/* Estado: Continuar revisión (azul) */
-.btn-azul {
-  background:#0e4aa8;
-  color:white;
-}
-.btn-azul:hover {
-  background:#0c3f8f;
-}
-
-/* Estado: Aprobado (verde) */
-.btn-verde {
-  background:#16a34a;
-  color:white;
-}
-.btn-verde svg {
-  stroke:white !important;
-}
-
-/* Estado: Pendiente por técnico (rojo) */
-.btn-rojo {
-  background:#fee2e2;
-  border-color:#fecaca;
-  color:#b91c1c;
-}
-.btn-rojo:hover {
-  background:#fecaca;
-}
 
   </style>
 `;
