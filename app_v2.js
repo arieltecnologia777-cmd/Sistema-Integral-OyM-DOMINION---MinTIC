@@ -348,22 +348,26 @@ function activarOrdenamientoFecha() {
 function prepararEventosTabla() {
 
   // === EVENTO REVISAR ===
-document.querySelectorAll(".btn-revisar").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const idx = btn.dataset.idx;
-    const item = datosActuales[idx];
+  document.querySelectorAll(".btn-revisar").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const idx = btn.dataset.idx;
+      const item = datosActuales[idx];
 
-    // ✅ marcar como en revisión
-    estadoInformes[item.id] = "en_revision";
-    guardarEstados();
+      // ✅ marcar como en revisión
+      estadoInformes[item.id] = "en_revision";
+      guardarEstados();
 
-    await verArchivo(item);
-
-    renderTabla();
+      await verArchivo(item);
+      renderTabla();
+    });
   });
-});
-   
-  document.getElementById("visorAprobar").addEventListener("click", async () => {
+
+}  // ✅✅✅ ESTA ES LA LLAVE QUE CIERRA PREPARAR EVENTOS TABLA
+
+
+
+// ✅ Evento APROBAR (ESTE DEBE IR FUERA de prepararEventosTabla)
+document.getElementById("visorAprobar").addEventListener("click", async () => {
   const item = window.__archivoActual;
   if (!item) return;
 
@@ -380,6 +384,7 @@ document.querySelectorAll(".btn-revisar").forEach(btn => {
   // ✅ refrescar tabla
   renderTabla();
 });
+
 
 
 /* ======================================================================
