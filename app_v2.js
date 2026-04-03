@@ -380,7 +380,7 @@ document.querySelectorAll(".btn-revisar").forEach(btn => {
   // ✅ refrescar tabla
   renderTabla();
 });
- 
+} 
 
 /* ======================================================================
    8) VER ARCHIVO — Vista previa del Excel + Fotos
