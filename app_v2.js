@@ -342,46 +342,44 @@ const cssEncabezados = `
     </div>
   `;
 
-// ✅ Después de renderizar el HTML, pintar encabezados exactos en gris
+// ✅ Pintar encabezados internos específicos en gris (versión robusta)
 setTimeout(() => {
 
-  const headersGrises = [
-    "N° DE CASO:",
-    "FECHA:",
-    "CONTRATO No.",
+  const patrones = [
+    "N° DE CASO",
+    "Nº DE CASO",
+    "FECHA",
+    "CONTRATO",
     "CONTRATISTA",
     "DEPARTAMENTO",
     "MUNICIPIO",
     "CENTRO POBLADO",
-    "SEDE INSTITUCIÓN EDUCATIVA O CASO ESPECIAL",
+    "SEDE INSTITUCIÓN EDUCATIVA",
+    "CASO ESPECIAL",
     "ID BENEFICIARIO",
-    "NOMBRE DEL RESPONSABLE (RESPONSABLE DE LA INSTITUCIÓN EDUCATIVA / AUTORIDAD COMPETENTE)",
+    "NOMBRE DEL RESPONSABLE",
     "NÚMERO DE CEDULA",
     "NÚMERO DE CONTACTO",
-    "3. DESCRIPCIÓN DE LA FALLA / HALLAZGOS",
-    "4. DECLARACIÓN",
-    "DATOS DE QUIEN ACOMPAÑA EN EL CENTRO DIGITAL (RECTOR, DOCENTE, AUTORIDAD COMPETENTE)",
-    "NOMBRES Y APELLIDOS:",
-    "CARGO:",
-    "NÚMERO DE CEDULA:",
-    "NÚMERO DE TELÉFONO O CELULAR 1:",
-    "NÚMERO DE TELÉFONO O CELULAR 2:",
-    "CORREO ELECTRÓNICO:",
-    "DATOS DE QUIEN REPARA EL SERVICIO EN EL CENTRO DIGITAL",
-    "NOMBRES Y APELLIDOS:",
-    "CARGO:",
-    "NÚMERO DE CEDULA:",
-    "NÚMERO DE TELÉFONO O  CELULAR:",
-    "CORREO ELECTRÓNICO:",
-    "FIRMA:"
+    "DESCRIPCIÓN DE LA FALLA",
+    "DECLARACIÓN",
+    "DATOS DE QUIÉN ACOMPAÑA",
+    "DATOS DE QUIÉN REPARA",
+    "NOMBRES Y APELLIDOS",
+    "CARGO",
+    "TELÉFONO",
+    "CELULAR",
+    "CORREO ELECTRÓNICO",
+    "FIRMA"
   ];
 
   const celdas = visor.querySelectorAll("td");
 
   celdas.forEach(td => {
-    const texto = td.innerText.trim();
+    const texto = td.innerText.toUpperCase().trim();
 
-    if (headersGrises.includes(texto)) {
+    const coincide = patrones.some(p => texto.includes(p.toUpperCase()));
+
+    if (coincide) {
       td.style.backgroundColor = "#e6e6e6";
       td.style.fontWeight = "700";
     }
