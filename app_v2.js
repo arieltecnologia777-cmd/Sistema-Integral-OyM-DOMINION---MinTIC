@@ -727,13 +727,10 @@ document.getElementById("visorAprobar").addEventListener("click", () => {
   const item = window.__archivoActual;
   if (!item) return;
 
-  // ✅ cambiar estado
   estadoInformes[item.id] = "aprobado";
+  guardarEstados();  // ✅ AGREGADO
 
-  // cerrar visor
   document.getElementById("visorVolver").click();
-
-  // refrescar tabla
   renderTabla();
 });
 
@@ -741,12 +738,9 @@ document.getElementById("visorRechazar").addEventListener("click", () => {
   const item = window.__archivoActual;
   if (!item) return;
 
-  // ✅ cambiar estado
   estadoInformes[item.id] = "rechazado";
+  guardarEstados();  // ✅ AGREGADO
 
-  // cerrar visor
   document.getElementById("visorVolver").click();
-
-  // refrescar tabla
   renderTabla();
 });
