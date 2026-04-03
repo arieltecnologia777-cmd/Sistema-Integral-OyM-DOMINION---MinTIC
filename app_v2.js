@@ -330,6 +330,17 @@ const cssEncabezados = `
         ${htmlPreview}
       </div>
 
+      
+      <div id="galeriaPreview" style="
+        margin-top:15px;
+        display:grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap:14px;">
+      </div>
+
+    </div>
+  `;
+
 // ✅ Pintar encabezados internos específicos en gris (versión robusta)
 setTimeout(() => {
 
