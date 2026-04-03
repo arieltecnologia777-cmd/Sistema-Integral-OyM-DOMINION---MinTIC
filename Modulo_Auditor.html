@@ -269,6 +269,38 @@ tbody td {
 .tabla tbody td:last-child {
   border-right: none;
 }
+
+  /* Botón tipo pill (estilo gestor_exclusiones) */
+.btn-pill-auditor {
+  appearance:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  height:32px;
+  padding:0 14px;
+  background:#fff;
+  color:#0e4aa8;
+  border:1px solid #cfe0ff;
+  border-radius:12px;
+  font-size:14px;
+  cursor:pointer;
+  transition: background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+.btn-pill-auditor:hover {
+  background:#f3f7ff;
+  color:#0e4aa8;
+  border-color:#bfd6ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(14,74,168,.18);
+}
+
+.btn-pill-auditor svg {
+  stroke:#324a78;
+  fill:none;
+  stroke-width:1.8;
+}
+``
   
 </style>
 </head>
