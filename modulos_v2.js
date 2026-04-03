@@ -51,8 +51,18 @@ export async function listarArchivosMCI(token) {
     const data = await res.json();
 
     // === 1) Separar excels y previewFotos ===
-    const excels = data.value.filter(f => f.name.endsWith(".xlsx"));
-    const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
+    // === 1) Separar excels y previewFotos ===
+const excels = data.value.filter(f => {
+  const isExcel = f.name.endsWith(".xlsx");
+
+  if (isExcel) {
+    console.log("✅ ARCHIVO GRAPH ORIGINAL:", f);  // <-- ESTE SÍ IMPRIME EL OBJETO REAL
+  }
+
+  return isExcel;
+});
+
+const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
 
     const lista = [];
 
