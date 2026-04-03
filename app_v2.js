@@ -210,10 +210,12 @@ filtrados.forEach((item) => {
     </td>
   `;
 
-  tbody.appendChild(tr);
+ tbody.appendChild(tr);
 });
 
-  prepararEventosTabla();
+// ✅ activar eventos siempre después de pintar filas Y con thead activo
+activarOrdenamientoFecha();
+prepararEventosTabla();
 }
 
 /* ======================================================================
