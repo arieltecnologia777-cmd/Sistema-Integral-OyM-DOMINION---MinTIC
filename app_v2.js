@@ -686,24 +686,3 @@ document.getElementById("visorDescargar").addEventListener("click", async () => 
   link.click();
 });
 
-document.getElementById("visorAprobar").addEventListener("click", () => {
-  const item = window.__archivoActual;
-  if (!item) return;
-
-  estadoInformes[item.id] = "aprobado";
-  guardarEstados();  // ✅ AGREGADO
-
-  document.getElementById("visorVolver").click();
-  renderTabla();
-});
-
-document.getElementById("visorRechazar").addEventListener("click", () => {
-  const item = window.__archivoActual;
-  if (!item) return;
-
-  estadoInformes[item.id] = "rechazado";
-  guardarEstados();  // ✅ AGREGADO
-
-  document.getElementById("visorVolver").click();
-  renderTabla();
-});
