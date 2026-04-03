@@ -74,8 +74,12 @@ const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
   // ✅ Fecha REAL desde OneDrive (UTC)
 fechaReal: x.fileSystemInfo?.lastModifiedDateTime,
 
-// ✅ Mostrar EXACTAMENTE la misma hora que OneDrive (RAW UTC)
-fecha: x.fileSystemInfo?.lastModifiedDateTime,
+// ✅ Fecha bonita, clara y EXACTA (sin convertir a zona local)
+fecha: (() => {
+  const d = new Date(x.fileSystemInfo?.lastModifiedDateTime);
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+})(),
 
   tamano: formatearTamano(x.size),
 
