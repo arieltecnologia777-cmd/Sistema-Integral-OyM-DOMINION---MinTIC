@@ -217,27 +217,24 @@ function prepararEventosTabla() {
     });
   });
 
-  // === ORDENAR POR FECHA AL CLIC ===
+  // ✅ ORDENAR POR FECHA AL CLIC
   document.querySelectorAll("th.sortable").forEach(th => {
     th.addEventListener("click", () => {
 
-      const tipo = th.dataset.sort; // "fecha"
       const direccionActual = th.dataset.order || "desc";
 
-      // ORDENAMIENTO
       datosActuales.sort((a, b) => {
-        const fA = new Date(a.fecha);
-        const fB = new Date(b.fecha);
-
+        const fA = new Date(a.archivo.fecha);
+        const fB = new Date(b.archivo.fecha);
         return direccionActual === "desc"
-          ? fA - fB  // ascendente
-          : fB - fA; // descendente
+          ? fA - fB   // ascendente
+          : fB - fA;  // descendente
       });
 
-      // ALTERNAR
+      // Alternar dirección
       th.dataset.order = direccionActual === "desc" ? "asc" : "desc";
 
-      // RECARGAR TABLA
+      // Volver a pintar la tabla
       renderTabla();
     });
   });
