@@ -201,6 +201,7 @@ function renderTabla() {
    ====================================================================== */
 function prepararEventosTabla() {
 
+  // === EVENTO VER ===
   document.querySelectorAll(".btn-ver").forEach(btn => {
     btn.addEventListener("click", async () => {
       const item = datosActuales[btn.dataset.idx];
@@ -208,12 +209,39 @@ function prepararEventosTabla() {
     });
   });
 
+  // === EVENTO APROBAR ===
   document.querySelectorAll(".btn-aprobar").forEach(btn => {
     btn.addEventListener("click", async () => {
       const item = datosActuales[btn.dataset.idx];
       await aprobarArchivo(item);
     });
   });
+
+  // === ORDENAR POR FECHA AL CLIC ===
+  document.querySelectorAll("th.sortable").forEach(th => {
+    th.addEventListener("click", () => {
+
+      const tipo = th.dataset.sort; // "fecha"
+      const direccionActual = th.dataset.order || "desc";
+
+      // ORDENAMIENTO
+      datosActuales.sort((a, b) => {
+        const fA = new Date(a.fecha);
+        const fB = new Date(b.fecha);
+
+        return direccionActual === "desc"
+          ? fA - fB  // ascendente
+          : fB - fA; // descendente
+      });
+
+      // ALTERNAR
+      th.dataset.order = direccionActual === "desc" ? "asc" : "desc";
+
+      // RECARGAR TABLA
+      renderTabla();
+    });
+  });
+
 }
 
 /* ======================================================================
