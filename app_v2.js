@@ -152,6 +152,11 @@ async function cargarDatosModulo() {
   }
 
   datosActuales = await cargarDesdeCarpeta(moduloActivo, false);
+   console.log("=== FECHAS REALES RECIBIDAS ===");
+datosActuales.forEach(x => {
+  console.log(x.nombre, " → fechaReal:", x.fechaReal, " | fecha:", x.fecha);
+});
+console.log("================================");
 
 // ✅ ORDENAR POR FECHA REAL — MÁS RECIENTE PRIMERO
 datosActuales.sort((a, b) => {
