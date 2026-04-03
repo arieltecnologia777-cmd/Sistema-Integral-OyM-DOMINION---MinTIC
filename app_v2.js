@@ -239,27 +239,31 @@ prepararEventosTabla();
 
 // ✅ Activar ordenamiento por fecha al hacer clic en el encabezado
 function activarOrdenamientoFecha() {
-  const th = document.querySelector("th.sortable");
+  const th = document.querySelector("span.sortable[data-col='fecha']");
   if (!th) return;
 
   th.onclick = () => {
-
-    // ✅ Esta variable EXISTE y se usará
     const estado = th.dataset.order || "desc";
 
+    // Ordenar por fecha real
     datosActuales.sort((a, b) => {
       const fA = new Date(a.fechaReal);
       const fB = new Date(b.fechaReal);
       return estado === "desc" ? fA - fB : fB - fA;
     });
 
-    // ✅ Alterna el estado para el próximo clic
-    th.dataset.order = estado === "desc" ? "asc" : "desc";
+    // Alternar estado
+    const nuevoEstado = estado === "desc" ? "asc" : "desc";
+    th.dataset.order = nuevoEstado;
 
+    // Actualizar la flecha en pantalla
+    const flecha = th.querySelector(".flecha");
+    flecha.textContent = nuevoEstado === "desc" ? "🔽" : "🔼";
+
+    // Repintar tabla
     renderTabla();
   };
 }
-
 /* ======================================================================
    7) EVENTOS DE TABLA
    ====================================================================== */
