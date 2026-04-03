@@ -278,27 +278,7 @@ function prepararEventosTabla() {
     });
   });
 
-  // ✅ ORDENAR POR FECHA AL CLIC
-  document.querySelectorAll("th.sortable").forEach(th => {
-    th.addEventListener("click", () => {
-
-      const direccionActual = th.dataset.order || "desc";
-
-      datosActuales.sort((a, b) => {
-  const fA = new Date(a.fechaReal);
-  const fB = new Date(b.fechaReal);
-  return estado === "desc" ? fA - fB : fB - fA;
-});
-
-      // Alternar dirección
-      th.dataset.order = direccionActual === "desc" ? "asc" : "desc";
-
-      // Volver a pintar la tabla
-      renderTabla();
-    });
-  });
-
-}
+ 
 
 /* ======================================================================
    8) VER ARCHIVO — Vista previa del Excel + Fotos
