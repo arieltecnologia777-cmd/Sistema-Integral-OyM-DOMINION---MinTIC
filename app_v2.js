@@ -277,10 +277,13 @@ function prepararEventosTabla() {
       const direccionActual = th.dataset.order || "desc";
 
       datosActuales.sort((a, b) => {
-  const fA = new Date(a.fechaReal);
-  const fB = new Date(b.fechaReal);
-  return estado === "desc" ? fA - fB : fB - fA;
+  const fA = parseFechaCol(a.fecha);
+  const fB = parseFechaCol(b.fecha);
+  return direccionActual === "desc"
+    ? fA - fB  // ascendente
+    : fB - fA; // descendente
 });
+``
 
       // Alternar dirección
       th.dataset.order = direccionActual === "desc" ? "asc" : "desc";
