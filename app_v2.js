@@ -228,20 +228,59 @@ filtrados.forEach((item) => {
 
   const tr = document.createElement("tr");
 
- tr.innerHTML = `
-  ${tds}
-  <td style="text-align:center;">
-    <button class="btn-pill-auditor btn-revisar" data-idx="${idxReal}">
-      <span class="icon">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
-             stroke="#324a78" stroke-width="2">
-          <path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6Z"/>
-          <circle cx="12" cy="12" r="3.2"/>
-        </svg>
-      </span>
+ // Estado actual del informe (por ID de archivo)
+const estado = estadoInformes[item.id] || "pendiente";
+
+let botonHTML = "";
+
+/* ---------------------------------------------------
+   1) ESTADO: PENDIENTE  → Botón gris “Revisar”
+--------------------------------------------------- */
+if (estado === "pendiente") {
+  botonHTML = `
+    <button class="btn-estado btn-gris btn-revisar" data-idx="${idxReal}" data-id="${item.id}">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+           stroke="#324a78" stroke-width="2">
+        <path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6Z"/>
+        <circle cx="12" cy="12" r="3.2"/>
+      </svg>
       Revisar
-    </button>
-  </td>
+    </button>`;
+}
+
+/* ---------------------------------------------------
+   2) ESTADO: EN REVISIÓN → Botón azul “Continuar revisión”
+--------------------------------------------------- */
+else if (estado === "en_revision") {
+  botonHTML = `
+    <button class="btn-estado btn-azul btn-revisar" data-idx="${idxReal}" data-id="${item.id}">
+      ✏️ Continuar revisión
+    </button>`;
+}
+
+/* ---------------------------------------------------
+   3) ESTADO: APROBADO → Botón verde con check
+--------------------------------------------------- */
+else if (estado === "aprobado") {
+  botonHTML = `
+    <button class="btn-estado btn-verde" disabled>
+      ✅ Aprobado
+    </button>`;
+}
+
+/* ---------------------------------------------------
+   4) ESTADO: RECHAZADO → Botón rojo “Pendiente por técnico”
+--------------------------------------------------- */
+else if (estado === "rechazado") {
+  botonHTML = `
+    <button class="btn-estado btn-rojo" disabled>
+      ⚠️ Pendiente por técnico
+    </button>`;
+}
+
+tr.innerHTML = `
+  ${tds}
+  <td style="text-align:center;">${botonHTML}</td>
 `;
 
  tbody.appendChild(tr);
