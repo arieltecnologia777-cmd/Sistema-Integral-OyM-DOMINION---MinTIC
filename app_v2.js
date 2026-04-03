@@ -277,13 +277,13 @@ function activarOrdenamientoFecha() {
    ====================================================================== */
 function prepararEventosTabla() {
 
-  // === EVENTO VER ===
-  document.querySelectorAll(".btn-ver").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const item = datosActuales[btn.dataset.idx];
-      await verArchivo(item);
-    });
+  // === EVENTO REVISAR ===
+document.querySelectorAll(".btn-revisar").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const item = datosActuales[btn.dataset.idx];
+    await verArchivo(item);
   });
+});
 
   // === EVENTO APROBAR ===
   document.querySelectorAll(".btn-aprobar").forEach(btn => {
