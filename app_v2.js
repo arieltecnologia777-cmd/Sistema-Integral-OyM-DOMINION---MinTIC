@@ -113,11 +113,14 @@ function generarTablaHTML(modulo) {
   const ths = modulo.columnas
     .map(col => {
       if (col.id === "fecha") {
-        return `<th class="sortable" data-sort="fecha" style="cursor:pointer;">
-                  ${col.label} 🔽
-                </th>`;
-      }
-      return `<th>${col.label}</th>`;
+  return `
+    <th style="cursor:pointer;">
+      <span class="sortable" data-col="fecha" data-order="desc">
+        ${col.label} <span class="flecha">🔽</span>
+      </span>
+    </th>`;
+}
+return `<th>${col.label}</th>`;
     })
     .join("");
 
