@@ -57,14 +57,14 @@ export async function listarArchivosMCI(token) {
     const lista = [];
 
     for (const x of excels) {
-       const item = {
+      const item = {
   id: x.id,
   nombre: x.name,
 
-  // ✅ Fecha visible (formateada)
+  // ✅ Fecha que se muestra en la tabla (formateada)
   fecha: formatearFecha(x.lastModifiedDateTime),
 
-  // ✅ Fecha REAL (ISO) para ordenar correctamente
+  // ✅ Fecha REAL que usaremos para ORDENAR
   fechaReal: x.lastModifiedDateTime,
 
   tamano: formatearTamano(x.size),
