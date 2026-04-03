@@ -213,10 +213,13 @@ filtrados.forEach((item) => {
  tbody.appendChild(tr);
 });
 
-// ✅ activar eventos siempre después de pintar filas Y con thead activo
+// ✅ activar ordenamiento después de pintar filas y con thead ya generado
 activarOrdenamientoFecha();
+
+// ✅ activar botones ver/aprobar
 prepararEventosTabla();
-}
+
+} // ← esta es la llave final que cierra renderTabla()
 
 // ✅ Activar ordenamiento por fecha al hacer clic en el encabezado
 function activarOrdenamientoFecha() {
