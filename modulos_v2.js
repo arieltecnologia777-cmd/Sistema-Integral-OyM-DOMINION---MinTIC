@@ -111,7 +111,15 @@ export async function descargarArchivo(token, fileId) {
 // ======================================================
 
 export function formatearFecha(f) {
-    return new Date(f).toLocaleString("es-CO");
+  return new Date(f).toLocaleString("es-CO", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  });
 }
 
 export function formatearTamano(b) {
