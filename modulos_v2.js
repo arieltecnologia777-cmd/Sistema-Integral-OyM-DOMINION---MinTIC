@@ -86,9 +86,17 @@ fecha: (() => {
   tamano: formatearTamano(x.size),
 
   archivo: {
+    idCorto: x.id,
+    nombre: x.name,
     ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
-    nombre: x.name
-  },
+    driveId: DRIVE_ID,
+
+    // ✅ fileId REAL (el mismo que registra el técnico)
+    fileIdReal: meta?.fileSystemInfo?.fileId || null,
+
+    // ✅ Ruta real dentro de OneDrive
+    carpeta: meta?.parentReference?.path || null
+},
 
   fotosPreview: null
 };
