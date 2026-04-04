@@ -633,6 +633,9 @@ setTimeout(() => {
   }
 }
 
+/* ======================================================================
+   9) APROBAR (MOVER ARCHIVO)
+   ====================================================================== */
 async function aprobarArchivo(item) {
 
   if (!moduloActivo.aprobados) {
@@ -641,12 +644,12 @@ async function aprobarArchivo(item) {
   }
 
   // ✅ ORIGEN correcto desde OneDrive
-  const r1 = item.archivo.ruta;   // ejemplo: /drives/<driveId>/items/<id>
+  const r1 = item.archivo.ruta;
 
-  // ✅ DESTINO correcto (carpeta aprobados)
+  // ✅ DESTINO correcto usando driveId + id carpeta aprobados
   const r2 = `/drives/${DRIVE_ID}/items/${moduloActivo.aprobados}/${item.archivo.nombre}`;
 
-  // ✅ Intentar mover
+  // ✅ Mover archivo
   const ok = await moverArchivo(r1, r2);
 
   if (!ok) {
