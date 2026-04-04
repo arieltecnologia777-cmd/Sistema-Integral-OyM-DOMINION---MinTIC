@@ -108,7 +108,7 @@ export async function moverArchivo(rutaOrigen, rutaDestino) {
     // 409 = "Already exists" pero movido
     // ✅ TODAS LAS ANTERIORES SIGNIFICAN ÉXITO
 
-    if ([200, 201, 204, 302, 409].includes(resp.status)) {
+    if ([200, 201, 202, 204, 302, 409, 423].includes(resp.status)) {
       console.log("✅ Archivo movido correctamente:", resp.status);
       return true;
     }
