@@ -364,6 +364,26 @@ function prepararEventosTabla() {
 
 } // ✅ CIERRE CORRECTO DE prepararEventosTabla()
 
+
+
+// ✅ Evento APROBAR (ESTE DEBE IR FUERA de prepararEventosTabla)
+document.getElementById("visorAprobar").addEventListener("click", async () => {
+  const item = window.__archivoActual;
+  if (!item) return;
+
+  // ✅ cambiar estado visual ANTES de mover
+  estadoInformes[item.id] = "aprobado";
+  guardarEstados();
+
+  // ✅ mover archivo real en OneDrive
+  await aprobarArchivo(item);
+
+  // ✅ cerrar visor (cargarDatosModulo ya refresca tabla)
+  document.getElementById("visorVolver").click();
+});
+
+
+
 /* ======================================================================
    8) VER ARCHIVO — Vista previa del Excel + Fotos
    ====================================================================== */
@@ -668,36 +688,18 @@ document.getElementById("visorDescargar").addEventListener("click", async () => 
   link.click();
 });
 
-// ✅ Aprobar desde el visor
+// ✅ Aprobar desde el visor (BOTÓN VERDE)
 document.getElementById("visorAprobar").addEventListener("click", async () => {
+  const item = window.__archivoActual;
+  if (!item) return;
 
-    const item = window.__archivoActual;
-    if (!item) return;
+  // ✅ mover archivo real en OneDrive
+  await aprobarArchivo(item);
 
-    // ✅ 1. Cerrar visor ANTES de mover el archivo
-    document.getElementById("modalVisor").style.display = "none";
-    document.getElementById("contenedor-modulo").style.display = "block";
+  // ✅ cambiar estado visual
+  estadoInformes[item.id] = "aprobado";
+  guardarEstados();
 
-    // ✅ 2. Esperar a que Microsoft Graph libere el archivo (muy importante)
-    await new Promise(res => setTimeout(res, 1800));  // 1.8 segundos
-
-    // ✅ 3. Intentar mover archivo (ya NO está bloqueado)
-    const ok = await aprobarArchivo(item);
-
-    if (!ok) {
-        alert("Error moviendo archivo.");
-        return;
-    }
-
-    // ✅ 4. Marcar estado local
-    estadoInformes[item.id] = "aprobado";
-    guardarEstados();
-
-    // ✅ 5. Registrar en Cloudflare KV
-    await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.archivo.fileIdReal, {
-        method: "PUT"
-    });
-
-    // ✅ 6. Refrescar tabla
-    renderTabla();
+  // ✅ cerrar visor
+  document.getElementById("visorVolver").click();
 });
