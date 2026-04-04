@@ -699,19 +699,3 @@ document.getElementById("visorDescargar").addEventListener("click", async () => 
   link.download = item.archivo.nombre;
   link.click();
 });
-
-// ✅ Aprobar desde el visor (BOTÓN VERDE)
-document.getElementById("visorAprobar").addEventListener("click", async () => {
-  const item = window.__archivoActual;
-  if (!item) return;
-
-  // ✅ mover archivo real en OneDrive
-  await aprobarArchivo(item);
-
-  // ✅ cambiar estado visual
-  estadoInformes[item.id] = "aprobado";
-  guardarEstados();
-
-  // ✅ cerrar visor
-  document.getElementById("visorVolver").click();
-});
