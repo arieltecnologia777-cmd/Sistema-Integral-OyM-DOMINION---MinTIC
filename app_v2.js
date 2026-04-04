@@ -364,26 +364,6 @@ function prepararEventosTabla() {
 
 } // ✅ CIERRE CORRECTO DE prepararEventosTabla()
 
-
-
-// ✅ Evento APROBAR (ESTE DEBE IR FUERA de prepararEventosTabla)
-document.getElementById("visorAprobar").addEventListener("click", async () => {
-  const item = window.__archivoActual;
-  if (!item) return;
-
-  // ✅ cambiar estado visual ANTES de mover
-  estadoInformes[item.id] = "aprobado";
-  guardarEstados();
-
-  // ✅ mover archivo real en OneDrive
-  await aprobarArchivo(item);
-
-  // ✅ cerrar visor (cargarDatosModulo ya refresca tabla)
-  document.getElementById("visorVolver").click();
-});
-
-
-
 /* ======================================================================
    8) VER ARCHIVO — Vista previa del Excel + Fotos
    ====================================================================== */
