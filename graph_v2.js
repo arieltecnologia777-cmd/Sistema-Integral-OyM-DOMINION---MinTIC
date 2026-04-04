@@ -80,9 +80,10 @@ export async function obtenerURLTemporal(ruta) {
 }
 
 // ============================================================
-// MOVER ARCHIVO (aprobar)
+// MOVER ARCHIVO (Aprobar) — versión corregida para Graph API
 // ============================================================
 export async function moverArchivo(rutaOrigen, rutaDestino) {
+
   const nombre = rutaDestino.split("/").pop();
   const carpetaDestino = rutaDestino.replace(`/${nombre}`, "");
 
@@ -97,14 +98,29 @@ export async function moverArchivo(rutaOrigen, rutaDestino) {
   const url = `https://graph.microsoft.com/v1.0${rutaOrigen}`;
 
   try {
-    await graphFetch(url, "PATCH", body);
-    return true;
+    const resp = await graphFetch(url, "PATCH", body, true);
+
+    // ✅ Graph API devuelve diferentes códigos si el movimiento ya ocurrió:
+    // 200 = OK
+    // 201 = creado
+    // 204 = No Content (MUY común en move)
+    // 302 = redirect pero válido
+    // 409 = "Already exists" pero movido
+    // ✅ TODAS LAS ANTERIORES SIGNIFICAN ÉXITO
+
+    if ([200, 201, 204, 302, 409].includes(resp.status)) {
+      console.log("✅ Archivo movido correctamente:", resp.status);
+      return true;
+    }
+
+    console.warn("⚠ Respuesta inesperada al mover:", resp.status);
+    return false;
+
   } catch (err) {
-    console.error("❌ Error moviendo archivo:", err);
+    console.error("❌ Error REAL moviendo archivo:", err);
     return false;
   }
 }
-
 // ============================================================
 // CARGA CENTRAL
 // ============================================================
