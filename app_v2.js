@@ -4,13 +4,15 @@
    ====================================================================== */
 
 import {
-  listarArchivosMCI,
-  descargarArchivo,
-  formatearFecha,
-  formatearTamano,
-  obtenerModulo,
-  MODULOS
+    listarArchivosMCI,
+    descargarArchivo,
+    formatearFecha,
+    formatearTamano,
+    obtenerModulo,
+    MODULOS
 } from './modulos_v2.js';
+
+import { DRIVE_ID } from './modulos_v2.js';   // ✅ AGREGA ESTA LÍNEA
 
 import { cargarDesdeCarpeta, obtenerURLTemporal, moverArchivo } from "./graph_v2.js";
 import { iniciarSesion, usuarioActual, cerrarSesion, obtenerToken } from "./auth.js";
