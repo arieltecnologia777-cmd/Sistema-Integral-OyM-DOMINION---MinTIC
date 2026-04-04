@@ -69,7 +69,7 @@ const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
     for (const x of excels) {
         // ✅ Obtener metadata completa del archivo (incluye fileIdReal)
 const metaResp = await fetch(
-    `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${x.id}`,
+    `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${x.id}?$select=id,name,webUrl,parentReference,fileSystemInfo`,
     {
         headers: { "Authorization": `Bearer ${token}` }
     }
