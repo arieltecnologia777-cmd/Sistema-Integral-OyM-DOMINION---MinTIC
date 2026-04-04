@@ -693,12 +693,17 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   const item = window.__archivoActual;
   if (!item) return;
 
-  // ✅ mover archivo real en OneDrive
+  // ✅ mover archivo real en OneDrive (tu app OK sigue funcionando)
   await aprobarArchivo(item);
 
   // ✅ cambiar estado visual
   estadoInformes[item.id] = "aprobado";
   guardarEstados();
+
+  // ✅ NUEVO: Registrar aprobación en Cloudflare KV
+  await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.archivo.fileIdReal, {
+      method: "PUT"
+  });
 
   // ✅ cerrar visor
   document.getElementById("visorVolver").click();
