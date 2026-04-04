@@ -67,12 +67,10 @@ const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
     const lista = [];
 
     for (const x of excels) {
-        // ✅ Obtener metadata completa del archivo (incluye fileIdReal)
+        // ✅ Obtener metadata completa del archivo
 const metaResp = await fetch(
-    `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${x.id}?$select=id,name,webUrl,parentReference,fileSystemInfo`,
-    {
-        headers: { "Authorization": `Bearer ${token}` }
-    }
+    `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${x.id}?$select=id,name,parentReference,fileSystemInfo`,
+    { headers: { "Authorization": `Bearer ${token}` } }
 );
 const meta = await metaResp.json();
     const item = {
@@ -93,14 +91,14 @@ fecha: (() => {
 
   tamano: formatearTamano(x.size),
 
-archivo: {
+  archivo: {
     ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
     nombre: x.name,
 
-    // ✅ fileId REAL para Cloudflare KV (formato compatible)
+    // ✅ fileIdReal compatible con KV
     fileIdReal: `${DRIVE_ID}.${x.id}`,
 
-    // ✅ Carpeta donde está el archivo en OneDrive
+    // ✅ carpeta real del archivo (opcional pero útil)
     carpeta: meta?.parentReference?.path || null
 },
 
@@ -165,4 +163,5 @@ export function formatearTamano(b) {
     if (b < 1024 * 1024) return (b / 1024).toFixed(1) + " KB";
     return (b / 1024 / 1024).toFixed(1) + " MB";
 }
+
 
