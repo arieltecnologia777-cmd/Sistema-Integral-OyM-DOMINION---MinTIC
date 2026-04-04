@@ -67,6 +67,11 @@ const previews = data.value.filter(f => f.name.includes("PreviewFotos"));
     const lista = [];
 
     for (const x of excels) {
+    const metaResp = await fetch(
+    `${GRAPH_BASE}/drives/${DRIVE_ID}/items/${x.id}?$select=parentReference`,
+    { headers: { "Authorization": `Bearer ${token}` } }
+);
+const meta = await metaResp.json();    
     const item = {
   id: x.id,
   nombre: x.name,
@@ -87,8 +92,14 @@ fecha: (() => {
 
   archivo: {
     ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
-    nombre: x.name
-  },
+    nombre: x.name,
+
+    // ✅ fileIdReal usado por KV
+    fileIdReal: `${DRIVE_ID}.${x.id}`,
+
+    // ✅ Carpeta real (opcional)
+    carpeta: meta?.parentReference?.path ?? null
+},
 
   fotosPreview: null
 };
