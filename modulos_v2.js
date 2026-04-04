@@ -93,10 +93,16 @@ fecha: (() => {
 
   tamano: formatearTamano(x.size),
 
-  archivo: {
+archivo: {
     ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
-    nombre: x.name
-  },
+    nombre: x.name,
+
+    // ✅ fileId REAL para Cloudflare KV (formato compatible)
+    fileIdReal: `${DRIVE_ID}.${x.id}`,
+
+    // ✅ Carpeta donde está el archivo en OneDrive
+    carpeta: meta?.parentReference?.path || null
+},
 
   fotosPreview: null
 };
