@@ -187,6 +187,7 @@ async function cargarDatosModulo() {
   // 1. Archivos en OneDrive
   const token = await obtenerToken();
   const listaOD = await listarArchivosMCI(token);
+   window.debugListaOD = listaOD;
 
   // 2. Archivos registrados en KV
   const tecnico = "usuario"; 
