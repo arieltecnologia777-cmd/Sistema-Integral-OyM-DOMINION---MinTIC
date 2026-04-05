@@ -397,10 +397,7 @@ async function verArchivo(item) {
 
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
-  // ✅ FIX: asegurar que el visor use el fileIdReal de KV (no null)
-if (item.fileIdReal) {
-    item.archivo.fileIdReal = item.fileIdReal;
-}
+  
 
 window.__archivoActual = item;
 
@@ -706,8 +703,7 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   if (!item) return;
 
   // ✅ 1. Cambiar estado local
-  estadoInformes[item.id] = "aprobado";
-  guardarEstados();
+  
 
   // ✅ 2. Registrar aprobación en Cloudflare KV usando mciId
   await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.mciId, {
