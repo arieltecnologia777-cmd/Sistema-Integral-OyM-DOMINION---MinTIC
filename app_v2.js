@@ -209,12 +209,6 @@ for (const a of listaOD) {
   }
 }
 
-datosActuales = listaOD;
-
-  // 4. Actualizar datos y mostrar tabla
-  datosActuales = cruzados;
-  renderTabla();
-  setTimeout(() => activarOrdenamientoFecha(), 0);
 }
 
 /* ======================================================================
