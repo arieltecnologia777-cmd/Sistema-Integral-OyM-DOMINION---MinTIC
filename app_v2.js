@@ -174,7 +174,7 @@ return `<th>${col.label}</th>`;
    5) CARGAR DATOS DESDE ONEDRIVE
    ====================================================================== */
 async function cargarDatosModulo() {
-  if (!moduloActivo.pendientes) {
+  if (!moduloActivo.pendientes) { 
     document.getElementById("tbodyDatos").innerHTML = `
       <tr><td colspan="99" style="padding:20px; text-align:center;">
       No hay ruta configurada para este módulo.<br>
@@ -189,38 +189,31 @@ async function cargarDatosModulo() {
   const listaOD = await listarArchivosMCI(token);
 
   // 2. Archivos registrados en KV
-  const tecnico = "usuario"; // luego lo reemplazamos con el usuario actual
+  const tecnico = "usuario"; 
   const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
   const listaKV = await respKV.json();
 
   // 3. Cruce OneDrive + KV por ITEM_ID real
-const cruzados = [];
+  const cruzados = [];
 
-for (const a of listaOD) {
+  for (const a of listaOD) {
 
-  // ID real de OneDrive
-  const oneDriveId = a.id;
+    const oneDriveId = a.id;  // ID real del archivo en OneDrive
 
-  // Buscar coincidencia REAL en KV
-  const match = listaKV.find(k => {
-    const kvItemId = k.fileId.split(".")[1];   // parte derecha del fileId
-    return kvItemId === oneDriveId;
-  });
+    const match = listaKV.find(k => {
+      const kvItemId = k.fileId.split(".")[1]; 
+      return kvItemId === oneDriveId;
+    });
 
-  if (match) {
-    a.fileIdReal = match.fileId;   // ✅ ESTE ES EL fileId REAL del técnico
-    a.estadoKV = match.estado;     // ✅ Estado real desde KV
-    cruzados.push(a);
+    if (match) {
+      a.fileIdReal = match.fileId;
+      a.estadoKV = match.estado;
+      cruzados.push(a);
+    }
   }
-}
 
-datosActuales = cruzados;
-
-renderTabla();
-setTimeout(() => activarOrdenamientoFecha(), 0);
-
+  // 4. Actualizar datos y mostrar tabla
   datosActuales = cruzados;
-
   renderTabla();
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
