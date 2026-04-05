@@ -167,7 +167,7 @@ async function cargarDatosModulo() {
   //    • KV entrega el fileIdReal verdadero y el estado
   for (const a of listaOD) {
 
-    const registro = listaKV.find(k => k.fileId && k.fileId.split(".").pop() === a.id);
+    const registro = listaKV.find(k => k.fileId && k.fileId.includes(a.id));
 
     if (registro) {
 
