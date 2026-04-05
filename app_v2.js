@@ -174,40 +174,51 @@ return `<th>${col.label}</th>`;
    5) CARGAR DATOS DESDE ONEDRIVE
    ====================================================================== */
 async function cargarDatosModulo() {
-
   if (!moduloActivo.pendientes) {
     document.getElementById("tbodyDatos").innerHTML = `
       <tr><td colspan="99" style="padding:20px; text-align:center;">
-        No hay ruta configurada para este módulo.<br>
-        (Ariel deberá especificarla cuando toque)
+      No hay ruta configurada para este módulo.<br>
+      (Ariel deberá especificarla cuando toque)
       </td></tr>
     `;
     return;
   }
 
-  // ✅ Cargar archivos usando listarArchivosMCI (esto sí trae la fecha real del archivo)
-const token = await obtenerToken();
-datosActuales = await listarArchivosMCI(token);
+  // 1. Traer archivos físicos (OneDrive)
+  const token = await obtenerToken();
+  const listaOD = await listarArchivosMCI(token);
 
-// ✅ Debug para verificar fechas reales
-console.log("=== FECHAS REALES RECIBIDAS ===");
-datosActuales.forEach(x => {
-  console.log(x.nombre, " → fechaReal:", x.fechaReal, " | fecha:", x.fecha);
-});
-console.log("================================");
+  // 2. Traer archivos registrados en KV
+  const tecnico = "usuario"; // luego lo reemplazaremos por el usuario actual
+  const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
+  const listaKV = await respKV.json();
 
-// ✅ Ordenar por FECHA REAL — más reciente primero
-datosActuales.sort((a, b) => {
-  const fechaA = new Date(a.fechaReal);
-  const fechaB = new Date(b.fechaReal);
-  return fechaB - fechaA;
-});
+  // 3. Cruzar OneDrive + KV (solo mostrar archivos registrados)
+  const cruzados = [];
+  for (const a of listaOD) {
+    if (!a.archivo.fileIdReal) continue;
 
-// ✅ Renderizar la tabla
-renderTabla();
+    const match = listaKV.find(kv => kv.fileId === a.archivo.fileIdReal);
+    if (match) {
+      // Añadimos estado desde KV
+      a.estadoKV = match.estado;
+      cruzados.push(a);
+    }
+  }
 
-// ✅ Activar el ordenamiento después de que la tabla exista en el DOM
-setTimeout(() => activarOrdenamientoFecha(), 0);
+  // 4. Ordenar por fecha
+  cruzados.sort((a, b) =>
+    new Date(b.fechaReal) - new Date(a.fechaReal)
+  );
+
+  // 5. Reemplaza datosActuales con los cruzados
+  datosActuales = cruzados;
+
+  // 6. Renderizar tabla
+  renderTabla();
+
+  // 7. Activar sort
+  setTimeout(() => activarOrdenamientoFecha(), 0);
 }
 
 /* ======================================================================
