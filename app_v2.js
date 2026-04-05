@@ -193,21 +193,31 @@ async function cargarDatosModulo() {
   const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
   const listaKV = await respKV.json();
 
-  // 3. Cruce por nombre → porque el técnico NO envía x.id, sino fileId REAL
-  const cruzados = [];
+  // 3. Cruce OneDrive + KV por ITEM_ID real
+const cruzados = [];
 
-  for (const a of listaOD) {
+for (const a of listaOD) {
 
-    const match = listaKV.find(k =>
-      a.archivo.nombre === k.fileId.split('.').pop()   // OJO AQUÍ
-    );
+  // ID real de OneDrive
+  const oneDriveId = a.id;
 
-    if (match) {
-      a.estadoKV = match.estado;
-      a.fileIdReal = match.fileId;
-      cruzados.push(a);
-    }
+  // Buscar coincidencia REAL en KV
+  const match = listaKV.find(k => {
+    const kvItemId = k.fileId.split(".")[1];   // parte derecha del fileId
+    return kvItemId === oneDriveId;
+  });
+
+  if (match) {
+    a.fileIdReal = match.fileId;   // ✅ ESTE ES EL fileId REAL del técnico
+    a.estadoKV = match.estado;     // ✅ Estado real desde KV
+    cruzados.push(a);
   }
+}
+
+datosActuales = cruzados;
+
+renderTabla();
+setTimeout(() => activarOrdenamientoFecha(), 0);
 
   datosActuales = cruzados;
 
