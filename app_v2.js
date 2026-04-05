@@ -184,40 +184,34 @@ async function cargarDatosModulo() {
     return;
   }
 
-  // 1. Traer archivos físicos (OneDrive)
+  // 1. Archivos en OneDrive
   const token = await obtenerToken();
   const listaOD = await listarArchivosMCI(token);
 
-  // 2. Traer archivos registrados en KV
-  const tecnico = "usuario"; // luego lo reemplazaremos por el usuario actual
+  // 2. Archivos registrados en KV
+  const tecnico = "usuario"; // luego lo reemplazamos con el usuario actual
   const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
   const listaKV = await respKV.json();
 
-  // 3. Cruzar OneDrive + KV (solo mostrar archivos registrados)
+  // 3. Cruce por nombre → porque el técnico NO envía x.id, sino fileId REAL
   const cruzados = [];
-  for (const a of listaOD) {
-    if (!a.archivo.fileIdReal) continue;
 
-    const match = listaKV.find(kv => kv.fileId === a.archivo.fileIdReal);
+  for (const a of listaOD) {
+
+    const match = listaKV.find(k =>
+      a.archivo.nombre === k.fileId.split('.').pop()   // OJO AQUÍ
+    );
+
     if (match) {
-      // Añadimos estado desde KV
       a.estadoKV = match.estado;
+      a.fileIdReal = match.fileId;
       cruzados.push(a);
     }
   }
 
-  // 4. Ordenar por fecha
-  cruzados.sort((a, b) =>
-    new Date(b.fechaReal) - new Date(a.fechaReal)
-  );
-
-  // 5. Reemplaza datosActuales con los cruzados
   datosActuales = cruzados;
 
-  // 6. Renderizar tabla
   renderTabla();
-
-  // 7. Activar sort
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
 
