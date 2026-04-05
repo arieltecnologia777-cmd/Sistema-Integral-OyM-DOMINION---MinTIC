@@ -93,7 +93,10 @@ fecha: (() => {
   archivo: {
   ruta: `/drives/${DRIVE_ID}/items/${x.id}`,
   nombre: x.name,
-  fileIdReal: null,   // ✅ SIEMPRE INICIA EN NULL, NUNCA ONE DRIVE
+
+  // ✅ SIEMPRE inicia en null — el auditor lo llenará con KV
+  fileIdReal: null,
+
   carpeta: meta?.parentReference?.path ?? null
 },
 
