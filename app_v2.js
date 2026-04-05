@@ -139,6 +139,7 @@ async function seleccionarModulo(mod) {
    3) CAMBIAR DE MÓDULO
    ====================================================================== */
 async function cargarDatosModulo() {
+
   if (!moduloActivo.pendientes) {
     document.getElementById("tbodyDatos").innerHTML = `
       <tr><td colspan="99" style="padding:20px; text-align:center;">
@@ -154,29 +155,52 @@ async function cargarDatosModulo() {
   const listaOD = await listarArchivosMCI(token);
   window.debugListaOD = listaOD;   // Debug opcional
 
-  // ✅ 2. Cargar registros KV
+  // ✅ 2. Cargar registros KV (pendientes, aprobados, etc.)
   const tecnico = "usuario";
-  const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
+  const respKV = await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`
+  );
   const listaKV = await respKV.json();
 
-  // ✅ 3. Combinar: mostrar TODO OneDrive + estado si existe KV
+  // ✅ 3. Mezclar: OneDrive + KV
+  //    • OneDrive entrega info del archivo
+  //    • KV entrega el fileIdReal verdadero y el estado
   for (const a of listaOD) {
+
     const registro = listaKV.find(k => k.fileId.endsWith(a.id));
+
     if (registro) {
+
+      // ✅ Este es el fileId que Cloudflare SÍ reconoce
       a.fileIdReal = registro.fileId;
       a.estadoKV = registro.estado;
+
+      // ✅ CORRECCIÓN CLAVE:
+      //    El visor y el botón “Aprobar” usan item.archivo.fileIdReal
+      //    Debe ser IGUAL al de KV, no al de OneDrive
+      if (a.archivo) {
+        a.archivo.fileIdReal = registro.fileId;
+      }
+
     } else {
+      // Archivos que existen en OneDrive pero no están aún en KV
       a.fileIdReal = null;
       a.estadoKV = "pendiente";
+
+      if (a.archivo) {
+        a.archivo.fileIdReal = null;
+      }
     }
   }
 
-  // ✅ 4. Actualizar datos y mostrar tabla
+  // ✅ 4. Actualizar datos de la tabla
   datosActuales = listaOD;
 
+  // ✅ 5. Renderizar y activar ordenamiento
   renderTabla();
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
+
 /* ======================================================================
    4) CREAR TABLA
    ====================================================================== */
