@@ -166,7 +166,7 @@ async function cargarDatosModulo() {
 for (const a of listaOD) {
 
   // Buscar en KV por el nombre del archivo
-  const registro = listaKV.find(k => k.fileName === a.nombre);
+  const registro = listaKV.find(k => k.fileId === a.id);
 
   if (registro) {
     // ✅ Guardamos el mciId que viene del KV
