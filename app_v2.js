@@ -162,28 +162,29 @@ async function cargarDatosModulo() {
   );
   const listaKV = await respKV.json();
 
-  // ✅ 3. Mezclar: OneDrive + KV usando mciId (ya no usamos fileIdReal)
+ // ✅ 3. Mezclar: OneDrive + KV usando fileId (seguro) y mciId (persistente en raíz)
 for (const a of listaOD) {
 
-  // Buscar en KV por el nombre del archivo
-  const registro = listaKV.find(k => k.fileId === a.id);
+    // Buscar en KV usando fileId (a.id SIEMPRE existe)
+    const registro = listaKV.find(k => k.fileId === a.id);
 
-  if (registro) {
-    // ✅ Guardamos el mciId que viene del KV (en la raíz)
-    a.mciId = registro.mciId;
-    a._mciId = registro.mciId; 
+    if (registro) {
+        // ✅ Guardamos mciId DEL KV en la raíz (se conserva en el visor)
+        a.mciId = registro.mciId;
+        a._mciId = registro.mciId;
 
-    // ✅ Estado KV en raíz
-    a.estadoKV = registro.estado;
+        // ✅ Estado del informe en la raíz
+        a.estadoKV = registro.estado;
 
-} else {
-
-    // ✅ Si no existe en KV, se muestra como pendiente
-    a.mciId = null;
-    a.estadoKV = "pendiente";
+    } else {
+        // ✅ Si no existe en KV, marcar como pendiente
+        // (RAÍZ, NO dentro de archivo, para que NO se pierda)
+        a.mciId = null;
+        a._mciId = null;
+        a.estadoKV = "pendiente";
+    }
 }
-}
-
+   
   // ✅ 4. Actualizar datos de la tabla
   datosActuales = listaOD;
 
