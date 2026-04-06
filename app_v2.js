@@ -695,7 +695,7 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   
 
   // ✅ 2. Registrar aprobación en Cloudflare KV usando mciId
-  await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.archivo.mciId, {
+ await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.mciId, {
     method: "PUT"
 });
 
