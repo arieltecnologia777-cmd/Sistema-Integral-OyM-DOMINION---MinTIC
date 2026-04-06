@@ -170,17 +170,17 @@ for (const a of listaOD) {
 
   if (registro) {
     // ✅ Guardamos el mciId que viene del KV
-    a.mciId = registro.mciId;
+    a.archivo.mciId = registro.mciId;
 
     // ✅ Estado del informe en KV
-    a.estadoKV = registro.estado;
+    a.archivo.estadoKV = registro.estado;
 
   } else {
-
     // ✅ Si no existe en KV, se muestra como pendiente
-    a.mciId = null;
-    a.estadoKV = "pendiente";
-  }
+    // ✅ LO GUARDAMOS EN a.archivo PARA QUE NO SE PIERDA AL REDIBUJAR
+    a.archivo.mciId = null;
+    a.archivo.estadoKV = "pendiente";
+}
 }
 
   // ✅ 4. Actualizar datos de la tabla
@@ -695,9 +695,9 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   
 
   // ✅ 2. Registrar aprobación en Cloudflare KV usando mciId
-  await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.mciId, {
-      method: "PUT"
-  });
+  await fetch("https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/" + item.archivo.mciId, {
+    method: "PUT"
+});
 
   // ✅ 3. Cerrar visor
   document.getElementById("visorVolver").click();
