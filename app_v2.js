@@ -169,17 +169,17 @@ for (const a of listaOD) {
   const registro = listaKV.find(k => k.fileId === a.id);
 
   if (registro) {
-    // ✅ Guardamos el mciId que viene del KV
-    a.archivo.mciId = registro.mciId;
+    // ✅ Guardamos el mciId que viene del KV (en la raíz)
+    a.mciId = registro.mciId;
 
-    // ✅ Estado del informe en KV
-    a.archivo.estadoKV = registro.estado;
+    // ✅ Estado KV en raíz
+    a.estadoKV = registro.estado;
 
-  } else {
+} else {
+
     // ✅ Si no existe en KV, se muestra como pendiente
-    // ✅ LO GUARDAMOS EN a.archivo PARA QUE NO SE PIERDA AL REDIBUJAR
-    a.archivo.mciId = null;
-    a.archivo.estadoKV = "pendiente";
+    a.mciId = null;
+    a.estadoKV = "pendiente";
 }
 }
 
