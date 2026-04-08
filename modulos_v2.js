@@ -45,14 +45,11 @@ export async function listarArchivosMCI(token) {
   // 🔧 CONFIG SHAREPOINT (ANCLAS)
   // ============================
   // ⚠️ DEBES AJUSTAR ESTOS 2 VALORES
-  const SITE_ID = "TU_SITE_ID_SHAREPOINT";
-  // Ejemplo real:
-  // dominio.sharepoint.com,aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee,ffffffff-1111-2222-3333-444444444444
+  const SITE_ID = "dominionglobal.sharepoint.com,10887380-6934-45ab-adf2-97b2aad78311,433b4a3a-96f7-4bf3-929a-eb5f824c466d";
 
-  const LIBRARY_ID = "TU_DOCUMENT_LIBRARY_ID";
-  // Normalmente es la biblioteca "Documentos"
+const LIBRARY_ID = "b!gHOIEDRpq0Wt8peyqteDETpKO0P3lvNLkprrX4JMRm3TjVug-HIEToXXjMDkE9rM";
 
-  const FOLDER_NAME = "MCI_Generados";
+const FOLDER_NAME = "MCI_Generados";
   // ============================
 
   const url = `${GRAPH_BASE}/sites/${SITE_ID}/drives/${LIBRARY_ID}/root:/${FOLDER_NAME}:/children`;
