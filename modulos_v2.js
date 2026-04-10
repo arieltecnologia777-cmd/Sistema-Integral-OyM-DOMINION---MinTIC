@@ -1,23 +1,21 @@
 // ======================================================================
-// CONFIG SHAREPOINT ONLINE — ID REALES Y VALORES CORRECTOS
+// CONFIG SHAREPOINT ONLINE — VALORES REALES
 // ======================================================================
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
-// ✅ DATOS REALES EXTRAÍDOS DE TU ARCHIVO ANTERIOR (EL QUE SÍ FUNCIONABA)
 export const SITE_ID =
- "dominionglobal.sharepoint.com,10887380-6934-45ab-adf2-97b2aad78311,433b4a3a-96f7-4bf3-929a-eb5f824c466d";
+  "dominionglobal.sharepoint.com,10887380-6934-45ab-adf2-97b2aad78311,433b4a3a-96f7-4bf3-929a-eb5f824c466d";
 
 export const LIBRARY_ID =
- "b!gHOIEDRpq0Wt8peyqteDETpKO0P3lvNLkprrX4JMRm3TjVug-HIEToXXjMDkE9rM";
+  "b!gHOIEDRpq0Wt8peyqteDETpKO0P3lvNLkprrX4JMRm3TjVug-HIEToXXjMDkE9rM";
 
-// ✅ Carpeta REAL que usabas en tu versión estable
 export const FOLDER_PATH =
- "Base MCI - Proyecto automatización/MCI_Generados";
+  "Base MCI - Proyecto automatización/MCI_Generados";
 
 
 // ======================================================================
-// DEFINICIÓN DE MÓDULOS (el Auditor usa este objeto)
+// DEFINICIÓN DE MÓDULOS
 // ======================================================================
 
 export const MODULOS = {
@@ -27,18 +25,14 @@ export const MODULOS = {
             { id: "fecha",  label: "Fecha" },
             { id: "tamano", label: "Tamaño" }
         ],
-
-        // ✅ carpeta de pendientes
         pendientes: FOLDER_PATH,
-
-        // ✅ si luego quieres agregamos aprobados
         aprobados: null
     }
 };
 
 
 // ======================================================================
-// OBTENER CONFIGURACIÓN DEL MÓDULO
+// OBTENER MÓDULO
 // ======================================================================
 
 export function obtenerModulo(nombre) {
@@ -58,7 +52,7 @@ export async function listarArchivosMCI(token) {
     });
 
     if (!res.ok) {
-        console.error("❌ Error listando en SharePoint:", await res.text());
+        console.error("❌ Error listando SharePoint:", await res.text());
         return [];
     }
 
@@ -67,7 +61,6 @@ export async function listarArchivosMCI(token) {
 
     const lista = [];
 
-    // ✅ Solo traer excels reales
     const excels = data.value.filter(f => f.name.endsWith(".xlsx"));
 
     for (const x of excels) {
@@ -78,11 +71,8 @@ export async function listarArchivosMCI(token) {
         lista.push({
             id: x.id,
             nombre: x.name,
-
             fechaReal: x.lastModifiedDateTime,
-
             fecha: `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`,
-
             tamano: formatearTamano(x.size),
 
             archivo: {
@@ -101,23 +91,21 @@ export async function listarArchivosMCI(token) {
 
 
 // ======================================================================
-// DESCARGAR DESDE SHAREPOINT
+// DESCARGAR ARCHIVO
 // ======================================================================
 
 export async function descargarArchivo(token, fileId) {
     const url =
 `${GRAPH_BASE}/sites/${SITE_ID}/drives/${LIBRARY_ID}/items/${fileId}/content`;
 
-    const res = await fetch(url, {
+    return fetch(url, {
         headers: { "Authorization": `Bearer ${token}` }
     });
-
-    return res;
 }
 
 
 // ======================================================================
-// FORMATOS — FECHA Y TAMAÑO
+// FORMATOS
 // ======================================================================
 
 export function formatearFecha(f) {
