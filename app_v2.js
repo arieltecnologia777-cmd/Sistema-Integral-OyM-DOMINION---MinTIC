@@ -29,7 +29,7 @@ function parseFechaCol(fechaStr) {
    ESTADO GLOBAL
    ====================================================================== */
 
-let moduloActivo = null;
+window.datosActuales = [];
 let datosActuales = [];
 let estadoInformes = {};
 
@@ -147,7 +147,7 @@ async function cargarDatosModulo() {
     }
   }
 
-  datosActuales = listaOD;
+  window.datosActuales = listaOD;
   renderTabla();
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
@@ -189,7 +189,7 @@ function generarTablaHTML(modulo) {
 function renderTabla() {
   const tbody = document.getElementById("tbodyDatos");
 
-  if (!datosActuales || datosActuales.length === 0) {
+  if (!window.datosActuales || window.datosActuales.length === 0) {
     tbody.innerHTML = `
     <tr><td colspan="99" style="padding:20px; text-align:center;">
     No hay informes pendientes.
@@ -275,7 +275,7 @@ function prepararEventosTabla() {
   document.querySelectorAll(".btn-revisar").forEach(btn => {
     btn.addEventListener("click", async () => {
       const idx = btn.dataset.idx;
-      const item = datosActuales[idx];
+      const item = window.datosActuales[idx];
       await verArchivo(item);
       renderTabla();
     });
