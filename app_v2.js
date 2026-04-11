@@ -306,9 +306,9 @@ async function verArchivo(item) {
   const sheet = wb.Sheets[wb.SheetNames[0]];
 
   // ✅ RANGOS ORIGINALES EXACTOS
-  const htmlInfoGeneral = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
-  const htmlDescripcion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
-  const htmlDeclaracion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
+  let htmlInfoGeneral = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
+let htmlDescripcion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
+let htmlDeclaracion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
 
    // === ENCABEZADOS EXACTOS DEL EXCEL A PINTAR EN GRIS ===
 let info = htmlInfoGeneral;
