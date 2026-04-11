@@ -508,15 +508,41 @@ document.getElementById("visorVolver").addEventListener("click", () => {
 document.getElementById("visorAprobar").addEventListener("click", async () => {
 
   const mciId = window.__mciIdActual;
-  if (!mciId) return alert("❌ No se encontró el mciId.");
+  if (!mciId) {
+    alert("❌ No se encontró el mciId.");
+    return;
+  }
 
-  await fetch(
-    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
-    { method: "PUT" }
-  );
+  console.log("⚡ Enviando aprobación al Worker…", mciId);
 
-  document.getElementById("visorVolver").click();
-  renderTabla();
+  try {
+    const resp = await fetch(
+      `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
+      { method: "PUT" }
+    );
+
+    const data = await resp.json();
+    console.log("✅ Respuesta del Worker:", data);
+
+    if (!resp.ok || !data.ok) {
+      alert("❌ Error al aprobar en el Worker.");
+      return;
+    }
+
+    // ✅ Mostrar mensaje rápido al auditor
+    alert("✅ Informe aprobado correctamente.");
+
+    // ✅ Recargar tabla sin refrescar la página
+    await cargarDatosModulo();
+
+    // ✅ Cerrar visor
+    document.getElementById("modalVisor").style.display = "none";
+    document.getElementById("contenedor-modulo").style.display = "block";
+
+  } catch (err) {
+    console.error("❌ Error en aprobar():", err);
+    alert("❌ No se pudo aprobar el informe.");
+  }
 });
 
 /* ======================================================================
