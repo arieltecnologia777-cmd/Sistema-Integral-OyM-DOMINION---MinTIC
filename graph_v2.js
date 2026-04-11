@@ -70,35 +70,39 @@ export async function obtenerURLTemporal(rutaItem) {
 
 
 // ======================================================================
-// MOVER ARCHIVO (APROBAR)
+// MOVER ARCHIVO (APROBAR) — VÁLIDO PARA ItemId (ej: 91)
 // ======================================================================
 
-// ======================================================================
-// MOVER ARCHIVO (APROBAR)
-// ======================================================================
+export async function moverArchivo(itemId, carpetaDestino) {
 
-export async function moverArchivo(rutaOrigen, rutaDestino) {
+    const token = await obtenerToken();
 
-    const nombreNuevo = rutaDestino.split("/").pop();
-    const carpetaDestino = rutaDestino.replace(`/${nombreNuevo}`, "");
+    // 1. Endpoint correcto para mover un Item de SharePoint
+    const url = `https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIBRARY_ID}/items/${itemId}/driveItem/move`;
 
+    // 2. Cuerpo con la carpeta destino
     const body = {
         parentReference: {
-            driveId: LIBRARY_ID,
-            id: carpetaDestino
-        },
-        name: nombreNuevo
+            path: `/drive/root:/${carpetaDestino}`
+        }
     };
 
-    const url = `${GRAPH_BASE}/sites/${SITE_ID}/drives/${LIBRARY_ID}${rutaOrigen}`;
+    const resp = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    });
 
-    try {
-        await graphFetchJson(url, "PATCH", body);
-        return true;
-    } catch (err) {
+    if (!resp.ok) {
+        const err = await resp.text();
         console.error("❌ Error moviendo archivo:", err);
-        return false;
+        throw new Error(err);
     }
+
+    return true;
 }
 // ======================================================================
 // CARGAR ARCHIVOS DESDE CARPETA (NO SE USA PARA LISTAR MCI)
