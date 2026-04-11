@@ -1,254 +1,56 @@
-/* ======================================================================
-   APP.JS — Panel Auditor (Versión completa con preview + fotos)
-====================================================================== */
-
-/* ============================
-   VARIABLES GLOBALES REALES
-============================ */
-window.moduloActivo = null;
-window.datosActuales = [];
-window.estadoInformes = {};
-window.__archivoActual = null;
-window.__mciIdActual = null;
-
-/* ============================
-   IMPORTS
-============================ */
-import { listarArchivosMCI, obtenerModulo } from "./modulos_v2.js";
-import { obtenerToken, iniciarSesion, usuarioActual, cerrarSesion } from "./auth.js";
-import { obtenerURLTemporal, moverArchivo } from "./graph_v2.js";
-
-/* ============================
-   ESTADO LOCAL
-============================ */
-function guardarEstados() {
-  localStorage.setItem("estadoInformesAuditor", JSON.stringify(window.estadoInformes));
-}
-function cargarEstados() {
-  const raw = localStorage.getItem("estadoInformesAuditor");
-  if (raw) {
-    try { window.estadoInformes = JSON.parse(raw); }
-    catch { window.estadoInformes = {}; }
-  }
-}
-
-/* ======================================================================
-   1) INICIALIZACIÓN
-====================================================================== */
-window.addEventListener("DOMContentLoaded", async () => {
-  if (!usuarioActual()) await iniciarSesion();
-  prepararSidebar();
-  cargarEstados();
-  seleccionarModulo("inicio");
-});
-
-/* ======================================================================
-   2) SIDEBAR
-====================================================================== */
-function prepararSidebar() {
-  const botones = document.querySelectorAll(".sb-item");
-  botones.forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (btn.classList.contains("logout")) {
-        cerrarSesion();
-        return;
-      }
-      botones.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      seleccionarModulo(btn.dataset.mod);
-    });
-  });
-}
-
-/* ======================================================================
-   3) SELECCIONAR MÓDULO
-====================================================================== */
-async function seleccionarModulo(mod) {
-
-  const cont = document.getElementById("contenedor-modulo");
-  cont.innerHTML = "";
-
-  if (mod === "inicio") {
-    window.moduloActivo = null;
-    cont.innerHTML = `
-    <div style="padding:20px; font-size:16px;">
-      Bienvenido al <strong>Panel Auditor</strong>.<br>
-      Selecciona un módulo en la barra lateral para comenzar.
-    </div>`;
-    return;
-  }
-
-  window.moduloActivo = obtenerModulo(mod);
-
-  if (!window.moduloActivo) {
-    cont.innerHTML = "<p>Error: módulo no encontrado.</p>";
-    return;
-  }
-
-  cont.innerHTML = generarTablaHTML(window.moduloActivo);
-  prepararEventosTabla();
-  await cargarDatosModulo();
-}
-/* ======================================================================
-   4) CARGAR DATOS DEL MÓDULO — SharePoint + KV
-====================================================================== */
-async function cargarDatosModulo() {
-
-  if (!window.moduloActivo.pendientes) {
-    document.getElementById("tbodyDatos").innerHTML = `
-    <tr><td colspan="99" style="padding:20px; text-align:center;">
-      No hay ruta configurada para este módulo.
-    </td></tr>`;
-    return;
-  }
+// ======================================================================
+// BUSCAR EL JSON ASOCIADO AL EXCEL EN LA MISMA CARPETA
+// ======================================================================
+async function obtenerJsonFotos(item) {
 
   const token = await obtenerToken();
 
-  // ✅ Lista real desde SharePoint
-  const listaOD = await listarArchivosMCI(token);
-  window.debugListaOD = listaOD;
+  // 1. Listamos TODOS los archivos de la carpeta MCI_Generados
+  const urlListar = `https://graph.microsoft.com/v1.0/sites/${SITE_ID}/drives/${LIBRARY_ID}/root:/${encodeURIComponent(FOLDER_PATH)}:/children`;
 
-  // ✅ Lista desde KV
-  const tecnico = "usuario";
-  const respKV = await fetch(
-    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`
-  );
-  const listaKV = await respKV.json();
-
-  // ✅ Mezclar SP + KV
-  for (const a of listaOD) {
-    const reg = listaKV.find(k => k.fileName === a.nombre);
-    a.mciId = reg ? reg.mciId : null;
-    a.estadoKV = reg ? reg.estado : "pendiente";
-  }
-
-  window.datosActuales = listaOD;
-
-  renderTabla();
-  setTimeout(() => activarOrdenamientoFecha(), 0);
-}
-
-/* ======================================================================
-   5) GENERAR TABLA
-====================================================================== */
-function generarTablaHTML(modulo) {
-
-  const ths = modulo.columnas.map(col => {
-    if (col.id === "fecha") {
-      return `
-      <th style="cursor:pointer;">
-        <span class="sortable" data-col="fecha" data-order="desc">
-          ${col.label} <span class="flecha">🔽</span>
-        </span>
-      </th>`;
-    }
-    return `<th>${col.label}</th>`;
-  }).join("");
-
-  return `
-  <div class="tabla-box">
-    <table class="tabla">
-      <thead><tr>${ths}<th>Acciones</th></tr></thead>
-      <tbody id="tbodyDatos">
-        <tr><td colspan="${modulo.columnas.length + 1}" style="text-align:center; padding:20px;">
-          Cargando…
-        </td></tr>
-      </tbody>
-    </table>
-  </div>`;
-}
-
-/* ======================================================================
-   6) RENDER TABLA
-====================================================================== */
-function renderTabla() {
-
-  const tbody = document.getElementById("tbodyDatos");
-
-  if (!window.datosActuales || window.datosActuales.length === 0) {
-    tbody.innerHTML = `
-    <tr><td colspan="99" style="padding:20px; text-align:center;">
-      No hay informes pendientes.
-    </td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = "";
-
-  const filtrados = window.datosActuales.filter(item =>
-    item.nombre.endsWith(".xlsx") &&
-    !item.nombre.includes("PreviewFotos")
-  );
-
-  filtrados.forEach(item => {
-    const idxReal = window.datosActuales.indexOf(item);
-
-    const tds = window.moduloActivo.columnas
-      .map(col => `<td>${item[col.id]}</td>`).join("");
-
-    const estado = item.estadoKV ?? "pendiente";
-
-    const htmlEstado =
-      estado === "pendiente"
-        ? `<button class="btn-estado btn-gris btn-revisar" data-idx="${idxReal}">Revisar</button>`
-        : estado === "en_revision"
-        ? `<button class="btn-estado btn-azul btn-revisar" data-idx="${idxReal}">✏️ Continuar revisión</button>`
-        : estado === "aprobado"
-        ? `<button class="btn-estado btn-verde" disabled>✅ Aprobado</button>`
-        : `<button class="btn-estado btn-rojo" disabled>⚠️ Pendiente por técnico</button>`;
-
-    const tr = document.createElement("tr");
-    tr.innerHTML = `${tds}<td style="text-align:center;">${htmlEstado}</td>`;
-    tbody.appendChild(tr);
+  const resp = await fetch(urlListar, {
+    headers: { "Authorization": `Bearer ${token}` }
   });
 
-  activarOrdenamientoFecha();
-  prepararEventosTabla();
-}
+  const data = await resp.json();
+  if (!data.value) return null;
 
-/* ======================================================================
-   7) ORDENAMIENTO POR FECHA
-====================================================================== */
-function activarOrdenamientoFecha() {
+  // 2. Nombre base del excel
+  const base = item.nombre;   // ejemplo: MCI_XXXX.xlsx
 
-  const th = document.querySelector("span.sortable[data-col='fecha']");
-  if (!th) return;
+  // 3. Buscar un archivo cuyo nombre empiece igual y termine en ".json"
+  const jsonFile = data.value.find(f =>
+    f.name.startsWith(base) &&
+    f.name.endsWith(".json")
+  );
 
-  th.onclick = () => {
+  if (!jsonFile) {
+    console.warn("No se encontró JSON para fotos.");
+    return null;
+  }
 
-    const estado = th.dataset.order ?? "desc";
+  // 4. Descargar el JSON
+  const urlContenido = `https://graph.microsoft.com/v1.0/sites/${SITE_ID}/drives/${LIBRARY_ID}/items/${jsonFile.id}/content`;
 
-    window.datosActuales.sort((a, b) => {
-      const fA = new Date(a.fechaReal);
-      const fB = new Date(b.fechaReal);
-      return estado === "desc" ? fA - fB : fB - fA;
-    });
-
-    th.dataset.order = estado === "desc" ? "asc" : "desc";
-    th.querySelector(".flecha").textContent =
-      estado === "desc" ? "🔽" : "🔼";
-
-    renderTabla();
-  };
-}
-/* ======================================================================
-   8) EVENTOS DE TABLA
-====================================================================== */
-function prepararEventosTabla() {
-  document.querySelectorAll(".btn-revisar").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const idx = btn.dataset.idx;
-      const item = window.datosActuales[idx];
-      await verArchivo(item);
-    });
+  const respJson = await fetch(urlContenido, {
+    headers: { "Authorization": `Bearer ${token}` }
   });
-}
 
+  const jsonTexto = await respJson.text();
+
+  try {
+    return JSON.parse(jsonTexto);
+  } catch (e) {
+    console.error("Error parsing JSON:", e);
+    return null;
+  }
+}
 /* ======================================================================
-   9) VISOR — PREVIEW XLSX + FOTOS
+   9) VISOR — PREVIEW XLSX (Excel) + CARGA DEL JSON DE FOTOS
 ====================================================================== */
 async function verArchivo(item) {
 
+  // Mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
@@ -257,26 +59,30 @@ async function verArchivo(item) {
 
   const token = await obtenerToken();
 
-  // Descargar Excel
+  // ============================================================
+  // ✅ 1. DESCARGAR EL EXCEL DESDE SHAREPOINT
+  // ============================================================
   const urlDescarga = `https://graph.microsoft.com/v1.0${item.archivo.ruta}/content`;
   const resp = await fetch(urlDescarga, {
     headers: { "Authorization": `Bearer ${token}` }
   });
+
   const blob = await resp.blob();
   const arrayBuffer = await blob.arrayBuffer();
-
   const wb = XLSX.read(arrayBuffer);
   const sheet = wb.Sheets[wb.SheetNames[0]];
 
-  /* ============================
-     PREVIEW XLSX
-  ============================= */
+  // ============================================================
+  // ✅ 2. PREVIEW DEL EXCEL USANDO SHEETJS
+  // ============================================================
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
   const visor = document.getElementById("visorIframe");
-  visor.innerHTML = "";
+  visor.innerHTML = ""; // limpiar
 
-  let html = `<table style="
+  let html = `<h3 style="margin:0 0 10px 0;">Vista previa del informe (Excel)</h3>`;
+
+  html += `<table style="
       width:100%;
       border-collapse:collapse;
       font-family:Segoe UI, sans-serif;
@@ -298,68 +104,140 @@ async function verArchivo(item) {
 
   html += `</table>`;
 
-  /* ============================
-     PREVIEW FOTOS
-  ============================= */
-  if (item.fotosPreview && Array.isArray(item.fotosPreview)) {
-
-    html += `
-    <div style="display:flex; flex-wrap:wrap; gap:20px;">
-    `;
-
-    for (const foto of item.fotosPreview) {
-
-      const urlTemp = await obtenerURLTemporal(foto.ruta);
-
-      html += `
-        <div style="
-          width:300px;
-          border:1px solid #d0d7e7;
-          border-radius:10px;
-          padding:10px;
-          background:white;
-        ">
-          <img src="${urlTemp}" style="width:100%; border-radius:8px;">
-          <div style="text-align:center; margin-top:6px; font-size:13px;">
-            ${foto.nombre}
-          </div>
-        </div>
-      `;
-    }
-
-    html += `</div>`;
-  }
-
+  // Ponemos temporalmente el HTML del Excel (fotos vienen después)
   visor.innerHTML = html;
+
+  // ============================================================
+  // ✅ 3. AHORA BUSCAR EL JSON ASOCIADO (PARTE 1)
+  // ============================================================
+  const jsonFotos = await obtenerJsonFotos(item);
+
+  // Guardamos fotos, aunque sean null
+  item.fotosPreview = jsonFotos;
+
+  // La Parte 3 (próxima que te envío) dibuja las fotos.
+  if (jsonFotos) {
+    visor.innerHTML += `<h3 style="margin-top:20px;">Fotos registradas</h3>`;
+  } else {
+    visor.innerHTML += `<p style="color:#888;">(Este informe no tiene fotos asociadas)</p>`;
+  }
 }
 /* ======================================================================
-   10) BOTÓN VOLVER
+   9-B) RENDERIZAR FOTOS DEL JSON (Galería dentro del visor)
+====================================================================== */
+async function renderizarFotos(item) {
+
+  const visor = document.getElementById("visorIframe");
+
+  // Si no hay JSON de fotos, no se hace nada
+  if (!item.fotosPreview) {
+    visor.innerHTML += `<p style="color:#888;">(Este informe no tiene fotos asociadas)</p>`;
+    return;
+  }
+
+  const fotos = item.fotosPreview; // Objeto JSON con fotos base64
+
+  // Área de galería
+  let htmlFotos = `
+    <h3 style="margin-top:20px;">Fotos del informe</h3>
+    <div style="
+      display:flex;
+      flex-wrap:wrap;
+      gap:20px;
+      margin-top:10px;
+    ">
+  `;
+
+  // Recorre cada propiedad del JSON: gps, apInt, apExt1, ...
+  for (const clave in fotos) {
+    const base64 = fotos[clave];    // valor tipo "data:image/jpeg;base64,..."
+
+    if (!base64) continue;
+
+    htmlFotos += `
+      <div style="
+        width:260px;
+        border:1px solid #d0d7e7;
+        border-radius:10px;
+        padding:10px;
+        background:white;
+      ">
+        <img src="${base64}" style="width:100%; border-radius:8px;" />
+        <div style="text-align:center; margin-top:8px; font-size:13px;">
+          ${clave}
+        </div>
+      </div>
+    `;
+  }
+
+  htmlFotos += `</div>`;
+
+  // Agregar fotos al visor bajo el Excel
+  visor.innerHTML += htmlFotos;
+}
+/* ======================================================================
+   10) BOTÓN "VOLVER" — CERRAR VISOR Y REGRESAR A LA TABLA
 ====================================================================== */
 document.getElementById("visorVolver").addEventListener("click", () => {
 
+  // Ocultar modal
   document.getElementById("modalVisor").style.display = "none";
+
+  // Mostrar tabla otra vez
   document.getElementById("contenedor-modulo").style.display = "block";
 
+  // Volver a dibujar tabla
   renderTabla();
 });
 
+
 /* ======================================================================
-   11) APROBAR
+   11) APROBAR — ACTUALIZA KV Y CIERRA VISOR
 ====================================================================== */
 document.getElementById("visorAprobar").addEventListener("click", async () => {
 
   const mciIdReal = window.__mciIdActual;
 
   if (!mciIdReal) {
-    alert("❌ Error: No se encontró el mciId para este informe.");
+    alert("❌ No se encontró el mciId para este informe.");
     return;
   }
 
+  // Llamar API KV para aprobar
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciIdReal}`,
     { method: "PUT" }
   );
 
+  // Cerrar visor
   document.getElementById("visorVolver").click();
+
+  // Actualizar tabla
+  renderTabla();
+});
+
+
+/* ======================================================================
+   12) BOTÓN "RECHAZAR" — (OPCIONAL)
+====================================================================== */
+document.getElementById("visorRechazar").addEventListener("click", async () => {
+
+  const mciIdReal = window.__mciIdActual;
+
+  if (!mciIdReal) {
+    alert("❌ No se encontró el mciId para este informe.");
+    return;
+  }
+
+  // Rechazar en KV (si existiera endpoint, ejemplo)
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciIdReal}`,
+    { method: "PUT" }
+  );
+
+  // Cerrar visor
+  document.getElementById("visorVolver").click();
+
+  // Actualizar tabla
   renderTabla();
 });
