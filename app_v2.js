@@ -351,12 +351,15 @@ async function renderizarFotos(item) {
   const fotos = item.fotosPreview;
   if (!fotos) return;
 
-  let html = `<div style="
-      display:flex;
-      flex-wrap:wrap;
-      gap:28px;
-      margin-top:10px;
-    ">`;
+  // === CONTENEDOR GRID RESPONSIVE (SIN ESPACIOS BLANCOS) ===
+  let html = `
+    <div style="
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 22px;
+      width: 100%;
+    ">
+  `;
 
   for (const clave in fotos) {
 
@@ -365,23 +368,33 @@ async function renderizarFotos(item) {
 
     html += `
       <div style="
-        width:260px;
-        background:#fff;
-        border:1px solid #dde5f8;
-        border-radius:12px;
-        overflow:hidden;
-        box-shadow:0 6px 15px rgba(0,0,0,.08);
+        background: #fff;
+        border: 1px solid #dde5f8;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0,0,0,.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
       ">
-        <div style="padding:10px 12px; font-weight:700;">${clave}</div>
 
-        <img src="${base64}"
-     style="
-       width:100%;
-       height:180px;
-       object-fit:cover;
-       border-radius:10px;
-       display:block;
-     ">
+        <!-- Título superior -->
+        <div style="
+          padding: 10px 12px;
+          font-weight: 700;
+          font-size: 14px;
+        ">
+          ${clave}
+        </div>
+
+        <!-- Imagen recortada, centrada y del mismo tamaño -->
+        <img src="${base64}" style="
+          width: 100%;
+          height: 180px;
+          object-fit: cover;
+          object-position: center;
+          display: block;
+          border-radius: 0 0 12px 12px;
+        ">
       </div>
     `;
   }
