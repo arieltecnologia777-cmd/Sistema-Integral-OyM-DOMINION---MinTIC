@@ -152,6 +152,7 @@ async function cargarDatosModulo() {
     const reg = listaKV.find(k => k.fileName === a.nombre);
     a.mciId = reg ? reg.mciId : null;
     a.estadoKV = reg ? reg.estado : "pendiente";
+    a.fileId = reg ? reg.fileId : null;
   });
 
   window.datosActuales = listaOD;
@@ -533,7 +534,7 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
 
     // ✅ 2. Mover archivo a la carpeta APROBADOS usando Graph
     console.log("📦 Moviendo archivo a MCI_Aprobados…");
-    await moverArchivo(item.archivo.id, "MCI_Aprobados");
+    await moverArchivo(item.fileId, "MCI_Aprobados");
     console.log("✅ Archivo movido correctamente.");
 
     // ✅ 3. Mostrar mensaje
