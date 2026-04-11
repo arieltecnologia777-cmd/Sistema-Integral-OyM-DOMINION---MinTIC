@@ -282,30 +282,37 @@ async function obtenerJsonFotos(item) {
 ====================================================================== */
 async function verArchivo(item) {
 
+  // ✅ Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
+  // ✅ Guardar referencia global
   window.__archivoActual = item;
   window.__mciIdActual = item.mciId ?? null;
 
+  // ✅ Obtener token para Graph
   const token = await obtenerToken();
 
-  // === Descargar Excel desde SharePoint ===
+  // ✅ Descargar EXCEL desde SharePoint
   const urlDescarga = `https://graph.microsoft.com/v1.0${item.archivo.ruta}/content`;
-  const resp = await fetch(urlDescarga, { headers: { "Authorization": `Bearer ${token}` } });
+  const resp = await fetch(urlDescarga, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+
   const arrayBuffer = await (await resp.blob()).arrayBuffer();
 
+  // ✅ Leer Excel
   const wb = XLSX.read(arrayBuffer);
   const sheet = wb.Sheets[wb.SheetNames[0]];
 
-  // === Rangos EXCEL ORIGINALES (estilo Dominion) ===
-  const htmlInfoGeneral   = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
-  const htmlDescripcion   = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
-  const htmlDeclaracion   = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
+  // ✅ RANGOS ORIGINALES EXACTOS
+  const htmlInfoGeneral = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
+  const htmlDescripcion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
+  const htmlDeclaracion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
 
+  // ✅ Render del visor
   const visor = document.getElementById("visorIframe");
 
-  // === CONTENEDOR DOMINION COMPLETO ===
   visor.innerHTML = `
     <div style="
       background:white;
@@ -315,22 +322,68 @@ async function verArchivo(item) {
       box-shadow:0 8px 24px rgba(0,0,0,.12);
     ">
 
-      <h2 style="margin:0 0 18px 0;">Información del técnico</h2>
-      <div class="auditor-block">${htmlInfoGeneral}</div>
+      <!-- ✅ ENCABEZADO 1 — Información general -->
+      <div style="
+        background:#eef1f6;
+        padding:14px 18px;
+        border-radius:10px;
+        font-weight:800;
+        font-size:15px;
+        color:#203054;
+        border:1px solid #d6dce8;
+        margin-bottom:14px;
+      ">
+        Información del Beneficiario y la Institución
+      </div>
 
-      <h2 style="margin:30px 0 10px 0;">Descripción</h2>
-      <div class="auditor-block">${htmlDescripcion}</div>
+      <div class="auditor-block">
+        ${htmlInfoGeneral}
+      </div>
 
-      <h2 style="margin:30px 0 10px 0;">Declaración</h2>
-      <div class="auditor-block">${htmlDeclaracion}</div>
+      <!-- ✅ ENCABEZADO 2 — Descripción -->
+      <div style="
+        background:#eef1f6;
+        padding:14px 18px;
+        border-radius:10px;
+        font-weight:800;
+        font-size:15px;
+        color:#203054;
+        border:1px solid #d6dce8;
+        margin:28px 0 14px 0;
+      ">
+        Descripción del Caso
+      </div>
 
+      <div class="auditor-block">
+        ${htmlDescripcion}
+      </div>
+
+      <!-- ✅ ENCABEZADO 3 — Declaración -->
+      <div style="
+        background:#eef1f6;
+        padding:14px 18px;
+        border-radius:10px;
+        font-weight:800;
+        font-size:15px;
+        color:#203054;
+        border:1px solid #d6dce8;
+        margin:28px 0 14px 0;
+      ">
+        Declaración
+      </div>
+
+      <div class="auditor-block">
+        ${htmlDeclaracion}
+      </div>
+
+      <!-- ✅ Sección de fotos -->
       <h2 style="margin:30px 0 10px 0;">Fotos del informe (vista previa)</h2>
       <div id="visorFotos"></div>
 
     </div>
   `;
 
-  // === Cargar JSON de fotos (base64) ===
+  // ✅ Cargar JSON de fotos generado por tu Flow
   const jsonFotos = await obtenerJsonFotos(item);
   item.fotosPreview = jsonFotos;
 
