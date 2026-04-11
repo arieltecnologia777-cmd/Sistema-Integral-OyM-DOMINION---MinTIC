@@ -70,22 +70,22 @@ export async function obtenerURLTemporal(rutaItem) {
 
 
 // ======================================================================
-// MOVER ARCHIVO (APROBAR) — VÁLIDO PARA ItemId (ej: 91)
+// MOVER ARCHIVO (APROBAR) — VÁLIDO PARA driveId + ItemId REAL (ej: 95)
 // ======================================================================
 
 export async function moverArchivo(itemId, carpetaDestino) {
 
     const token = await obtenerToken();
 
-    // 1. Endpoint correcto para mover un Item de SharePoint
-    const url = `https://graph.microsoft.com/v1.0/sites/${SITE_ID}/lists/${LIBRARY_ID}/items/${itemId}/driveItem/move`;
-
-    // 2. Cuerpo con la carpeta destino
+    // Carpeta destino dentro de la biblioteca
     const body = {
         parentReference: {
             path: `/drive/root:/${carpetaDestino}`
         }
     };
+
+    // ✅ Endpoint correcto → mover driveItem usando driveId + itemId
+    const url = `https://graph.microsoft.com/v1.0/drives/${LIBRARY_ID}/items/${itemId}`;
 
     const resp = await fetch(url, {
         method: "PATCH",
@@ -97,9 +97,9 @@ export async function moverArchivo(itemId, carpetaDestino) {
     });
 
     if (!resp.ok) {
-        const err = await resp.text();
-        console.error("❌ Error moviendo archivo:", err);
-        throw new Error(err);
+        const txt = await resp.text();
+        console.error("❌ Error moviendo archivo:", txt);
+        throw new Error(txt);
     }
 
     return true;
