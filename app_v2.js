@@ -310,36 +310,45 @@ async function verArchivo(item) {
   const htmlDescripcion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
   const htmlDeclaracion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
 
-   // === ARREGLAR ENCABEZADOS GRIS EXACTOS ===
+   // === ENCABEZADOS EXACTOS DEL EXCEL A PINTAR EN GRIS ===
 let info = htmlInfoGeneral;
 
-// Lista exacta de títulos que deben ir en gris
 const camposGrises = [
-  "N° DE CASO:",
-  "FECHA:",
-  "CONTRATO No.",
+  "N° DE CASO",
+  "FECHA",
+  "CONTRATO No",
   "CONTRATISTA",
   "DEPARTAMENTO",
   "MUNICIPIO",
   "CENTRO POBLADO",
   "SEDE INSTITUCIÓN EDUCATIVA O CASO ESPECIAL",
-  "ID BENEFICIARIO",
-  "NOMBRE DEL RESPONSABLE (RESPONSABLE DE LA INSTITUCIÓN EDUCATIVA / AUTORIDAD COMPETENTE)",
+  "CORREO ELECTRÓNICO",
+  "3. DESCRIPCIÓN DE LA FALLA",
+  "4. DECLARACIÓN",
+  "DATOS DE QUIEN ACOMPAÑA EN EL CENTRO DIGITAL",
+  "NOMBRES Y APELLIDOS",
+  "CARGO",
   "NÚMERO DE CEDULA",
-  "NÚMERO DE CONTACTO",
-  "CORREO ELECTRÓNICO"
+  "NÚMERO DE TELÉFONO O CELULAR 1",
+  "NÚMERO DE TELÉFONO O CELULAR 2",
+  "DATOS DE QUIEN REPARA EL SERVICIO EN EL CENTRO DIGITAL",
+  "NÚMERO DE TELÉFONO O  CELULAR",
+  "FIRMA"
 ];
 
-// Para cada encabezado, aplicar fondo gris
+// REGEX para detectar encabezados dentro de cualquier <td>
 camposGrises.forEach(titulo => {
-  info = info.replaceAll(
-    `<td>${titulo}</td>`,
-    `<td style="background:#eef1f6; font-weight:700; border:1px solid #d6dce8;">${titulo}</td>`
-  );
+  const regex = new RegExp(`<td[^>]*>\\s*${titulo}[^<]*<\\/td>`, "gi");
+
+  info = info.replace(regex, (match) => {
+    return match.replace(
+      "<td",
+      `<td style="background:#eef1f6; font-weight:700; border:1px solid #d6dce8;"`
+    );
+  });
 });
 
 htmlInfoGeneral = info;
-
   // ✅ Render del visor
   const visor = document.getElementById("visorIframe");
 
