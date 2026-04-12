@@ -68,42 +68,6 @@ export async function obtenerURLTemporal(rutaItem) {
     return json?.link?.webUrl ?? null;
 }
 
-
-// ======================================================================
-// MOVER ARCHIVO (APROBAR) — VÁLIDO PARA driveId + ItemId REAL (ej: 95)
-// ======================================================================
-
-export async function moverArchivo(itemId, carpetaDestino) {
-
-    const token = await obtenerToken();
-
-    // Carpeta destino dentro de la biblioteca
-    const body = {
-        parentReference: {
-            path: `/drive/root:/${carpetaDestino}`
-        }
-    };
-
-    // ✅ Endpoint correcto → mover driveItem usando driveId + itemId
-    const url = `https://graph.microsoft.com/v1.0/drives/${LIBRARY_ID}/items/${itemId}`;
-
-    const resp = await fetch(url, {
-        method: "PATCH",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-    });
-
-    if (!resp.ok) {
-        const txt = await resp.text();
-        console.error("❌ Error moviendo archivo:", txt);
-        throw new Error(txt);
-    }
-
-    return true;
-}
 // ======================================================================
 // CARGAR ARCHIVOS DESDE CARPETA (NO SE USA PARA LISTAR MCI)
 // PERO SE DEJA POR COMPATIBILIDAD
