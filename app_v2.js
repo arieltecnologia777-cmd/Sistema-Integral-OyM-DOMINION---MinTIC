@@ -289,9 +289,11 @@ async function verArchivo(item) {
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-  // ✅ Guardar referencia global
-  window.__archivoActual = item;
-  window.__mciIdActual = item.nombre.replace(".xlsx", "");
+ // ✅ Guardar referencia global
+window.__archivoActual = item;
+
+// ✅ mciId SIEMPRE desde el nombre del archivo
+window.__mciIdActual = item.nombre.replace(".xlsx", "");
 
 
   // ✅ Obtener token para Graph
