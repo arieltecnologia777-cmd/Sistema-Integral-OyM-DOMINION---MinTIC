@@ -5676,9 +5676,14 @@ const KV_URL = "https://cloudflare-index.modulo-de-exclusiones.workers.dev/regis
 
 // ✅ Nueva función registrarEnKV — versión final y completa
 // ✅ Nueva función registrarEnKV — DEFINITIVA
-async function registrarEnKV(mciId, fileId, fileName, tecnico, fileUrl) {
+async function registrarEnKV(mciId, tecnico) {
   try {
-    const payload = { mciId, fileId, fileName, tecnico, fileUrl };
+    const payload = {
+      mciId,
+      tecnico,
+      estado: "pendiente",
+      fileUrl: null
+    };
 
     const resp = await fetch(KV_URL, {
       method: "POST",
