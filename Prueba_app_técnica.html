@@ -6021,9 +6021,10 @@ if (!resp.ok) {
   throw new Error(`Error HTTP ${resp.status} al generar el informe`);
 }
 
+await registrarEnKV(numeroCaso, tecnicoActual);
+
 setStatus("✅ Informe enviado para revisión del auditor", "ok");
 alert("El informe fue enviado correctamente. El auditor lo revisará y aprobará.");
-
     }catch(err){
         console.error(err);
         setStatus('Error al generar: ' + err.message, 'err');
