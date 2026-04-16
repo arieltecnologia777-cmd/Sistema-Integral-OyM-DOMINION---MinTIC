@@ -5680,6 +5680,8 @@ async function registrarEnKV(mciId, tecnico) {
   try {
     const payload = {
       mciId,
+      fileId: "",          // ✅ requerido por el Worker
+      fileName: "",        // ✅ requerido por el Worker
       tecnico,
       estado: "pendiente",
       fileUrl: null
