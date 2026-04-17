@@ -292,14 +292,6 @@ async function verArchivo(item) {
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
- // ✅ Guardar referencia global
-window.__archivoActual = item;
-
-// ✅ mciId SIEMPRE desde el nombre del archivo
-const match = item.nombre.match(/OT\d+/);
-window.__mciIdActual = match ? match[0] : null;
-
-
   // ✅ Obtener token para Graph
   const token = await obtenerToken();
 
@@ -566,14 +558,16 @@ const mciId = match ? match[0] : null;
 ====================================================================== */
 document.getElementById("visorRechazar").addEventListener("click", async () => {
 
-  const mciId = window.__mciIdActual;
-  if (!mciId) return alert("❌ No se encontró mciId.");
+  const nombreArchivo = window.__archivoActual?.nombre || "";
+const match = nombreArchivo.match(/OT\d+|TM\d+/);
+const mciId = match ? match[0] : null;
 
-  await fetch(
-    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
-    { method: "PUT" }
-  );
+if (!mciId) {
+  alert("❌ No se encontró el mciId.");
+  return;
+}
 
-  document.getElementById("visorVolver").click();
-  renderTabla();
-});
+await fetch(
+  `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
+  { method: "PUT" }
+);
