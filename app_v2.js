@@ -148,18 +148,20 @@ async function cargarDatosModulo() {
   const listaKV = await respKV.json();
   console.log("KV recibido:", listaKV);
 
-  // ✅ Mezcla SP + KV
-  listaOD.forEach(a => {
+  // ✅ Mezcla SP + KV (BLOQUE FINAL CORRECTO)
+listaOD.forEach(a => {
+
   const reg = listaKV.find(k => {
     const id = k.mciId || k.mcid;
     return id && a.nombre.includes(id);
   });
 
+  // mciId y estado vienen de KV
   a.mciId    = reg ? (reg.mciId || reg.mcid) : null;
   a.estadoKV = reg ? reg.estado : "pendiente";
 
-  // ✅ fileId REAL viene de Graph (a.id)
-  a.fileId = a.id || null;
+  // ✅ NO tocar fileId
+  // El fileId REAL ya viene desde SharePoint (listarArchivosMCI)
 });
 
   window.datosActuales = listaOD;
