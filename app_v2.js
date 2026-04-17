@@ -151,12 +151,15 @@ async function cargarDatosModulo() {
   // ✅ Mezcla SP + KV
   listaOD.forEach(a => {
   const reg = listaKV.find(k => {
-  const id = k.mciId || k.mcid;
-  return id && a.nombre.includes(id);
-});
-a.mciId = reg ? (reg.mciId || reg.mcid) : null;
+    const id = k.mciId || k.mcid;
+    return id && a.nombre.includes(id);
+  });
+
+  a.mciId    = reg ? (reg.mciId || reg.mcid) : null;
   a.estadoKV = reg ? reg.estado : "pendiente";
-  a.fileId = a.archivo?.id || null;   // ✅ AGREGA ESTA LÍNEA
+
+  // ✅ fileId REAL viene de Graph (a.id)
+  a.fileId = a.id || null;
 });
 
   window.datosActuales = listaOD;
