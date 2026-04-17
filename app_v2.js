@@ -509,68 +509,35 @@ document.getElementById("visorVolver").addEventListener("click", () => {
 ====================================================================== */
 document.getElementById("visorAprobar").addEventListener("click", async () => {
 
-  const nombreArchivo = window.__archivoActual?.nombre || "";
-const match = nombreArchivo.match(/OT\d+|TM\d+/);
-const mciId = match ? match[0] : null;
-
   const item = window.__archivoActual;
+  const mciId = item?.mciId || null;
 
-  if (!mciId) {
-    alert("❌ No se encontró el mciId.");
-    return;
-  }
+  if (!mciId) return;
 
-  console.log("⚡ Enviando aprobación al Worker…", mciId);
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
+    { method: "PUT" }
+  );
 
-  try {
-    // ✅ 1. Aprobar en KV
-    const resp = await fetch(
-      `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
-      { method: "PUT" }
-    );
+  await cargarDatosModulo();
 
-    const data = await resp.json();
-    console.log("✅ Respuesta del Worker:", data);
-
-    if (!resp.ok || !data.ok) {
-      alert("❌ Error al aprobar en Cloudflare KV.");
-      return;
-    }
-
-    
-
-    // ✅ 3. Mostrar mensaje
-    alert("✅ Informe aprobado correctamente.");
-
-    // ✅ 4. Recargar la tabla sin refrescar toda la página
-    await cargarDatosModulo();
-
-    // ✅ 5. Cerrar visor
-    document.getElementById("modalVisor").style.display = "none";
-    document.getElementById("contenedor-modulo").style.display = "block";
-
-  } catch (err) {
-    console.error("❌ Error en aprobar():", err);
-    alert("❌ No se pudo completar la aprobación.");
-  }
+  document.getElementById("modalVisor").style.display = "none";
+  document.getElementById("contenedor-modulo").style.display = "block";
 });
+
 
 /* ======================================================================
    16) RECHAZAR (OPCIONAL)
 ====================================================================== */
 document.getElementById("visorRechazar").addEventListener("click", async () => {
 
-  const nombreArchivo = window.__archivoActual?.nombre || "";
-const match = nombreArchivo.match(/OT\d+|TM\d+/);
-const mciId = match ? match[0] : null;
+  const item = window.__archivoActual;
+  const mciId = item?.mciId || null;
 
+  if (!mciId) return;
 
-if (!mciId) {
-  alert("❌ No se encontró el mciId.");
-  return;
-}
-
-await fetch(
-  `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
-  { method: "PUT" }
-);
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
+    { method: "PUT" }
+  );
+});
