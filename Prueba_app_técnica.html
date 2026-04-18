@@ -6484,7 +6484,7 @@ document.getElementById("downloadBtn").onclick = async () => {
             return;
         }
 
-        // ✅ AHORA ESPERAMOS JSON, NO BLOB
+        // ✅ Ahora el flujo devuelve JSON con Base64
         const { fileName, fileB64 } = await resp.json();
 
         const bytes = atob(fileB64);
