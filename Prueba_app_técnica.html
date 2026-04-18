@@ -5640,7 +5640,65 @@ if (saveDraftBtn) {
 // --- RESTAURAR AUTOMÁTICO AL INICIAR ---
 restoreDraft();
 
+// ===============================
+// UTILIDADES DE IMÁGENES (RESTAURADAS)
+// ===============================
 
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result || '');
+    fr.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+    fr.readAsDataURL(file);
+  });
+}
+
+function downscaleDataUrl(dataUrl, maxPx = 1600, quality = 0.85) {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth || img.width;
+        const h = img.naturalHeight || img.height;
+        const scale = Math.min(1, maxPx / Math.max(w, h));
+        if (scale < 1) {
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(w * scale);
+          canvas.height = Math.round(h * scale);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        } else {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    } catch {
+      resolve(dataUrl);
+    }
+  });
+}
+
+// ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
+async function getFoto(id, maxPx = 1600, quality = 0.85) {
+  const input = document.getElementById(id);
+
+  // 1️⃣ Si el input tiene archivo → usarlo
+  if (input && input.files && input.files[0]) {
+    const raw = await fileToDataURL(input.files[0]);
+    return await downscaleDataUrl(raw, maxPx, quality);
+  }
+
+  // 2️⃣ Si NO tiene archivo → cargar desde IndexedDB
+  return new Promise(resolve => {
+    cargarFotoOffline(id, async base64 => {
+      if (!base64) return resolve("");
+      const scaled = await downscaleDataUrl(base64, maxPx, quality);
+      resolve(scaled);
+    });
+  });
+}
     // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
     const FLOW_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/22e52a8b0ddf4b26aa1c13ee9df6d12c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uVH7aAkzxBXlzwLu6tw4_HX6WmaheUTZtR14-P9miXI';
 
