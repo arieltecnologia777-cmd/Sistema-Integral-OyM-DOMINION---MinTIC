@@ -6370,7 +6370,7 @@ setTimeout(async () => {
     if (!btn) return;
 
     if (informe) {
-        window.__fileUrlActual = informe.fileUrl;
+        
         console.log("✅ Informe aprobado — habilitando botón de descarga (login manual)");
         btn.style.display = "block";
     } else {
@@ -6397,7 +6397,7 @@ setTimeout(async () => {
         const btn2 = document.getElementById("downloadBtn");
         if (btn2) {
             if (informe) {
-                window.__fileUrlActual = informe.fileUrl;
+                
                 console.log("✅ Informe aprobado — habilitando botón (retry)");
                 btn2.style.display = "block";
             } else {
@@ -6409,10 +6409,12 @@ setTimeout(async () => {
 }
 
     if (informe) {
-        window.__fileUrlActual = informe.fileUrl;
-        console.log("✅ Informe aprobado — habilitando botón de descarga");
-        btn.style.display = "block";
-    } else {
+    window.__mciIdActual = informe.mciId;
+    localStorage.setItem("ultimoMciId", informe.mciId);
+
+    console.log("✅ Informe aprobado — mciId fijado:", informe.mciId);
+    btn.style.display = "block";
+} else {
         console.log("📌 Aún no aprobado en KV");
         btn.style.display = "none";
     }
@@ -6453,7 +6455,7 @@ if (informe && informe.mciId) {
       if (!btn) return;
 
       if (informe) {
-          window.__fileUrlActual = informe.fileUrl;
+          
           console.log("✅ Informe aprobado — habilitando botón de descarga (auto-login)");
           btn.style.display = "block";
       } else {
@@ -6465,6 +6467,8 @@ if (informe && informe.mciId) {
 }
 
 document.getElementById("downloadBtn").onclick = async () => {
+
+    window.__mciIdActual = window.__mciIdActual || localStorage.getItem("ultimoMciId");
 
     const mciId = window.__mciIdActual;
     if (!mciId) {
