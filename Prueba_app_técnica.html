@@ -5702,6 +5702,9 @@ async function getFoto(id, maxPx = 1600, quality = 0.85) {
       // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
     const FLOW_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/22e52a8b0ddf4b26aa1c13ee9df6d12c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uVH7aAkzxBXlzwLu6tw4_HX6WmaheUTZtR14-P9miXI';
 
+    // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
+    const FLOW_DESCARGAR_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/9310fab7f1414cb883b670bc9a4d87d6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=Dp99TuJKR8dF91xIftSR37Ki92CHtqYuvOEOYMeD4ZQ';
+    
 // ✅ Endpoint Cloudflare KV
 const KV_URL = "https://cloudflare-index.modulo-de-exclusiones.workers.dev/registrar";
 
@@ -6545,8 +6548,8 @@ document.getElementById("downloadBtn").onclick = async () => {
   }
 
   try {
-    // 2️⃣ Llamar SOLO al flujo GRANDE
-    const resp = await fetch(FLOW_URL, {
+    // 2️⃣ Llamar a flujo FLOW_DESCARGAR_URL
+    const resp = await fetch(FLOW_DESCARGAR_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
