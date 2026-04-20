@@ -251,6 +251,7 @@ function prepararEventosTabla() {
 /* ======================================================================
    11) BUSCAR JSON DE FOTOS EN ONEDRIVE
 ====================================================================== */
+console.log("DEBUG: entrar a obtenerJsonFotos", item);
 async function obtenerJsonFotos(item) {
   const resp = await fetch(FLOW_GET_FOTOS_PREVIEW, {
     method: "POST",
