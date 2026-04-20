@@ -6094,9 +6094,7 @@ if (!resp.ok) {
 await registrarEnKV({
   mciId: numeroCaso,
   tecnico: tecnicoActual,
-  fileName: null, // ← se completa en el flujo
-  fileIdentifierExcel: fileIdentifierExcel,
-  jsonFileId: jsonFileId
+  fileName: null
 });
       
 setStatus("✅ Informe enviado para revisión del auditor", "ok");
