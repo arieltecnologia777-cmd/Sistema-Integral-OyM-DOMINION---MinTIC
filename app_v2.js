@@ -295,7 +295,7 @@ async function verArchivo(item) {
 
   // === LEER EXCEL ===
   const wb = XLSX.read(arrayBuffer);
-  const sheet = wb.Sheets[wb.SheetNames[wb.SheetNames.length - 1]];
+  const sheet = wb.Sheets[wb.SheetNames[0]];
 
   // === ELIMINAR SAP, EQUIPOS, SERIALES (IGUAL QUE ANTES) ===
   const eliminarFilas = (sheet, desde, hasta) => {
