@@ -245,14 +245,15 @@ function prepararEventosTabla() {
   });
 }
 /* ======================================================================
-   11) BUSCAR JSON DE FOTOS EN SHAREPOINT
+   11) BUSCAR JSON DE FOTOS EN ONEDRIVE
 ====================================================================== */
 async function obtenerJsonFotos(item) {
-  const resp = await fetch(FLOW_GET_JSON_PREVIEW_ONEDRIVE, {
+  const resp = await fetch(FLOW_GET_ONEDRIVE_FILE, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      jsonFileId: item.jsonFileId
+      tipo: "json",
+      fileId: item.jsonFileId
     })
   });
 
@@ -265,166 +266,98 @@ async function obtenerJsonFotos(item) {
    12) VER ARCHIVO — PREVIEW EXCEL + JSON (ESTILO ORIGINAL)
 ====================================================================== */
 async function verArchivo(item) {
-   window.__archivoActual = item;
+  window.__archivoActual = item;
 
-  console.log("🟨 item completo:", item);
-  console.log("🟦 fileId en auditor:", item.fileId);
-
-
-  // ✅ Ocultar tabla y mostrar modal
+  // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-  // ✅ Obtener token para Graph
-  const token = await obtenerToken();
+  // === OBTENER EXCEL DESDE ONEDRIVE (FLOW ÚNICO) ===
+  const resp = await fetch(FLOW_GET_ONEDRIVE_FILE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      tipo: "excel",
+      fileId: item.fileIdentifierExcel
+    })
+  });
 
-  // ✅ Descargar EXCEL desde SharePoint
-  const resp = await fetch(FLOW_GET_EXCEL_PREVIEW_ONEDRIVE, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    fileId: item.fileIdentifierExcel
-  })
-});
+  if (!resp.ok) {
+    throw new Error("No se pudo obtener el Excel desde OneDrive");
+  }
 
-if (!resp.ok) {
-  throw new Error("No se pudo obtener el Excel desde OneDrive");
-}
+  const blob = await resp.blob();
+  const arrayBuffer = await blob.arrayBuffer();
 
-const blob = await resp.blob();
-const arrayBuffer = await blob.arrayBuffer();
-
-
-  // ✅ Leer Excel
+  // === LEER EXCEL ===
   const wb = XLSX.read(arrayBuffer);
   const sheet = wb.Sheets[wb.SheetNames[0]];
 
-  // ✅ RANGOS ORIGINALES EXACTOS (IMPORTANTE: todas en let)
-  let htmlInfoGeneral  = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
-  let htmlDescripcion  = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
-  let htmlDeclaracion  = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
+  let htmlInfoGeneral = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B9:P18" });
+  let htmlDescripcion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B69:P69" });
+  let htmlDeclaracion = XLSX.utils.sheet_to_html({ ...sheet, "!ref": "B71:M77" });
 
-  // ✅ FUNCIÓN PARA PINTAR SOLO LOS CAMPOS REALES DEL EXCEL
   function pintarGris(html) {
-
     const campos = [
-      "N° DE CASO",
-      "FECHA",
-      "CONTRATO No",
-      "CONTRATISTA",
-      "DEPARTAMENTO",
-      "MUNICIPIO",
-      "CENTRO POBLADO",
-      "SEDE INSTITUCIÓN EDUCATIVA O CASO ESPECIAL",
-      "ID BENEFICIARIO",
+      "N° DE CASO","FECHA","CONTRATO No","CONTRATISTA","DEPARTAMENTO","MUNICIPIO",
+      "CENTRO POBLADO","SEDE INSTITUCIÓN EDUCATIVA O CASO ESPECIAL","ID BENEFICIARIO",
       "NOMBRE DEL RESPONSABLE (RESPONSABLE DE LA INSTITUCIÓN EDUCATIVA / AUTORIDAD COMPETENTE)",
-      "NÚMERO DE CEDULA",
-      "NÚMERO DE CONTACTO",
-      "CORREO ELECTRÓNICO",
-      "3. DESCRIPCIÓN DE LA FALLA / HALLAZGOS",
-      "4. DECLARACIÓN",
-      "DATOS DE QUIEN ACOMPAÑA EN EL CENTRO DIGITAL",
-      "NOMBRES Y APELLIDOS",
-      "CARGO",
-      "NÚMERO DE CEDULA",
-      "NÚMERO DE TELÉFONO O CELULAR 1",
+      "NÚMERO DE CEDULA","NÚMERO DE CONTACTO","CORREO ELECTRÓNICO",
+      "3. DESCRIPCIÓN DE LA FALLA / HALLAZGOS","4. DECLARACIÓN",
+      "DATOS DE QUIEN ACOMPAÑA EN EL CENTRO DIGITAL","NOMBRES Y APELLIDOS","CARGO",
+      "NÚMERO DE CEDULA","NÚMERO DE TELÉFONO O CELULAR 1",
       "NÚMERO DE TELÉFONO O CELULAR 2",
       "DATOS DE QUIEN REPARA EL SERVICIO EN EL CENTRO DIGITAL",
-      "NÚMERO DE TELÉFONO O  CELULAR",
-      "FIRMA"
+      "NÚMERO DE TELÉFONO O CELULAR","FIRMA"
     ];
 
     campos.forEach(t => {
       const rg = new RegExp(`(<td[^>]*>\\s*${t}[^<]*</td>)`, "gi");
-      html = html.replace(rg, celda =>
-        celda.replace(
-          "<td",
-          `<td style="background:#eef1f6; font-weight:700; border:1px solid #d6dce8;"`
-        )
+      html = html.replace(rg, c =>
+        c.replace("<td", `<td style="background:#eef1f6;font-weight:700;border:1px solid #d6dce8;"`)
       );
     });
-
     return html;
   }
 
-  // ✅ APLICAR A LOS TRES RANGOS
-  htmlInfoGeneral  = pintarGris(htmlInfoGeneral);
-  htmlDescripcion  = pintarGris(htmlDescripcion);
-  htmlDeclaracion  = pintarGris(htmlDeclaracion);
+  htmlInfoGeneral = pintarGris(htmlInfoGeneral);
+  htmlDescripcion = pintarGris(htmlDescripcion);
+  htmlDeclaracion = pintarGris(htmlDeclaracion);
 
-  // ✅ Renderizar visor
   const visor = document.getElementById("visorIframe");
-
   visor.innerHTML = `
-    <div style="
-      background:white;
-      padding:25px;
-      border-radius:14px;
-      border:1px solid #dce3f5;
-      box-shadow:0 8px 24px rgba(0,0,0,.12);
-    ">
+    <div style="background:white;padding:25px;border-radius:14px;border:1px solid #dce3f5;box-shadow:0 8px 24px rgba(0,0,0,.12);">
 
-      <!-- Encabezado 1 -->
-      <div style="
-        background:#eef1f6;
-        padding:14px 18px;
-        border-radius:10px;
-        font-weight:800;
-        font-size:15px;
-        color:#203054;
-        border:1px solid #d6dce8;
-        margin-bottom:14px;
-      ">
+      <div style="background:#eef1f6;padding:14px 18px;border-radius:10px;font-weight:800;margin-bottom:14px;">
         Información del Beneficiario y la Institución
       </div>
-
       <div class="auditor-block">${htmlInfoGeneral}</div>
 
-      <!-- Encabezado 2 -->
-      <div style="
-        background:#eef1f6;
-        padding:14px 18px;
-        border-radius:10px;
-        font-weight:800;
-        font-size:15px;
-        color:#203054;
-        border:1px solid #d6dce8;
-        margin:28px 0 14px 0;
-      ">
+      <div style="background:#eef1f6;padding:14px 18px;border-radius:10px;font-weight:800;margin:28px 0 14px;">
         Descripción del Caso
       </div>
-
       <div class="auditor-block">${htmlDescripcion}</div>
 
-      <!-- Encabezado 3 -->
-      <div style="
-        background:#eef1f6;
-        padding:14px 18px;
-        border-radius:10px;
-        font-weight:800;
-        font-size:15px;
-        color:#203054;
-        border:1px solid #d6dce8;
-        margin:28px 0 14px 0;
-      ">
+      <div style="background:#eef1f6;padding:14px 18px;border-radius:10px;font-weight:800;margin:28px 0 14px;">
         Declaración
       </div>
-
       <div class="auditor-block">${htmlDeclaracion}</div>
 
-      <h2 style="margin:30px 0 10px 0;">Fotos del informe (vista previa)</h2>
+      <h2 style="margin:30px 0 10px;">Fotos del informe (vista previa)</h2>
       <div id="visorFotos"></div>
-
     </div>
   `;
 
-  // ✅ Cargar fotos (JSON)
+  // === CARGA DE FOTOS ===
   const jsonFotos = await obtenerJsonFotos(item);
   item.fotosPreview = jsonFotos;
 
-  if (jsonFotos) await renderizarFotos(item);
-  else document.getElementById("visorFotos").innerHTML =
-    "<p style='color:#777;'>Este informe no tiene fotos adjuntas.</p>";
+  if (jsonFotos) {
+    await renderizarFotos(item);
+  } else {
+    document.getElementById("visorFotos").innerHTML =
+      "<p style='color:#777;'>Este informe no tiene fotos adjuntas.</p>";
+  }
 }
 /* ======================================================================
    13) RENDER FOTOS — ESTILO DOMINION
