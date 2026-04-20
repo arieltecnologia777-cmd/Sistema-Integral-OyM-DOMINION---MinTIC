@@ -1,4 +1,13 @@
 /* ======================================================================
+   0) CONFIGURACIÓN — FLUJO ÚNICO ONE DRIVE (EXCEL + JSON)
+====================================================================== */
+
+// ✅ URL del TRIGGER HTTP del flujo "Generar MCI"
+// (copiada directamente desde Power Automate, con & normales)
+const FLOW_GET_ONEDRIVE_FILE =
+  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dc99f30c70a64d57b309dce1c13d1290/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NMxJMh4pAr98EPpIwDJGzHb5_glsVkAv-A1TVjR9zsA";
+
+/* ======================================================================
    0) IMPORTS — NECESARIOS
 ====================================================================== */
 import {obtenerModulo } from "./modulos_v2.js";
@@ -127,48 +136,33 @@ function generarTablaHTML(modulo) {
 ====================================================================== */
 async function cargarDatosModulo() {
 
-  if (!window.moduloActivo.pendientes) {
+  if (!window.moduloActivo?.pendientes) {
     document.getElementById("tbodyDatos").innerHTML = `
       <tr><td colspan="99" style="padding:20px; text-align:center;">
-        No hay ruta configurada para este módulo.
+        No hay informes pendientes.
       </td></tr>`;
     return;
   }
 
-  const token = await obtenerToken();
+  const tecnico = "usuario"; // o el auditor logueado
+  const respKV = await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`
+  );
 
-  // ✅ ARCHIVOS DESDE SHAREPOINT
-  const listaOD = await listarArchivosMCI(token);
-  window.debugListaOD = listaOD;
-
-  // ✅ KV
-  const tecnico = "usuario";
-  const respKV = await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`);
   const listaKV = await respKV.json();
-  console.log("KV recibido:", listaKV);
 
-  // ✅ Mezcla SP + KV (BLOQUE FINAL CORRECTO)
-listaOD.forEach(a => {
-
-  const reg = listaKV.find(k => {
-    const id = k.mciId || k.mcid;
-    return id && a.nombre.includes(id);
-  });
-
-  // mciId y estado vienen de KV
-  a.mciId    = reg ? (reg.mciId || reg.mcid) : null;
-  a.estadoKV = reg ? reg.estado : "pendiente";
-
-  // ✅ NO tocar fileId
-  // El fileId REAL ya viene desde SharePoint (listarArchivosMCI)
-});
-
-  window.datosActuales = listaOD;
+  window.datosActuales = listaKV.map(reg => ({
+    nombre: reg.fileName,
+    mciId: reg.mciId,
+    estadoKV: reg.estado,
+    fileIdentifierExcel: reg.fileIdentifierExcel,
+    jsonFileId: reg.jsonFileId,
+    fechaReal: reg.fecha || null
+  }));
 
   renderTabla();
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
-
 /* ======================================================================
    8) RENDER TABLA
 ====================================================================== */
