@@ -263,11 +263,15 @@ async function obtenerJsonFotos(item) {
     })
   });
 
-  if (!resp.ok) return null;
+  if (!resp.ok) {
+    console.log("DEBUG fotos: resp.ok = false");
+    return null;
+  }
 
   const raw = await resp.text();
   console.log("DEBUG fotos RAW response:", raw);
-  // return JSON.parse(atob(fileB64));
+
+  return null; // temporal
 }
 /* ======================================================================
    12) VER ARCHIVO — Vista previa del Excel + Fotos (IGUAL A VERSIÓN VIEJA)
