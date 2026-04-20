@@ -6091,11 +6091,6 @@ if (!resp.ok) {
   throw new Error(`Error HTTP ${resp.status} al generar el informe`);
 }
 
-await registrarEnKV({
-  mciId: numeroCaso,
-  tecnico: tecnicoActual,
-  fileName: null
-});
       
 setStatus("✅ Informe enviado para revisión del auditor", "ok");
 alert("El informe fue enviado correctamente. El auditor lo revisará y aprobará.");
