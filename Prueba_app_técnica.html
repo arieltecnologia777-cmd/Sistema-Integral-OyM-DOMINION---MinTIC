@@ -6091,8 +6091,14 @@ if (!resp.ok) {
   throw new Error(`Error HTTP ${resp.status} al generar el informe`);
 }
 
-// await registrarEnKV(numeroCaso, tecnicoActual);
-
+await registrarEnKV({
+  mciId: numeroCaso,              // o mciId según tu variable
+  tecnico: tecnicoActual,
+  fileName: fileName,             // el mismo nombre que usas para el Excel
+  fileIdentifierExcel: fileIdentifierExcel,
+  jsonFileId: jsonFileId
+});
+      
 setStatus("✅ Informe enviado para revisión del auditor", "ok");
 alert("El informe fue enviado correctamente. El auditor lo revisará y aprobará.");
     }catch(err){
