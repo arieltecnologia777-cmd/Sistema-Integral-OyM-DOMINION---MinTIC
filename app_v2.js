@@ -254,7 +254,6 @@ function prepararEventosTabla() {
 async function obtenerJsonFotos(item) {
   console.log("DEBUG: entrar a obtenerJsonFotos", item);
 
-  async function obtenerJsonFotos(item) {
   const resp = await fetch(FLOW_GET_FOTOS_PREVIEW, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -263,7 +262,7 @@ async function obtenerJsonFotos(item) {
     })
   });
 
-  const fotos = await resp.json();   // ← YA ES JSON PURO
+  const fotos = await resp.json(); // ✅ JSON puro que viene del flujo
   return fotos;
 }
 /* ======================================================================
