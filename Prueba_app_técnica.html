@@ -6092,9 +6092,9 @@ if (!resp.ok) {
 }
 
 await registrarEnKV({
-  mciId: numeroCaso,              // o mciId según tu variable
+  mciId: numeroCaso,
   tecnico: tecnicoActual,
-  fileName: fileName,             // el mismo nombre que usas para el Excel
+  fileName: null, // ← se completa en el flujo
   fileIdentifierExcel: fileIdentifierExcel,
   jsonFileId: jsonFileId
 });
