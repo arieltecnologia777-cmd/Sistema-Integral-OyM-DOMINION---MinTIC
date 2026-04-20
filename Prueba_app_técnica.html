@@ -5708,44 +5708,50 @@ async function getFoto(id, maxPx = 1600, quality = 0.85) {
 // ✅ Endpoint Cloudflare KV
 const KV_URL = "https://cloudflare-index.modulo-de-exclusiones.workers.dev/registrar";
 
-    const setWorking = (on, text) => {
-      exportBtn.disabled = on;
-      exportBtn.textContent = on ? (text || 'Generando…') : '📤 Generar informe';
-    };
-    const setStatus = (msg, kind='')=>{
-      statusEl.textContent = msg || '';
-      statusEl.className = 'status ' + (kind||'');
-    };
+const setWorking = (on, text) => {
+  exportBtn.disabled = on;
+  exportBtn.textContent = on ? (text || 'Generando…') : '📤 Generar informe';
+};
 
-    function toDDMMYYYY(dateInput){
-      if (!dateInput) return '';
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
-        const [yyyy, mm, dd] = dateInput.split('-');
-        return `${dd}/${mm}/${yyyy}`;
-      }
-      try {
-        const d = new Date(dateInput + 'T12:00');
-        if (Number.isNaN(d.getTime())) return '';
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        const yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-      } catch {
-        return '';
-      }
-    }
+const setStatus = (msg, kind = '') => {
+  statusEl.textContent = msg || '';
+  statusEl.className = 'status ' + (kind || '');
+};
 
-// ✅ Nueva función registrarEnKV — versión final y completa
-// ✅ Nueva función registrarEnKV — DEFINITIVA
-async function registrarEnKV(mciId, tecnico) {
+function toDDMMYYYY(dateInput) {
+  if (!dateInput) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+    const [yyyy, mm, dd] = dateInput.split('-');
+    return `${dd}/${mm}/${yyyy}`;
+  }
+  try {
+    const d = new Date(dateInput + 'T12:00');
+    if (Number.isNaN(d.getTime())) return '';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  } catch {
+    return '';
+  }
+}
+
+// ✅ registrarEnKV — VERSIÓN CORRECTA PARA ONE DRIVE + AUDITOR
+async function registrarEnKV({
+  mciId,
+  tecnico,
+  fileName,
+  fileIdentifierExcel,
+  jsonFileId
+}) {
   try {
     const payload = {
       mciId,
-      fileId: "",          // ✅ requerido por el Worker
-      fileName: "",        // ✅ requerido por el Worker
       tecnico,
       estado: "pendiente",
-      fileUrl: null
+      fileName,
+      fileIdentifierExcel,
+      jsonFileId
     };
 
     const resp = await fetch(KV_URL, {
