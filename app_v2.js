@@ -254,24 +254,17 @@ function prepararEventosTabla() {
 async function obtenerJsonFotos(item) {
   console.log("DEBUG: entrar a obtenerJsonFotos", item);
 
+  async function obtenerJsonFotos(item) {
   const resp = await fetch(FLOW_GET_FOTOS_PREVIEW, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      tipo: "json",
       fileId: item.jsonFileId
     })
   });
 
-  if (!resp.ok) {
-    console.log("DEBUG fotos: resp.ok = false");
-    return null;
-  }
-
-  const raw = await resp.text();
-  console.log("DEBUG fotos RAW response:", raw);
-
-  return null; // temporal
+  const fotos = await resp.json();   // ← YA ES JSON PURO
+  return fotos;
 }
 /* ======================================================================
    12) VER ARCHIVO — Vista previa del Excel + Fotos (IGUAL A VERSIÓN VIEJA)
