@@ -6072,11 +6072,14 @@ if (!tecnicoActual) {
 
         const resp = await fetch(FLOW_URL, {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
+  headers: {
+    "Content-Type": "application/json"
+  },
   body: JSON.stringify({
-    payloadJson: JSON.stringify(payloadJson),
-    imgsJson: JSON.stringify(imgsJson),
-    tecnico: tecnicoActual
+    mciId: mciId,
+    tecnico: tecnicoActual,
+    payloadJson: payloadJson,
+    imgsJson: imgsJson
   })
 });
 
