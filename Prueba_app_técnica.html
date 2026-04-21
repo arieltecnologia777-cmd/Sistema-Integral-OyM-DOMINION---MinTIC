@@ -6579,7 +6579,7 @@ async function cargarInformesEnTabla() {
   // 🔎 Solo informes del técnico actual
   const propios = informes.filter(i => i.tecnico === tecnico);
 
-  const tbody = document.querySelector("#tablaInformes tbody");
+  const tbody = document.querySelector("#tablaInformesModal tbody");
   if (!tbody) return;
 
   tbody.innerHTML = "";
@@ -6640,8 +6640,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Abrir modal
   if (misInformesBtn && misInformesModal) {
     misInformesBtn.addEventListener("click", () => {
-      misInformesModal.style.display = "flex";
-    });
+  misInformesModal.style.display = "flex";
+
+  // ✅ Cargar informes SOLO cuando se abre el modal
+  cargarInformesEnTabla();
+});
   }
 
   // Cerrar modal con botón
