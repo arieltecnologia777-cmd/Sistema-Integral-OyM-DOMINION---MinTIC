@@ -408,9 +408,10 @@ async function renderizarFotos(item) {
   let html = `
     <div style="
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
       width: 100%;
+      align-items: start;
     ">
   `;
 
@@ -426,23 +427,20 @@ async function renderizarFotos(item) {
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0,0,0,.08);
       ">
-        
         <div style="
           padding: 8px 12px;
           font-weight: 700;
           font-size: 14px;
           background: #f4f6fb;
           border-bottom: 1px solid #e1e6f5;
+          text-transform: lowercase;
         ">
           ${clave}
         </div>
 
-        <img src="${src}" style="
-          width: 100%;
-          height: 180px;
-          object-fit: cover;
-          display: block;
-        ">
+        <div style="padding: 10px;">
+          ${src}
+        </div>
       </div>
     `;
   }
