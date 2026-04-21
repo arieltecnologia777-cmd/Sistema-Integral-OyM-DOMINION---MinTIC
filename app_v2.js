@@ -185,15 +185,19 @@ function renderTabla() {
   tbody.innerHTML = "";
 
   const filtrados = window.datosActuales.filter(item =>
-    item.nombre.endsWith(".xlsx") &&
+    item.nombre && item.nombre.endsWith(".xlsx") &&
     !item.nombre.includes("PreviewFotos")
   );
 
   filtrados.forEach(item => {
     const idx = window.datosActuales.indexOf(item);
 
+    // ✅ Evitar undefined en columnas como fecha y tamaño
     const tds = window.moduloActivo.columnas
-      .map(col => `<td>${item[col.id]}</td>`)
+      .map(col => {
+        const valor = item[col.id];
+        return `<td>${valor ?? ""}</td>`;
+      })
       .join("");
 
     const estado = item.estadoKV ?? "pendiente";
