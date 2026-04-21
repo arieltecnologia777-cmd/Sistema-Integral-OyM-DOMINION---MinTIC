@@ -2,15 +2,11 @@
    0) CONFIGURACIÓN — FLUJO ÚNICO ONE DRIVE (EXCEL + JSON)
 ====================================================================== */
 
-// ✅ URL del TRIGGER HTTP del flujo "Generar MCI"
+// ✅ ✅ URL del TRIGGER HTTP del flujo "Fotos Preview"
 // (copiada directamente desde Power Automate, con & normales)
-const FLOW_GET_ONEDRIVE_FILE =
+const FLOW_FOTOS =
   "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5f65d8cc4aa4001b6966552ed454170/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ybNuejYFtJf4p_P2vNPf_TY_Zzm2uvkSVYkqPu0GyQg";
 
-// ✅ URL del TRIGGER HTTP del flujo "Fotos Preview"
-// (copiada directamente desde Power Automate, con & normales)
-const FLOW_GET_FOTOS_PREVIEW =
-  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5f65d8cc4aa4001b6966552ed454170/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ybNuejYFtJf4p_P2vNPf_TY_Zzm2uvkSVYkqPu0GyQg";
 /* ======================================================================
    0) IMPORTS — NECESARIOS
 ====================================================================== */
@@ -287,7 +283,7 @@ function prepararEventosTabla() {
 async function obtenerJsonFotos(item) {
   console.log("DEBUG: entrar a obtenerJsonFotos", item);
 
-  const resp = await fetch(FLOW_GET_FOTOS_PREVIEW, {
+  const resp = await fetch(FLOW_FOTOS, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -309,7 +305,7 @@ async function verArchivo(item) {
   document.getElementById("modalVisor").style.display = "block";
 
   // === OBTENER EXCEL DESDE ONEDRIVE (FLOW DESCARGADOR) ===
-  const resp = await fetch(FLOW_GET_ONEDRIVE_FILE, {
+  const resp = await fetch(FLOW_FOTOS, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
