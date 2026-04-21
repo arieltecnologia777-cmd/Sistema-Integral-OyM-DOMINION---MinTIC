@@ -397,63 +397,52 @@ async function verArchivo(item) {
    13) RENDER FOTOS — ESTILO DOMINION
 ====================================================================== */
 function renderizarFotos(item) {
-  const cont = document.getElementById("visorFotos");
   const fotos = item.fotosPreview;
+  const galeria = document.getElementById("visorFotos");
 
-  if (!fotos || Object.keys(fotos).length === 0) {
-    cont.innerHTML = "<p style='color:#777;'>Este informe no tiene fotos adjuntas.</p>";
+  galeria.innerHTML = "";
+
+  if (!fotos) {
+    galeria.innerHTML = "<p style='color:#666;'>Sin fotos en preview.</p>";
     return;
   }
 
-  let html = `
-    <div style="
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      width: 100%;
-      align-items: flex-start;
-    ">
-  `;
+  const orden = [
+    { key: "gps", titulo: "GPS" },
+    { key: "apInt", titulo: "AP Interior" },
+    { key: "apExt1", titulo: "AP Exterior 1" },
+    { key: "apExt2", titulo: "AP Exterior 2" },
+    { key: "pcInt", titulo: "PC Interior" },
+    { key: "movilExt", titulo: "Móvil Exterior" },
+    { key: "senal", titulo: "Señalética" },
+    { key: "med1", titulo: "Medición Eléctrica 1" }
+  ];
 
-  Object.entries(fotos).forEach(([clave, dataUrl]) => {
-    if (!dataUrl || typeof dataUrl !== "string") return;
+  orden.forEach(f => {
+    const base64 = fotos[f.key];
+    if (!base64) return;
 
-    html += `
-      <div style="
-        flex: 0 0 calc(33.333% - 11px);
-        background: #fff;
-        border: 1px solid #dde5f8;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
-        overflow: hidden;
-      ">
-        <div style="
-          padding: 8px 12px;
-          font-weight: 700;
-          font-size: 14px;
-          background: #f4f6fb;
-          border-bottom: 1px solid #e1e6f5;
-        ">
-          ${clave}
-        </div>
+    const cont = document.createElement("div");
+    cont.style.border = "1px solid #dce3f5";
+    cont.style.borderRadius = "10px";
+    cont.style.overflow = "hidden";
+    cont.style.background = "#fff";
+    cont.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+    cont.style.cursor = "pointer";
+    cont.style.display = "flex";
+    cont.style.flexDirection = "column";
 
-        <div style="padding: 10px;">
-          <img
-            src="${dataUrl}"
-            style="
-              width: 100%;
-              height: auto;
-              object-fit: contain;
-              display: block;
-            "
-          />
-        </div>
+    cont.innerHTML = `
+      <div style="padding:6px 10px; font-weight:700; font-size:14px; border-bottom:1px solid #eee;">
+        ${f.titulo}
       </div>
+      <img src="${base64}" style="width:100%; height:180px; object-fit:cover;">
     `;
-  });
 
-  html += "</div>";
-  cont.innerHTML = html;
+    cont.onclick = () => window.open(base64, "_blank");
+
+    galeria.appendChild(cont);
+  });
 }
 /* ======================================================================
    14) VOLVER
