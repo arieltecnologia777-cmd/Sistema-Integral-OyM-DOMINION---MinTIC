@@ -5,7 +5,7 @@
 // ✅ URL del TRIGGER HTTP del flujo "Generar MCI"
 // (copiada directamente desde Power Automate, con & normales)
 const FLOW_GET_ONEDRIVE_FILE =
-  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd9e2227be594ecdb47c0da4a898d474/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=j3SlbYcxilxwhnHJfL95lpTA-Y2RzAtiNrmug_D01eQ";
+  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5f65d8cc4aa4001b6966552ed454170/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ybNuejYFtJf4p_P2vNPf_TY_Zzm2uvkSVYkqPu0GyQg";
 
 // ✅ URL del TRIGGER HTTP del flujo "Fotos Preview"
 // (copiada directamente desde Power Automate, con & normales)
