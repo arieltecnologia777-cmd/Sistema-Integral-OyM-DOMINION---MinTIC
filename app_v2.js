@@ -10,7 +10,7 @@ const FLOW_GET_ONEDRIVE_FILE =
 // ✅ URL del TRIGGER HTTP del flujo "Fotos Preview"
 // (copiada directamente desde Power Automate, con & normales)
 const FLOW_GET_FOTOS_PREVIEW =
-  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dc99f30c70a64d57b309dce1c13d1290/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NMxJMh4pAr98EPpIwDJGzHb5_glsVkAv-A1TVjR9zsA";
+  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5f65d8cc4aa4001b6966552ed454170/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ybNuejYFtJf4p_P2vNPf_TY_Zzm2uvkSVYkqPu0GyQg";
 /* ======================================================================
    0) IMPORTS — NECESARIOS
 ====================================================================== */
