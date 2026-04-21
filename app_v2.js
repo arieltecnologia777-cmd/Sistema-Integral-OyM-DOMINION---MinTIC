@@ -350,11 +350,11 @@ async function verArchivo(item) {
 
       <h3 style="font-weight:800; margin-top:20px;">Fotos del informe (vista previa)</h3>
       <div id="visorFotos" style="
-        margin-top:15px;
-        display:grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap:14px;">
-      </div>
+  margin-top:15px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;">
+</div>
 
     </div>
   `;
