@@ -5069,10 +5069,10 @@ document.getElementById("downloadBtn").addEventListener("click", async () => {
     return;
   }
 
-  if (!resp.ok) {
-    alert("Error al descargar el informe.");
-    return;
-  }
+  if (resp.status !== 200) {
+  alert("Error al descargar el informe");
+  return;
+}
 
   const blob = await resp.blob();
   const url = URL.createObjectURL(blob);
@@ -6606,10 +6606,10 @@ document.getElementById("downloadBtn").onclick = async () => {
   })
 });
 
-    if (!resp.ok) {
-      alert("Error al descargar el archivo.");
-      return;
-    }
+    if (resp.status !== 200) {
+  alert("Error al descargar el informe");
+  return;
+}
 
     // 3️⃣ Leer respuesta Base64
     const { fileName, fileB64 } = await resp.json();
