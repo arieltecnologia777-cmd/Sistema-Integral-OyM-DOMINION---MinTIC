@@ -307,25 +307,29 @@ async function verArchivo(item) {
    // 🔒 Resetear estado de apertura de Excel
 window.__excelAbierto = false;
    
-// ✅ Enganchar Abrir Excel (YA existe el botón)
+// ✅ Enganchar Abrir Excel (habilita Aprobar SOLO al hacer click real)
 const btnExcel = document.getElementById("visorAbrirExcel");
-if (btnExcel) {
-  btnExcel.onclick = () => {
-    const item = window.__archivoActual;
-    if (!item?.excelWebUrl) {
+const btnAprobar = document.getElementById("visorAprobar");
+
+if (btnExcel && btnAprobar) {
+  btnExcel.addEventListener("click", () => {
+
+    if (!window.__archivoActual?.excelWebUrl) {
       alert("No se encontró el enlace al Excel en línea.");
       return;
     }
 
     // Abrir Excel
-    window.open(item.excelWebUrl, "_blank");
+    window.open(window.__archivoActual.excelWebUrl, "_blank");
 
-    // Marcar Excel como abierto
+    // Marcar Excel abierto
     window.__excelAbierto = true;
 
-    // ✅ ACTIVAR Aprobar SOLO AQUÍ
+    // ✅ HABILITAR APROBAR (ESTE ERA EL PASO QUE FALLABA)
     btnAprobar.disabled = false;
-  };
+    btnAprobar.style.opacity = "1";
+    btnAprobar.style.cursor = "pointer";
+  });
 }
 
   // Ocultar tabla y mostrar modal
