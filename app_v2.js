@@ -318,8 +318,23 @@ async function verArchivo(item) {
     throw new Error("No se pudo obtener el Excel desde OneDrive");
   }
 
-  const blob = await resp.blob();
-  const arrayBuffer = await blob.arrayBuffer();
+  // === RESPUESTA DEL FLOW ===
+const data = await resp.json();
+
+// ✅ Guardar base64 para preview
+const base64Excel = data.excelBase64;
+
+// ✅ Guardar URL real para Excel en línea
+item.excelWebUrl = data.excelWebUrl;
+
+// === Base64 → ArrayBuffer (para SheetJS) ===
+const byteCharacters = atob(base64Excel);
+const byteNumbers = new Array(byteCharacters.length);
+for (let i = 0; i < byteCharacters.length; i++) {
+  byteNumbers[i] = byteCharacters.charCodeAt(i);
+}
+const byteArray = new Uint8Array(byteNumbers);
+const arrayBuffer = byteArray.buffer;
 
   // === LEER EXCEL ===
   const wb = XLSX.read(arrayBuffer);
