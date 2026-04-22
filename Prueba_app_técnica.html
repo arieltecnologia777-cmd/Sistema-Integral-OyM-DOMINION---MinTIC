@@ -5129,6 +5129,7 @@ function verificarSesion() {
 
     // ✅ Restaurar técnico en memoria
     window.tecnicoActual = sesion.usuario;
+    localStorage.setItem("tecnicoActual", sesion.usuario);
     return true;
 
   } catch (e) {
@@ -6780,24 +6781,18 @@ function enlazarBotonesDescargaFila() {
   });
 }
 
-  function cerrarSesion(automatico = false) {
-  // Borrar sesión
-  localStorage.removeItem("tecnicoSesion");
+function mostrarApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("sidebar").style.display = "flex";
+  document.querySelector(".main").style.display = "flex";
+}
 
-  // Limpiar variables en memoria
-  window.tecnicoActual = null;
-
-  if (automatico) {
-    alert("Tu sesión expiró por seguridad. Inicia sesión nuevamente.");
-  }
-
-  // Mostrar login
+function ocultarApp() {
   document.getElementById("loginScreen").style.display = "flex";
-
-  // Ocultar aplicación
   document.getElementById("sidebar").style.display = "none";
   document.querySelector(".main").style.display = "none";
 }
+  
   
  // ================================
 // MODAL · MIS INFORMES (abrir/cerrar)
