@@ -398,7 +398,7 @@ if (btnExcel && btnAprobar) {
   btnExcel.addEventListener("click", () => {
 
     if (!window.__archivoActual?.excelWebUrl) {
-      alert("No se encontró el enlace al Excel en línea.");
+      alert("⏳ por favor espere la vista previa para abrirl el Excel en línea.");
       return;
     }
 
