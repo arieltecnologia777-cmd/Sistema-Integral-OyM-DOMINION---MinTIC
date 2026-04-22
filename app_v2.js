@@ -328,13 +328,7 @@ const base64Excel = data.excelBase64;
 item.excelWebUrl = data.excelWebUrl;
 
 // === Base64 → ArrayBuffer (para SheetJS) ===
-const byteCharacters = atob(base64Excel);
-const byteNumbers = new Array(byteCharacters.length);
-for (let i = 0; i < byteCharacters.length; i++) {
-  byteNumbers[i] = byteCharacters.charCodeAt(i);
-}
-const byteArray = new Uint8Array(byteNumbers);
-const arrayBuffer = byteArray.buffer;
+
 
   // === LEER EXCEL ===
   const wb = XLSX.read(arrayBuffer);
