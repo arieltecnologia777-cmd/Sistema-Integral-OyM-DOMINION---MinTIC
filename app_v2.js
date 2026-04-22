@@ -308,6 +308,9 @@ async function verArchivo(item) {
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
+   console.log("ENVIANDO AL FLOW (Excel):", {
+  fileIdentifierExcel: item.fileIdentifierExcel
+});
   // === OBTENER EXCEL DESDE ONEDRIVE (FLOW DESCARGADOR) ===
   const resp = await fetch(FLOW_FOTOS, {
   method: "POST",
