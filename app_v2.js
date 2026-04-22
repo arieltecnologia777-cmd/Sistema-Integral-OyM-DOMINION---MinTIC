@@ -21,6 +21,7 @@ window.datosActuales = [];
 window.estadoInformes = {};
 window.__archivoActual = null;
 window.__mciIdActual = null;
+window.__excelAbierto = false;
 
 /* ======================================================================
    2) GUARDAR / CARGAR ESTADO LOCAL
@@ -303,6 +304,13 @@ async function obtenerJsonFotos(item) {
 ====================================================================== */
 async function verArchivo(item) {
   window.__archivoActual = item;
+   // 🔒 Resetear estado de apertura de Excel
+window.__excelAbierto = false;
+
+// 🔒 Deshabilitar Aprobar al entrar al visor
+const btnAprobar = document.getElementById("visorAprobar");
+if (btnAprobar) btnAprobar.disabled = true;
+
 
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
@@ -504,6 +512,11 @@ document.getElementById("visorVolver").addEventListener("click", () => {
 ====================================================================== */
 document.getElementById("visorAprobar").addEventListener("click", async () => {
 
+  if (!window.__excelAbierto) {
+    alert("Debes abrir el Excel en línea antes de aprobar el informe.");
+    return;
+  }
+
   const item = window.__archivoActual;
   const mciId = item?.mciId || null;
   if (!mciId) return;
@@ -548,7 +561,14 @@ if (btnAbrirExcel) {
       return;
     }
 
-    // ✅ Abre el Excel real en OneDrive web
+    // ✅ Abrir Excel en línea
     window.open(item.excelWebUrl, "_blank");
+
+    // ✅ Marcar que el Excel fue abierto
+    window.__excelAbierto = true;
+
+    // ✅ Habilitar botón Aprobar
+    const btnAprobar = document.getElementById("visorAprobar");
+    if (btnAprobar) btnAprobar.disabled = false;
   });
 }
