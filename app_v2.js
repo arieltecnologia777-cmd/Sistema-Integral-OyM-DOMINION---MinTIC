@@ -232,7 +232,7 @@ function renderTabla() {
       estado === "pendiente" ? `<button class="btn-estado btn-gris btn-revisar" data-idx="${idx}">Revisar</button>` :
       estado === "en_revision" ? `<button class="btn-estado btn-azul btn-revisar" data-idx="${idx}">✏️ Continuar</button>` :
       estado === "aprobado" ? `<button class="btn-estado btn-verde" disabled>✅ Aprobado</button>` :
-      `<button class="btn-estado btn-rojo" disabled>⚠️ Pendiente por técnico</button>`;
+      `<button class="btn-estado btn-rojo" disabled>⛔ Rechazado</button>`;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `${tds}<td style="text-align:center;">${btn}</td>`;
