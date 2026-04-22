@@ -6625,7 +6625,7 @@ localStorage.setItem("tecnicoSesion", JSON.stringify({
   loginTime: Date.now()
 }));
     
-    document.getElementById("loginScreen").style.display = "none";
+    mostrarApp();
 
 // ✅ Mostrar sección de informes
 mostrarMisInformes();
@@ -6800,8 +6800,12 @@ function ocultarApp() {
 document.addEventListener("DOMContentLoaded", () => {
 
   // 🔐 Verificar sesión al cargar la aplicación
-if (!verificarSesion()) {
-  return; // No continuar si no hay sesión válida
+const haySesion = verificarSesion();
+
+if (haySesion) {
+  mostrarApp();
+} else {
+  ocultarApp();
 }
   const misInformesBtn = document.getElementById("misInformesBtn");
   const misInformesModal = document.getElementById("misInformesModal");
