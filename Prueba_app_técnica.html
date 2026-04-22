@@ -5087,7 +5087,34 @@ body.theme-pro #sec-pruebas
   </main>
 
   <script>
+const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
 
+function verificarSesion() {
+  const raw = localStorage.getItem("tecnicoSesion");
+  if (!raw) return false;
+
+  try {
+    const sesion = JSON.parse(raw);
+    const ahora = Date.now();
+
+    if (
+      !sesion.loginTime ||
+      (ahora - sesion.loginTime) > SESSION_DURATION_MS
+    ) {
+      cerrarSesion(true);
+      return false;
+    }
+
+    // ✅ Restaurar técnico en memoria
+    window.tecnicoActual = sesion.usuario;
+    return true;
+
+  } catch (e) {
+    cerrarSesion(true);
+    return false;
+  }
+}
+    
     /* ================================
    CONFIGURACIÓN — FLUJOS
 ================================ */
@@ -6725,11 +6752,34 @@ function enlazarBotonesDescargaFila() {
   });
 }
 
+  function cerrarSesion(automatico = false) {
+  // Borrar sesión
+  localStorage.removeItem("tecnicoSesion");
+
+  // Limpiar variables en memoria
+  window.tecnicoActual = null;
+
+  if (automatico) {
+    alert("Tu sesión expiró por seguridad. Inicia sesión nuevamente.");
+  }
+
+  // Mostrar login
+  document.getElementById("loginScreen").style.display = "flex";
+
+  // Ocultar aplicación
+  document.getElementById("sidebar").style.display = "none";
+  document.querySelector(".main").style.display = "none";
+}
+  
  // ================================
 // MODAL · MIS INFORMES (abrir/cerrar)
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 🔐 Verificar sesión al cargar la aplicación
+if (!verificarSesion()) {
+  return; // No continuar si no hay sesión válida
+}
   const misInformesBtn = document.getElementById("misInformesBtn");
   const misInformesModal = document.getElementById("misInformesModal");
   const cerrarMisInformes = document.getElementById("cerrarMisInformes");
