@@ -537,13 +537,14 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
       const token = await obtenerToken();
 
       const resp = await fetch(
-        `https://graph.microsoft.com/v1.0/me/drive/items/${item.fileIdentifierExcel}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  `https://graph.microsoft.com/v1.0/drive/items/${item.fileIdentifierExcel}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
 
       if (!resp.ok) {
         throw new Error("Graph no devolvió el archivo");
