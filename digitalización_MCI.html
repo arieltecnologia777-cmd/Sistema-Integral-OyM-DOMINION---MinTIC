@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
+    
     :root{
   /* Paleta base */
   --primary-900:#0b2e59; --primary-800:#103a70; --primary-700:#1e3a8a;
@@ -4201,9 +4202,186 @@ body.theme-pro #sec-pruebas
     height: 32px !important;
     background-size: 33px 33px !important;
 }
+
+    /* ================================
+   BOTÓN DESCARGAR EN MODAL
+   Mis informes (igual al sidebar)
+================================ */
+#misInformesModal .btnDescargar {
+  background: #3b82f6;           /* azul primary */
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;           /* pill */
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#misInformesModal .btnDescargar:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.45);
+}
+
+#misInformesModal .btnDescargar:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(59, 130, 246, 0.35);
+}
+/* ================================
+   BOTÓN PENDIENTE · EN VALIDACIÓN
+   (modal Mis informes)
+================================ */
+#misInformesModal .btnValidacion {
+  background: #e5e7eb;          /* gris claro */
+  color: #6b7280;               /* gris texto */
+  border: 1px solid #d1d5db;
+  border-radius: 12px;          /* mismo pill */
+  padding: 8px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.95;
+}
+
+    /* =========================
+   LOGIN SCREEN – ESTILO OFICIAL MCI
+========================= */
+
+/* Cubre toda la pantalla */
+.login-screen{
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #e9f2ff, #f5f9ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Tarjeta blanca */
+.login-card{
+  background: #ffffff;
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 26px 32px;
+  border-radius: 16px;
+  box-shadow:
+    0 20px 60px rgba(15, 23, 42, 0.18),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+/* Logos */
+.login-logo{
+  display: block;
+}
+
+.logo-bot{
+  width: 90px;
+  margin-bottom: 6px;
+}
+
+.logo-dominion{
+  width: 140px;
+  margin-top: 18px;
+  opacity: 0.9;
+}
+
+/* Título */
+.login-card h2{
+  margin: 6px 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b2e59;
+}
+
+/* Inputs */
+.login-card input{
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #dbe2f1;
+  font-size: 14px;
+  outline: none;
+}
+
+.login-card input:focus{
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+}
+
+/* Botón (usa el mismo .btn global) */
+.login-card .btn{
+  width: 100%;
+  margin-top: 6px;
+}
+
+/* Ocultar app mientras no hay login */
+body:not(.logged-in) .sidebar,
+body:not(.logged-in) .main{
+  display: none;
+}
+    
   </style>
 </head>
 <body class="theme-pro">
+
+<!-- =========================
+ LOGIN TÉCNICOS
+========================= -->
+<div id="loginScreen" class="login-screen">
+
+  <div class="login-card">
+
+    <!-- Logo Bot Assistant -->
+    <img 
+      src="assistant_casco.png" 
+      alt="Asistente Técnico"
+      class="login-logo logo-bot"
+    >
+
+    <h2>Bienvenido al Generador MCI</h2>
+
+    <input 
+      id="loginUser" 
+      type="text" 
+      placeholder="Usuario"
+    >
+
+    <input 
+      id="loginPass" 
+      type="password" 
+      placeholder="Contraseña"
+    >
+
+    <button id="loginBtn" class="btn">
+      Ingresar
+    </button>
+
+    <p 
+      id="loginError" 
+      style="color:red; margin-top:10px; display:none;"
+    >
+      Usuario o contraseña incorrectos.
+    </p>
+
+    <!-- Logo Dominion -->
+    <img 
+      src="dominion_logo.png" 
+      alt="Dominion"
+      class="login-logo logo-dominion"
+    >
+
+  </div>
+</div>
+
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -4221,14 +4399,22 @@ body.theme-pro #sec-pruebas
       <a href="#" data-target="sec-etiqueta" style="display:none !important;">ETIQUETA RE FOTOGRÁFICO</a>      
     </nav>
 <div class="sidebar-actions">
-
   <button class="btn secondary" id="collapseBtn">Cerrar menú</button>
-  <button class="btn" id="exportBtn">Exportar</button>
-<button class="btn secondary" id="resetWorkBtn">Reiniciar trabajo</button>
+  <button class="btn" id="exportBtn">📤 Cargar informe</button>
+  <button class="btn" id="misInformesBtn">
+  🔎 Ver mis informes
+</button>
+
+  <button class="btn secondary" id="resetWorkBtn">Reiniciar trabajo</button>
+  <button class="btn secondary" id="logoutBtn">
+  🚪 Cerrar sesión
+</button>
 </div>
-  </aside>
+</aside>
 
   <!-- MAIN -->
+
+  
   <main class="main">
     <div class="topbar">
       <button class="hamburger" id="hamburger" aria-label="Abrir menú">
@@ -5009,6 +5195,150 @@ body.theme-pro #sec-pruebas
   </main>
 
   <script>
+const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
+
+    function cerrarSesion(automatico = false) {
+  // 🔐 Limpiar sesión
+  localStorage.removeItem("tecnicoSesion");
+
+  // Limpiar usuario en memoria
+  window.tecnicoActual = null;
+
+  if (automatico) {
+    alert("Tu sesión expiró por seguridad. Inicia sesión nuevamente.");
+  }
+
+  // Mostrar pantalla de login
+  document.getElementById("loginScreen").style.display = "flex";
+
+  // Ocultar aplicación
+  document.getElementById("sidebar").style.display = "none";
+  document.querySelector(".main").style.display = "none";
+}
+    
+function verificarSesion() {
+  const raw = localStorage.getItem("tecnicoSesion");
+  if (!raw) return false;
+
+  try {
+    const sesion = JSON.parse(raw);
+    const ahora = Date.now();
+
+    if (
+      !sesion.loginTime ||
+      (ahora - sesion.loginTime) > SESSION_DURATION_MS
+    ) {
+      cerrarSesion(true);
+      return false;
+    }
+
+    // ✅ Restaurar técnico en memoria
+    window.tecnicoActual = sesion.usuario;
+    localStorage.setItem("tecnicoActual", sesion.usuario);
+    return true;
+
+  } catch (e) {
+    cerrarSesion(true);
+    return false;
+  }
+}
+    
+    /* ================================
+   CONFIGURACIÓN — FLUJOS
+================================ */
+
+// ✅ Descarga controlada (APP TÉCNICA)
+const FLOW_DESCARGAR_MCI =
+  "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd9e2227be594ecdb47c0da4a898d474/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=j3SlbYcxilxwhnHJfL95lpTA-Y2RzAtiNrmug_D01eQ";
+// ================================
+// DESCARGA DE INFORME (DESDE MODAL)
+// ================================
+async function descargarInforme(mciId) {
+  if (!mciId) {
+    alert("No se encontró el mciId del informe.");
+    return;
+  }
+
+  console.log("📥 Descargando informe:", mciId);
+
+  try {
+    const resp = await fetch(FLOW_DESCARGAR_MCI, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mciId })
+    });
+
+    if (resp.status === 403) {
+      const data = await resp.json();
+      alert(data.error || "Informe no aprobado.");
+      return;
+    }
+
+    if (resp.status !== 200) {
+      alert("Error al descargar el informe");
+      return;
+    }
+
+    const blob = await resp.blob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${mciId}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    console.log("✅ Descarga iniciada correctamente:", mciId);
+
+  } catch (err) {
+    console.error("❌ Error al descargar:", err);
+    alert("Error inesperado en la descarga.");
+  }
+}
+// ===================================================
+// EVENT DELEGATION · DESCARGA DESDE MODAL (con feedback)
+// ===================================================
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".btnDescargar");
+  if (!btn) return;
+
+  const mciId = btn.dataset.mciid;
+  if (!mciId) {
+    alert("No se pudo identificar el informe.");
+    return;
+  }
+
+  // ✅ Guardar texto original
+  const textoOriginal = btn.innerHTML;
+
+  try {
+    // ✅ Estado visual: descargando
+    btn.innerHTML = "⏳ Descargando…";
+    btn.disabled = true;
+    btn.style.opacity = "0.8";
+    btn.style.cursor = "not-allowed";
+
+    console.log("📥 Iniciando descarga:", mciId);
+
+    // ✅ Ejecutar descarga
+    await descargarInforme(mciId);
+
+    console.log("✅ Descarga finalizada:", mciId);
+
+  } catch (err) {
+    console.error("❌ Error en la descarga:", err);
+    alert("Ocurrió un error al descargar el informe.");
+  } finally {
+    // ✅ Restaurar botón
+    btn.innerHTML = textoOriginal;
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+  }
+});
 const photoInputs = [
   "inp-firma-tec",
   "img-gps-geo",
@@ -5606,97 +5936,139 @@ if (saveDraftBtn) {
 // --- RESTAURAR AUTOMÁTICO AL INICIAR ---
 restoreDraft();
 
+// ===============================
+// UTILIDADES DE IMÁGENES (RESTAURADAS)
+// ===============================
 
-    // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
-    const FLOW_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fc02f93a22fb46008ba5614c89513080/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NOqnsTHpUknrTNvtdPXaz97iG36kKX25ceUDUSxcaSc';
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result || '');
+    fr.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+    fr.readAsDataURL(file);
+  });
+}
 
-    const setWorking = (on, text) => {
-      exportBtn.disabled = on;
-      exportBtn.textContent = on ? (text || 'Generando…') : 'Exportar';
-    };
-    const setStatus = (msg, kind='')=>{
-      statusEl.textContent = msg || '';
-      statusEl.className = 'status ' + (kind||'');
-    };
-
-    function toDDMMYYYY(dateInput){
-      if (!dateInput) return '';
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
-        const [yyyy, mm, dd] = dateInput.split('-');
-        return `${dd}/${mm}/${yyyy}`;
-      }
-      try {
-        const d = new Date(dateInput + 'T12:00');
-        if (Number.isNaN(d.getTime())) return '';
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        const yyyy = d.getFullYear();
-        return `${dd}/${mm}/${yyyy}`;
-      } catch {
-        return '';
-      }
-    }
-
-    function b64ToBlob(base64, mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'){
-      const binary = atob(base64);
-      const len = binary.length;
-      const chunk = 1024*1024;
-      const parts = [];
-      for (let i=0;i<len;i+=chunk){
-        const slice = binary.slice(i, i+chunk);
-        const arr = new Uint8Array(slice.length);
-        for (let j=0;j<slice.length;j++){ arr[j] = slice.charCodeAt(j); }
-        parts.push(arr);
-      }
-      return new Blob(parts, { type: mime });
-    }
-
-    function fileToDataURL(file){
-      return new Promise((resolve, reject)=>{
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result || '');
-        fr.onerror = () => reject(new Error('No se pudo leer el archivo.'));
-        fr.readAsDataURL(file);
-      });
-    }
-
-    function downscaleDataUrl(dataUrl, maxPx=1600, quality=0.85){
-      return new Promise((resolve)=>{
-        try{
-          const img = new Image();
-          img.onload = () => {
-            const w = img.naturalWidth || img.width;
-            const h = img.naturalHeight || img.height;
-            const scale = Math.min(1, maxPx / Math.max(w, h));
-            if (scale < 1){
-              const canvas = document.createElement('canvas');
-              canvas.width  = Math.round(w * scale);
-              canvas.height = Math.round(h * scale);
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-              resolve(canvas.toDataURL('image/jpeg', quality));
-            } else {
-              resolve(dataUrl);
-            }
-          };
-          img.onerror = () => resolve(dataUrl);
-          img.src = dataUrl;
-        }catch{
+function downscaleDataUrl(dataUrl, maxPx = 1600, quality = 0.85) {
+  return new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth || img.width;
+        const h = img.naturalHeight || img.height;
+        const scale = Math.min(1, maxPx / Math.max(w, h));
+        if (scale < 1) {
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(w * scale);
+          canvas.height = Math.round(h * scale);
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        } else {
           resolve(dataUrl);
         }
-      });
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    } catch {
+      resolve(dataUrl);
     }
-
-    async function pickDataUrl(id, maxPx=1600, quality=0.85){
-      const el = document.getElementById(id);
-      const f = el?.files?.[0];
-      if (!f) return '';
-      const raw = await fileToDataURL(f);
-      return await downscaleDataUrl(raw, maxPx, quality);
-    }
-
+  });
+}
 
 // ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
+async function getFoto(id, maxPx = 1600, quality = 0.85) {
+  const input = document.getElementById(id);
+
+  // 1️⃣ Si el input tiene archivo → usarlo
+  if (input && input.files && input.files[0]) {
+    const raw = await fileToDataURL(input.files[0]);
+    return await downscaleDataUrl(raw, maxPx, quality);
+  }
+
+  // 2️⃣ Si NO tiene archivo → cargar desde IndexedDB
+  return new Promise(resolve => {
+    cargarFotoOffline(id, async base64 => {
+      if (!base64) return resolve("");
+      const scaled = await downscaleDataUrl(base64, maxPx, quality);
+      resolve(scaled);
+    });
+  });
+}
+      // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
+    const FLOW_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/dc99f30c70a64d57b309dce1c13d1290/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NMxJMh4pAr98EPpIwDJGzHb5_glsVkAv-A1TVjR9zsA';
+
+    // ⚙️ URL del Trigger HTTP del Flow (pega la tuya)
+    const FLOW_DESCARGAR_URL = 'https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd9e2227be594ecdb47c0da4a898d474/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=j3SlbYcxilxwhnHJfL95lpTA-Y2RzAtiNrmug_D01eQ';
+    
+// ✅ Endpoint Cloudflare KV
+const KV_URL = "https://cloudflare-index.modulo-de-exclusiones.workers.dev/registrar";
+
+const setWorking = (on, text) => {
+  exportBtn.disabled = on;
+  exportBtn.textContent = on ? (text || 'Generando…') : '📤 Generar informe';
+};
+
+const setStatus = (msg, kind = '') => {
+  statusEl.textContent = msg || '';
+  statusEl.className = 'status ' + (kind || '');
+};
+
+function toDDMMYYYY(dateInput) {
+  if (!dateInput) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+    const [yyyy, mm, dd] = dateInput.split('-');
+    return `${dd}/${mm}/${yyyy}`;
+  }
+  try {
+    const d = new Date(dateInput + 'T12:00');
+    if (Number.isNaN(d.getTime())) return '';
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  } catch {
+    return '';
+  }
+}
+
+// ✅ registrarEnKV — VERSIÓN CORRECTA PARA ONE DRIVE + AUDITOR
+async function registrarEnKV({
+  mciId,
+  tecnico,
+  fileName,
+  fileIdentifierExcel,
+  jsonFileId
+}) {
+  try {
+    const payload = {
+      mciId,
+      tecnico,
+      estado: "pendiente",
+      fileName,
+      fileIdentifierExcel,
+      jsonFileId
+    };
+
+    const resp = await fetch(KV_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!resp.ok) {
+      console.error("❌ Error KV:", resp.status);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("❌ Error KV:", err);
+    return false;
+  }
+}
+
+    // ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
 async function getFoto(id, maxPx = 1600, quality = 0.85) {
     const input = document.getElementById(id);
 
@@ -5747,7 +6119,46 @@ async function getFoto(id, maxPx = 1600, quality = 0.85) {
       wireSapAntes();
     }
 
+// ===============================
+// ✅ NUEVA FUNCIÓN GLOBAL
+// ===============================
+async function verificarEstadoPorTecnico() {
+    try {
+        const tecnico = localStorage.getItem("tecnicoActual");
+        if (!tecnico) {
+            window.__informeAprobado = false;
+            return null;
+        }
+
+        const resp = await fetch(
+            `https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar/${tecnico}`
+        );
+
+        const lista = await resp.json();
+
+        const aprobado = lista.find(r => r.estado === "aprobado");
+
+        if (aprobado) {
+            window.__informeAprobado = true;
+            return aprobado;
+        } else {
+            window.__informeAprobado = false;
+            return null;
+        }
+
+    } catch (e) {
+        console.error("❌ Error consultando KV:", e);
+        window.__informeAprobado = false;
+        return null;
+    }
+}
+
     async function exportarMCI(){
+// ✅ Validar login antes de exportar
+if (!tecnicoActual) {
+    alert("Debes iniciar sesión para poder exportar el MCI.");
+    return;
+}
 
     // 1) Mínimos requeridos
     const numeroCaso = document.getElementById('inp-numero-caso').value.trim();
@@ -5962,32 +6373,23 @@ async function getFoto(id, maxPx = 1600, quality = 0.85) {
         setWorking(true, 'Enviando…');
 
         const resp = await fetch(FLOW_URL, {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify({
-                payloadJson: JSON.stringify(payloadJson),
-                imgsJson: JSON.stringify(imgsJson)
-            })
-        });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    mciId: numeroCaso,
+    tecnico: tecnicoActual,
+    payloadJson: payloadJson,
+    imgsJson: imgsJson
+  })
+});
 
-        if (!resp.ok){
-            const t = await resp.text().catch(()=> '');
-            throw new Error(`HTTP ${resp.status} ${resp.statusText} ${t}`);
-        }
+if (!resp.ok) {
+  throw new Error(`Error HTTP ${resp.status} al generar el informe`);
+}
 
-        const data = await resp.json();
-        const { fileName = 'FORMATO_MCI.xlsx', fileB64, result } = data || {};
-        if (!fileB64) throw new Error('La respuesta no incluye fileB64.');
-
-        const blob = b64ToBlob(fileB64);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = fileName;
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-
-        setStatus(result ? `Listo: ${result}` : 'Archivo generado correctamente ✔', 'ok');
-
+      
+setStatus("✅ Informe enviado para revisión del auditor", "ok");
+alert("El informe fue enviado correctamente. El auditor lo revisará y aprobará.");
     }catch(err){
         console.error(err);
         setStatus('Error al generar: ' + err.message, 'err');
@@ -5996,7 +6398,11 @@ async function getFoto(id, maxPx = 1600, quality = 0.85) {
         setWorking(false);
         clearDraft();
     }
-}
+
+   
+    //-----------------------------------------------------------
+
+}  // ✅ ← CIERRA exportarMCI()
 
 // === PASO 7: Propagar títulos de <label> a data-title en cada tarjeta de PRUEBAS ===
 // Ubicación recomendada: justo ANTES de document.getElementById('exportBtn')...
@@ -6282,9 +6688,8 @@ cargarFotoOffline(id, function(base64) {
 }
 
 
-
   </script>
-<script>
+  <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js")
     .then(() => console.log("✅ SW registrado"))
@@ -6292,7 +6697,359 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+<script>
+// ================================
+// LOGIN PARA TÉCNICOS (CORREGIDO)
+// ================================
+const TECNICOS = {
+  "usuario": "1234",
+  "maria": "abcd",
+  "juan": "pass2026"
+};
+
+// ✅ VARIABLE GLOBAL NECESARIA PARA EXPORTAR MCI + CLOUDFLARE
+let tecnicoActual = localStorage.getItem("tecnicoActual") || null;
+
+// ✅ Variables globales para verificar aprobación y descarga (RAM)
+window.__mciIdActual = null;
+window.__fileNameActual = null;
+
+// ✅ EVENTO DE LOGIN
+document.getElementById("loginBtn").onclick = () => {
+  const u = loginUser.value.trim().toLowerCase();
+  const p = loginPass.value.trim();
+
+  if (TECNICOS[u] && TECNICOS[u] === p) {
+
+    localStorage.setItem("tecnicoActual", u);
+    tecnicoActual = u;
+
+    // ✅ Guardar sesión del técnico (control 24h)
+localStorage.setItem("tecnicoSesion", JSON.stringify({
+  usuario: u,
+  loginTime: Date.now()
+}));
+    
+    mostrarApp();
+
+// ✅ Mostrar sección de informes
+mostrarMisInformes();
+
+// ✅ Cargar informes del técnico en la tabla
+cargarInformesEnTabla();
 
 
+    
+// ✅ Revisar aprobación al iniciar sesión (login manual)
+setTimeout(async () => {
+
+  const informe = await verificarEstadoPorTecnico();
+  const btn = document.getElementById("downloadBtn");
+  if (!btn) return;
+
+  // 🔒 Lógica de selección se moverá al listado por fila (Opción A)
+  // registro global desactivado intencionalmente
+
+}, 1500);
+
+
+
+    if (registro && registro.estado === "aprobado") {
+    window.__mciIdActual = registro.mciId;
+    localStorage.setItem("ultimoMciId", registro.mciId);
+
+    console.log("✅ Informe aprobado — mciId fijado:", registro.mciId);
+    btn.style.display = "block";
+} else {
+        console.log("📌 Aún no aprobado en KV");
+        btn.style.display = "none";
+    } 
+
+    // ✅ Restaurar referencias guardadas en IndexedDB
+    window.__mciIdActual = localStorage.getItem("ultimoMciId");
+window.__fileNameActual = localStorage.getItem("ultimoFileName");
+
+  } else {
+    loginError.style.display = "block";
+  }
+};
+
+// ✅ Sesión previa → saltar login automáticamente
+const previo = localStorage.getItem("tecnicoActual");
+if (previo) {
+  tecnicoActual = previo;
+  document.getElementById("loginScreen").style.display = "none";
+
+  window.__mciIdActual = localStorage.getItem("ultimoMciId");
+if (!window.__mciIdActual) {
+  window.__mciIdActual = localStorage.getItem("ultimoMciId");
+}
+
+  window.__fileNameActual = localStorage.getItem("ultimoFileName");
+
+  // ✅ Revisar aprobación cuando entra por sesión previa (AQUÍ DEBE IR)
+  setTimeout(async () => {
+
+      const informe = await verificarEstadoPorTecnico();
+    const registro = Array.isArray(informe) ? informe[0] : informe;
+if (registro && registro.estado === "aprobado") {
+  window.__mciIdActual = registro.mciId;
+  localStorage.setItem("ultimoMciId", registro.mciId);
+}
+      const btn = document.getElementById("downloadBtn");
+      if (!btn) return;
+
+      if (registro && registro.estado === "aprobado") {
+    window.__mciIdActual = registro.mciId;
+    localStorage.setItem("ultimoMciId", registro.mciId);
+
+    console.log("✅ Informe aprobado — mciId fijado:", registro.mciId);
+    btn.style.display = "block";
+} else {
+          console.log("📌 Aún no aprobado en KV (auto-login)");
+          btn.style.display = "none";
+      }
+
+  }, 1500);
+}
+
+  // ✅ Mostrar listado de informes cuando el técnico ya inició sesión
+function mostrarMisInformes() {
+  const seccion = document.getElementById("misInformes");
+  if (seccion) {
+    seccion.style.display = "block";
+  }
+}
+
+  // ✅ Cargar y renderizar informes del técnico en la tabla
+async function cargarInformesEnTabla() {
+  const tecnico = localStorage.getItem("tecnicoActual");
+  if (!tecnico) return;
+
+  const resp = await fetch(
+    "https://cloudflare-index.modulo-de-exclusiones.workers.dev/consultar"
+  );
+  const informes = await resp.json();
+
+  // 🔎 Solo informes del técnico actual
+  const propios = informes.filter(i => i.tecnico === tecnico);
+
+  const tbody = document.querySelector("#tablaInformesModal tbody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  // 📅 Más recientes primero
+  propios.sort((a, b) =>
+    new Date(b.fechaGenerado) - new Date(a.fechaGenerado)
+  );
+
+  for (const inf of propios) {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td style="padding:8px;">
+        ${new Date(inf.fechaGenerado).toLocaleDateString()}
+      </td>
+      <td style="padding:8px;">${inf.mciId}</td>
+      <td style="padding:8px;">
+        ${inf.estado === "aprobado" ? "✅ Aprobado" : "⏳ Pendiente"}
+      </td>
+      <td style="padding:8px;">
+  ${
+    inf.estado === "aprobado"
+  ? `<button class="btn btnDescargar" data-mciid="${inf.mciId}">
+       📥 Descargar
+     </button>`
+  : `<button class="btn btnValidacion" disabled>
+       ⏳ En validación
+     </button>`
+  }
+
+</td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+}
+
+  // ✅ Enlazar botones de descarga por fila
+function enlazarBotonesDescargaFila() {
+  document.querySelectorAll(".btnDescargar").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const mciId = btn.dataset.mciid;
+      if (!mciId) return;
+
+      // ✅ Reutiliza la descarga existente
+      descargarInforme(mciId);
+    });
+  });
+}
+
+function mostrarApp() {
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("sidebar").style.display = "flex";
+  document.querySelector(".main").style.display = "flex";
+}
+
+function ocultarApp() {
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("sidebar").style.display = "none";
+  document.querySelector(".main").style.display = "none";
+}
+  
+  
+ // ================================
+// MODAL · MIS INFORMES (abrir/cerrar)
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔐 Verificar sesión al cargar la aplicación
+const haySesion = verificarSesion();
+
+if (haySesion) {
+  mostrarApp();
+} else {
+  ocultarApp();
+}
+  const misInformesBtn = document.getElementById("misInformesBtn");
+  const misInformesModal = document.getElementById("misInformesModal");
+  const cerrarMisInformes = document.getElementById("cerrarMisInformes");
+
+  // Abrir modal
+  if (misInformesBtn && misInformesModal) {
+    misInformesBtn.addEventListener("click", () => {
+  misInformesModal.style.display = "flex";
+
+  // ✅ Cargar informes SOLO cuando se abre el modal
+  cargarInformesEnTabla();
+});// ================================
+// ✅ Botón 🔄 Actualizar informes
+// ================================
+const refreshBtn = document.getElementById("refreshMisInformes");
+
+if (refreshBtn) {
+  refreshBtn.addEventListener("click", async () => {
+    refreshBtn.innerHTML = "⏳ Actualizando...";
+    refreshBtn.disabled = true;
+
+    try {
+      await cargarInformesEnTabla();
+    } finally {
+      refreshBtn.innerHTML = "🔄 Actualizar";
+      refreshBtn.disabled = false;
+    }
+  });
+}
+
+// 🚪 Cerrar sesión manual
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("¿Deseas cerrar la sesión?")) {
+      cerrarSesion(false);
+    }
+  });
+}
+    
+  }
+
+  
+  // Cerrar modal con botón
+  if (cerrarMisInformes && misInformesModal) {
+    cerrarMisInformes.addEventListener("click", () => {
+      misInformesModal.style.display = "none";
+    });
+  }
+
+  // Cerrar modal haciendo clic fuera del contenido
+  if (misInformesModal) {
+    misInformesModal.addEventListener("click", (e) => {
+      if (e.target === misInformesModal) {
+        misInformesModal.style.display = "none";
+      }
+    });
+  }
+
+});
+  
+</script>
+<!-- =========================
+ MODAL · MIS INFORMES
+========================= -->
+<div id="misInformesModal" style="
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+">
+
+  <!-- Contenedor principal -->
+  <div style="
+    background: white;
+    border-radius: 14px;
+    width: min(920px, 92%);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  ">
+
+    <!-- Header -->
+    <div style="
+      padding: 14px 18px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    ">
+      <h3 style="margin:0; color:#0b2e59;">
+        Mis informes
+      </h3>
+
+<button id="refreshMisInformes" class="btn secondary" style="margin-right:8px;">
+  🔄 Actualizar
+</button>
+
+      <button
+        id="cerrarMisInformes"
+        class="btn secondary"
+        style="padding:6px 12px; font-size:13px;"
+      >
+        Volver
+      </button>
+    </div>
+
+    <!-- Cuerpo del modal -->
+    <div style="
+      padding: 16px;
+      overflow: auto;
+      flex: 1;
+    ">
+
+      <!-- Aquí reutilizamos TU tabla -->
+      <table id="tablaInformesModal" class="table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>IM/OT</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Se llena dinámicamente -->
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
