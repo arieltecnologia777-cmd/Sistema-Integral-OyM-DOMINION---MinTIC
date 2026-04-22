@@ -5089,6 +5089,25 @@ body.theme-pro #sec-pruebas
   <script>
 const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 horas
 
+    function cerrarSesion(automatico = false) {
+  // 🔐 Limpiar sesión
+  localStorage.removeItem("tecnicoSesion");
+
+  // Limpiar usuario en memoria
+  window.tecnicoActual = null;
+
+  if (automatico) {
+    alert("Tu sesión expiró por seguridad. Inicia sesión nuevamente.");
+  }
+
+  // Mostrar pantalla de login
+  document.getElementById("loginScreen").style.display = "flex";
+
+  // Ocultar aplicación
+  document.getElementById("sidebar").style.display = "none";
+  document.querySelector(".main").style.display = "none";
+}
+    
 function verificarSesion() {
   const raw = localStorage.getItem("tecnicoSesion");
   if (!raw) return false;
@@ -6596,6 +6615,12 @@ document.getElementById("loginBtn").onclick = () => {
     localStorage.setItem("tecnicoActual", u);
     tecnicoActual = u;
 
+    // ✅ Guardar sesión del técnico (control 24h)
+localStorage.setItem("tecnicoSesion", JSON.stringify({
+  usuario: u,
+  loginTime: Date.now()
+}));
+    
     document.getElementById("loginScreen").style.display = "none";
 
 // ✅ Mostrar sección de informes
