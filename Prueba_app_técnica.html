@@ -4301,6 +4301,9 @@ body.theme-pro #sec-pruebas
 </button>
 
   <button class="btn secondary" id="resetWorkBtn">Reiniciar trabajo</button>
+  <button class="btn secondary" id="logoutBtn">
+  🚪 Cerrar sesión
+</button>
 </div>
 </aside>
 
@@ -6831,6 +6834,17 @@ if (refreshBtn) {
     } finally {
       refreshBtn.innerHTML = "🔄 Actualizar";
       refreshBtn.disabled = false;
+    }
+  });
+}
+
+// 🚪 Cerrar sesión manual
+const logoutBtn = document.getElementById("logoutBtn");
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    if (confirm("¿Deseas cerrar la sesión?")) {
+      cerrarSesion(false);
     }
   });
 }
