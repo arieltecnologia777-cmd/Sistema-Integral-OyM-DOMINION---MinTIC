@@ -6679,17 +6679,13 @@ async function cargarInformesEnTabla() {
       </td>
       <td style="padding:8px;">
   ${
-    
-inf.estado === "aprobado"
-  ? `<button class="btn btnDescargar" data-mciid="${inf.mciId}">
+    inf.estado === "aprobado"
+  ? `<button class="btnDescargar" data-mciid="${inf.mciId}">
        📥 Descargar
      </button>`
-  : `<button class="btn btnValidacion" disabled>
-       ⏳ En validación
-     </button>`
-
       : ""
   }
+
 </td>
     `;
 
