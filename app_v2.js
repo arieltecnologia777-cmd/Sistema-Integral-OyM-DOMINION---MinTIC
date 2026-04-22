@@ -324,7 +324,8 @@ async function verArchivo(item) {
 
   // === RESPUESTA DEL FLOW ===
 const data = await resp.json();
-
+console.log("RESPUESTA FLOW EXCEL:", data);
+console.log("excelWebUrl recibido:", data.excelWebUrl);
 // ✅ Guardar base64 para preview
 const base64Excel = data.excelBase64;
 
