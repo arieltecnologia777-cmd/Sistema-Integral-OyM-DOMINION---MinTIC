@@ -496,10 +496,9 @@ if (btnVerExcel) {
     }
 
     // ✅ Abrir Excel real en nueva pestaña
-    const urlReal = 
-      "https://onedrive.live.com/?id=" +
-      encodeURIComponent(item.fileIdentifierExcel) +
-      "&action=office";
+    const urlReal =
+  "https://view.officeapps.live.com/op/view.aspx?src=" +
+  encodeURIComponent(item.fileIdentifierExcel);
 
     window.open(urlReal, "_blank");
   });
