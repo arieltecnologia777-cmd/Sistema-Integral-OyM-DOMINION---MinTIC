@@ -358,13 +358,13 @@ function activarOrdenamientoFecha() {
    11) EVENTOS DE TABLA
 ====================================================================== */
 function prepararEventosTabla() {
-  document.querySelectorAll(".btn-revisar").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const idx = btn.dataset.idx;
-      const item = window.datosActuales[idx];
-      await verArchivo(item);
-    });
+  document.querySelectorAll(".btn-revisar, .btn-ver").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const idx = btn.dataset.idx;
+    const item = window.datosActuales[idx];
+    await verArchivo(item);
   });
+});
 }
 /* ======================================================================
    12) BUSCAR JSON DE FOTOS EN ONEDRIVE
