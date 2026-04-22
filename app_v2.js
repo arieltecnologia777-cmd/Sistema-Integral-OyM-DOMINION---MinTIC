@@ -482,6 +482,29 @@ document.getElementById("visorVolver").addEventListener("click", () => {
   renderTabla();
 });
 
+/* ======================================================
+  VER EXCEL REAL — ABRIR EN ONEDRIVE (NO TOCA PREVIEW)
+====================================================== */
+const btnVerExcel = document.getElementById("visorVerExcel");
+
+if (btnVerExcel) {
+  btnVerExcel.addEventListener("click", () => {
+    const item = window.__archivoActual;
+    if (!item?.fileIdentifierExcel) {
+      alert("No se pudo localizar el Excel real.");
+      return;
+    }
+
+    // ✅ Abrir Excel real en nueva pestaña
+    const urlReal = 
+      "https://onedrive.live.com/?id=" +
+      encodeURIComponent(item.fileIdentifierExcel) +
+      "&action=office";
+
+    window.open(urlReal, "_blank");
+  });
+}
+
 /* ======================================================================
    15) APROBAR
 ====================================================================== */
