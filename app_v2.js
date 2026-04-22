@@ -519,7 +519,7 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
 });
 
 /* ======================================================================
-  ABRIR EXCEL EN LÍNEA — OneDrive Corporativo (Graph)
+  ABRIR EXCEL EN LÍNEA — OneDrive Corporativo (Graph correcto)
 ====================================================================== */
 (() => {
   const btn = document.getElementById("visorAbrirExcel");
@@ -527,27 +527,33 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
 
   btn.addEventListener("click", async () => {
     const item = window.__archivoActual;
-
     if (!item?.fileIdentifierExcel) {
-      alert("No se encontró el identificador del archivo.");
+      alert("No hay identificador de archivo.");
       return;
     }
 
     try {
       const token = await obtenerToken();
 
-      const resp = await fetch(
-  `https://graph.microsoft.com/v1.0/drive/items/${item.fileIdentifierExcel}`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
+      // ✅ El identificador viene como driveId!itemId
+      const rawId = item.fileIdentifierExcel;
+      if (!rawId.includes("!")) {
+        throw new Error("Identificador de archivo no válido");
+      }
 
+      const [driveId, itemId] = rawId.split("!");
+
+      const resp = await fetch(
+        `https://graph.microsoft.com/v1.0/drives/${driveId}/items/${itemId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!resp.ok) {
-        throw new Error("Graph no devolvió el archivo");
+        throw new Error("Graph no pudo resolver el archivo");
       }
 
       const data = await resp.json();
@@ -556,13 +562,14 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
         throw new Error("El archivo no tiene webUrl");
       }
 
+      // ✅ Abrir Excel real (esto ES lo que tenías antes)
       window.open(data.webUrl, "_blank");
 
     } catch (err) {
-      console.error(err);
+      console.error("Abrir Excel:", err);
       alert(
         "No fue posible abrir el Excel en línea.\n" +
-        "La vista previa sigue funcionando correctamente."
+        "La vista previa sigue funcionando."
       );
     }
   });
