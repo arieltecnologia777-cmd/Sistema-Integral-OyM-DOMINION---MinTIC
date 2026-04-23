@@ -443,7 +443,7 @@ function renderInfoInforme(info) {
 }
 
    // ✅ Renderizar información del informe UNA sola vez
-renderInfoInforme(infoInforme);
+
 
    
    // ✅ Estado actual del informe
@@ -487,17 +487,11 @@ visor.innerHTML = `
   <div id="visorFotos"></div>
 `;
 
+   renderInfoInforme(infoInforme);
+   
 // ==============================
 // Fallback de datos base (SÍ llegan siempre)
 // ==============================
-
-// Técnico: usar nombre del archivo mientras Excel no sobrescriba
-document.getElementById("infoTecnico").innerText =
-  item.nombre ?? "—";
-
-// Fecha: siempre desde KV
-document.getElementById("infoFecha").innerText =
-  item.fecha ?? "—";
    
    // ==============================
 // PASO 1 — Modal dinámico por estado
@@ -580,34 +574,7 @@ window.__archivoActual.excelWebUrl = data.excelWebUrl;
 document.getElementById("infoFecha").innerText =
   item.fecha ?? "—";
 
-// ==============================
-// MICRO‑PASO D — Leer datos puntuales del Excel (BLOQUE ÚNICO Y BLINDADO)
-// ==============================
-if (data.excelBase64) {
-  try {
-    const wb = XLSX.read(data.excelBase64, { type: "base64" });
 
-    document.getElementById("infoTecnico").innerText =
-      leerCeldaExcel(wb, "E16");
-
-    document.getElementById("infoCelular").innerText =
-      leerCeldaExcel(wb, "E12");
-
-    document.getElementById("infoDepto").innerText =
-      leerCeldaExcel(wb, "E11");
-
-    document.getElementById("infoBeneficiario").innerText =
-      leerCeldaExcel(wb, "E13");
-
-    document.getElementById("infoOT").innerText =
-      leerCeldaExcel(wb, "E9");
-
-  } catch (e) {
-    console.warn("Error leyendo datos del Excel:", e);
-  }
-} else {
-  console.warn("El FLOW no devolvió excelBase64; se mantienen valores visuales.");
-}
    
   // === CARGA DE FOTOS (NO TOCADO) ===
   const jsonFotos = await obtenerJsonFotos(item);
