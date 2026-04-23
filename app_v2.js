@@ -429,10 +429,9 @@ if (btnExcel && btnAprobar) {
    // ==============================
 // PASO 1 — Modal dinámico por estado
 // ==============================
-btnAprobar   = document.getElementById("visorAprobar");
-btnRechazar  = document.getElementById("visorRechazar");
-btnDescargar = document.getElementById("visorDescargar");
-btnExcel     = document.getElementById("visorAbrirExcel");
+const btnAprobarUI   = document.getElementById("visorAprobar");
+const btnRechazarUI  = document.getElementById("visorRechazar");
+const btnDescargarUI = document.getElementById("visorDescargar");
    
 if (estado === "aprobado") {
   // ✅ Solo lectura
