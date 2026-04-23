@@ -543,24 +543,56 @@ console.log("RESPUESTA FLOW EXCEL:", data);
 console.log("excelWebUrl recibido:", data.excelWebUrl);
 
   // ==============================
-// PASO 3 — Sobrescribir infoInforme desde Excel (si existe)
-// (NO toca el DOM)
+// PASO 3 — Sobrescribir infoInforme desde Excel (celdas reales)
 // ==============================
 if (data.excelBase64) {
   try {
     const wb = XLSX.read(data.excelBase64, { type: "base64" });
 
-    const tecnicoExcel      = leerCeldaExcel(wb, "E16");
-    const celularExcel      = leerCeldaExcel(wb, "E12");
-    const deptoExcel        = leerCeldaExcel(wb, "E11");
-    const beneficiarioExcel = leerCeldaExcel(wb, "E13");
-    const otExcel           = leerCeldaExcel(wb, "E9");
+    // Técnico → M72
+    const tecnicoExcel = leerCeldaExcel(wb, "M72");
 
-    if (tecnicoExcel !== "—")      infoInforme.tecnico = tecnicoExcel;
-    if (celularExcel !== "—")      infoInforme.celular = celularExcel;
-    if (deptoExcel !== "—")        infoInforme.depto = deptoExcel;
-    if (beneficiarioExcel !== "—") infoInforme.beneficiario = beneficiarioExcel;
-    if (otExcel !== "—")           infoInforme.ot = otExcel;
+    // N° de caso (IM / OT) → C9:F9
+    const otExcel =
+      [
+        leerCeldaExcel(wb, "C9"),
+        leerCeldaExcel(wb, "D9"),
+        leerCeldaExcel(wb, "E9"),
+        leerCeldaExcel(wb, "F9")
+      ].filter(v => v !== "—").join(" ");
+
+    // ID Beneficiario → B16:E16
+    const beneficiarioExcel =
+      [
+        leerCeldaExcel(wb, "B16"),
+        leerCeldaExcel(wb, "C16"),
+        leerCeldaExcel(wb, "D16"),
+        leerCeldaExcel(wb, "E16")
+      ].filter(v => v !== "—").join(" ");
+
+    // Departamento → B14:E14
+    const deptoExcel =
+      [
+        leerCeldaExcel(wb, "B14"),
+        leerCeldaExcel(wb, "C14"),
+        leerCeldaExcel(wb, "D14"),
+        leerCeldaExcel(wb, "E14")
+      ].filter(v => v !== "—").join(" ");
+
+    // Celular → M75:P75
+    const celularExcel =
+      [
+        leerCeldaExcel(wb, "M75"),
+        leerCeldaExcel(wb, "N75"),
+        leerCeldaExcel(wb, "O75"),
+        leerCeldaExcel(wb, "P75")
+      ].filter(v => v !== "—").join(" ");
+
+    if (tecnicoExcel)       infoInforme.tecnico = tecnicoExcel;
+    if (otExcel)            infoInforme.ot = otExcel;
+    if (beneficiarioExcel)  infoInforme.beneficiario = beneficiarioExcel;
+    if (deptoExcel)         infoInforme.depto = deptoExcel;
+    if (celularExcel)       infoInforme.celular = celularExcel;
 
   } catch (e) {
     console.warn("Error leyendo Excel:", e);
