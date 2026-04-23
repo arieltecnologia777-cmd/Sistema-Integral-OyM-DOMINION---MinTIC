@@ -387,20 +387,6 @@ async function obtenerJsonFotos(item) {
 
   return data.imgsJson;
 }
-
-/* =========================================================
-   LECTOR SEGURO DE CELDAS EXCEL (SIN RENDER)
-========================================================= */
-function leerCeldaExcel(workbook, ref) {
-  try {
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const celda = sheet?.[ref];
-    return celda ? String(celda.v).trim() : "—";
-  } catch (e) {
-    return "—";
-  }
-}
-
 /* ======================================================================
    13) VER ARCHIVO — Vista previa del Excel + Fotos (IGUAL A VERSIÓN VIEJA)
 ====================================================================== */
@@ -411,54 +397,35 @@ const estado = item.estadoKV || "pendiente";
    // 🔒 Resetear estado de apertura de Excel
 window.__excelAbierto = false;
    
+// ✅ Enganchar Abrir Excel (habilita Aprobar SOLO al hacer click real)
+const btnExcel = document.getElementById("visorAbrirExcel");
+const btnAprobar = document.getElementById("visorAprobar");
 
+if (btnExcel && btnAprobar) {
+  btnExcel.addEventListener("click", () => {
+
+    if (!window.__archivoActual?.excelWebUrl) {
+      alert("⏳ por favor espere la vista previa para abrirl el Excel en línea.");
+      return;
+    }
+
+    // Abrir Excel
+    window.open(window.__archivoActual.excelWebUrl, "_blank");
+
+    // Marcar Excel abierto
+    window.__excelAbierto = true;
+
+    // ✅ HABILITAR APROBAR (ESTE ERA EL PASO QUE FALLABA)
+    btnAprobar.disabled = false;
+    btnAprobar.style.opacity = "1";
+    btnAprobar.style.cursor = "pointer";
+  });
+}
 
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-   // ✅ Crear contenedor de fotos (OBLIGATORIO)
-const visor = document.getElementById("visorIframe");
-visor.innerHTML = `
-  <div style="
-    border:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:12px;
-    background:#f9fafb;
-    margin-bottom:16px;
-  ">
-    <div style="font-weight:700; margin-bottom:8px;">
-      Información del informe
-    </div>
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:14px;">
-      <div><strong>Técnico:</strong> <span id="infoTecnico">—</span></div>
-      <div><strong>Celular:</strong> <span id="infoCelular">—</span></div>
-      <div><strong>Departamento:</strong> <span id="infoDepto">—</span></div>
-      <div><strong>ID Beneficiario:</strong> <span id="infoBeneficiario">—</span></div>
-      <div><strong>IM / OT:</strong> <span id="infoOT">—</span></div>
-      <div><strong>Fecha reporte:</strong> <span id="infoFecha">—</span></div>
-    </div>
-  </div>
-
-  <h3 style="font-weight:800; margin-bottom:10px;">
-    Fotos del informe
-  </h3>
-  <div id="visorFotos"></div>
-`;
-
-// ==============================
-// Fallback de datos base (SÍ llegan siempre)
-// ==============================
-
-// Técnico: usar nombre del archivo mientras Excel no sobrescriba
-document.getElementById("infoTecnico").innerText =
-  item.nombre ?? "—";
-
-// Fecha: siempre desde KV
-document.getElementById("infoFecha").innerText =
-  item.fecha ?? "—";
-   
    // ==============================
 // PASO 1 — Modal dinámico por estado
 // ==============================
@@ -508,42 +475,29 @@ const data = await resp.json();
 console.log("RESPUESTA FLOW EXCEL:", data);
 console.log("excelWebUrl recibido:", data.excelWebUrl);
 
-// ✅ Guardar URL del Excel para abrir en línea
-window.__archivoActual.excelWebUrl = data.excelWebUrl;
+  // ✅ Pintar encabezados internos en gris (versión vieja)
+  setTimeout(() => {
+    const patrones = [
+      "N° DE CASO","Nº DE CASO","FECHA","CONTRATO","CONTRATISTA",
+      "DEPARTAMENTO","MUNICIPIO","CENTRO POBLADO",
+      "SEDE INSTITUCIÓN EDUCATIVA","CASO ESPECIAL","ID BENEFICIARIO",
+      "NOMBRE DEL RESPONSABLE","NÚMERO DE CEDULA","NÚMERO DE CONTACTO",
+      "DESCRIPCIÓN DE LA FALLA","DECLARACIÓN",
+      "DATOS DE QUIÉN ACOMPAÑA","DATOS DE QUIÉN REPARA",
+      "NOMBRES Y APELLIDOS","CARGO","TELÉFONO","CELULAR",
+      "CORREO ELECTRÓNICO","CORREO ELECTRONICO","FIRMA"
+    ];
 
-// ✅ Fecha SIEMPRE desde KV (no depende del Excel)
-document.getElementById("infoFecha").innerText =
-  item.fecha ?? "—";
+    const celdas = visor.querySelectorAll("td");
+    celdas.forEach(td => {
+      const texto = td.innerText.toUpperCase().trim();
+      if (patrones.some(p => texto.includes(p))) {
+        td.style.backgroundColor = "#e6e6e6";
+        td.style.fontWeight = "700";
+      }
+    });
+  }, 80);
 
-// ==============================
-// MICRO‑PASO D — Leer datos puntuales del Excel (BLOQUE ÚNICO Y BLINDADO)
-// ==============================
-if (data.excelBase64) {
-  try {
-    const wb = XLSX.read(data.excelBase64, { type: "base64" });
-
-    document.getElementById("infoTecnico").innerText =
-      leerCeldaExcel(wb, "E16");
-
-    document.getElementById("infoCelular").innerText =
-      leerCeldaExcel(wb, "E12");
-
-    document.getElementById("infoDepto").innerText =
-      leerCeldaExcel(wb, "E11");
-
-    document.getElementById("infoBeneficiario").innerText =
-      leerCeldaExcel(wb, "E13");
-
-    document.getElementById("infoOT").innerText =
-      leerCeldaExcel(wb, "E9");
-
-  } catch (e) {
-    console.warn("Error leyendo datos del Excel:", e);
-  }
-} else {
-  console.warn("El FLOW no devolvió excelBase64; se mantienen valores visuales.");
-}
-   
   // === CARGA DE FOTOS (NO TOCADO) ===
   const jsonFotos = await obtenerJsonFotos(item);
   item.fotosPreview = jsonFotos;
@@ -664,20 +618,3 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
   // ✅ Recargar tabla
   await cargarDatosModulo();
 });
-/* =========================================================
-   ABRIR EXCEL EN LÍNEA — LISTENER GLOBAL ÚNICO
-========================================================= */
-const btnAbrirExcel = document.getElementById("visorAbrirExcel");
-
-if (btnAbrirExcel) {
-  btnAbrirExcel.addEventListener("click", () => {
-    const url = window.__archivoActual?.excelWebUrl;
-
-    if (!url) {
-      alert("El enlace al Excel aún no está disponible.");
-      return;
-    }
-
-    window.open(url, "_blank");
-  });
-}
