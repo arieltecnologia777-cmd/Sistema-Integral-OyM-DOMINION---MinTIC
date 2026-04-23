@@ -601,6 +601,22 @@ if (data.excelBase64) {
 // ✅ Guardar URL del Excel para abrir en línea
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
 
+   // ==============================
+// NORMALIZAR CAMPOS NO DILIGENCIADOS
+// ==============================
+function normalizarCampo(valor) {
+  if (!valor || valor === "Cargando datos…") {
+    return "No informado";
+  }
+  return valor;
+}
+
+infoInforme.tecnico = normalizarCampo(infoInforme.tecnico);
+infoInforme.celular = normalizarCampo(infoInforme.celular);
+infoInforme.depto = normalizarCampo(infoInforme.depto);
+infoInforme.beneficiario = normalizarCampo(infoInforme.beneficiario);
+infoInforme.ot = normalizarCampo(infoInforme.ot);
+   
 // ==============================
 // PASO 4 — Render único (YA con datos del Excel)
 // ==============================
