@@ -392,6 +392,8 @@ async function obtenerJsonFotos(item) {
 ====================================================================== */
 async function verArchivo(item) {
   window.__archivoActual = item;
+   // ✅ Estado actual del informe
+const estado = item.estadoKV || "pendiente";
    // 🔒 Resetear estado de apertura de Excel
 window.__excelAbierto = false;
    
@@ -423,6 +425,30 @@ if (btnExcel && btnAprobar) {
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
+
+   // ==============================
+// PASO 1 — Modal dinámico por estado
+// ==============================
+const btnAprobar   = document.getElementById("visorAprobar");
+const btnRechazar  = document.getElementById("visorRechazar");
+const btnDescargar = document.getElementById("visorDescargar");
+const btnExcel     = document.getElementById("visorAbrirExcel");
+
+if (estado === "aprobado") {
+  // ✅ Solo lectura
+  btnAprobar.style.display = "none";
+  btnRechazar.style.display = "none";
+  btnDescargar.style.display = "none";
+}
+
+if (estado === "rechazado") {
+  // ✅ Solo lectura
+  btnAprobar.style.display = "none";
+  btnRechazar.style.display = "none";
+  btnDescargar.style.display = "none";
+}
+
+// Para pendientes / en revisión → no tocamos nada
    
    // 🔒 Forzar Aprobar DESACTIVADO una vez el modal ya está visible
 setTimeout(() => {
