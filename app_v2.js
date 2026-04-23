@@ -397,29 +397,20 @@ const estado = item.estadoKV || "pendiente";
    // 🔒 Resetear estado de apertura de Excel
 window.__excelAbierto = false;
    
-// ✅ Enganchar Abrir Excel (habilita Aprobar SOLO al hacer click real)
-const btnExcel = document.getElementById("visorAbrirExcel");
-const btnAprobar = document.getElementById("visorAprobar");
 
-if (btnExcel && btnAprobar) {
-  btnExcel.addEventListener("click", () => {
-
-    // Abrir Excel
-    window.open(window.__archivoActual.excelWebUrl, "_blank");
-
-    // Marcar Excel abierto
-    window.__excelAbierto = true;
-
-    // ✅ HABILITAR APROBAR (ESTE ERA EL PASO QUE FALLABA)
-    btnAprobar.disabled = false;
-    btnAprobar.style.opacity = "1";
-    btnAprobar.style.cursor = "pointer";
-  });
-}
 
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
+   // ✅ Inicializar contenedor del visor (solo fotos)
+const visor = document.getElementById("visorIframe");
+visor.innerHTML = `
+  <h3 style="font-weight:800; margin-bottom:10px;">
+    Fotos del informe
+  </h3>
+  <div id="visorFotos"></div>
+`;
+
    // ✅ Contenedor limpio (sin Excel preview)
 const visor = document.getElementById("visorIframe");
 visor.innerHTML = `<div id="visorFotos"></div>`;
