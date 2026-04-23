@@ -447,9 +447,17 @@ visor.innerHTML = `
   <div id="visorFotos"></div>
 `;
 
+// ==============================
+// Fallback de datos base (SÍ llegan siempre)
+// ==============================
 
-   
+// Técnico: usar nombre del archivo mientras Excel no sobrescriba
+document.getElementById("infoTecnico").innerText =
+  item.nombre ?? "—";
 
+// Fecha: siempre desde KV
+document.getElementById("infoFecha").innerText =
+  item.fecha ?? "—";
    
    // ==============================
 // PASO 1 — Modal dinámico por estado
