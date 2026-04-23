@@ -402,20 +402,7 @@ window.__excelAbierto = false;
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
-   // ✅ Inicializar contenedor del visor (solo fotos)
-const visor = document.getElementById("visorIframe");
-visor.innerHTML = `
-  <h3 style="font-weight:800; margin-bottom:10px;">
-    Fotos del informe
-  </h3>
-  <div id="visorFotos"></div>
-`;
-
-   // ✅ Contenedor limpio (sin Excel preview)
-const visor = document.getElementById("visorIframe");
-visor.innerHTML = `<div id="visorFotos"></div>`;
-   document.getElementById("visorIframe").innerHTML = "";
-
+   
    // ==============================
 // PASO 1 — Modal dinámico por estado
 // ==============================
