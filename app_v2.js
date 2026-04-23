@@ -404,11 +404,6 @@ const btnAprobar = document.getElementById("visorAprobar");
 if (btnExcel && btnAprobar) {
   btnExcel.addEventListener("click", () => {
 
-    if (!window.__archivoActual?.excelWebUrl) {
-      alert("⏳ por favor espere la vista previa para abrirl el Excel en línea.");
-      return;
-    }
-
     // Abrir Excel
     window.open(window.__archivoActual.excelWebUrl, "_blank");
 
@@ -425,6 +420,9 @@ if (btnExcel && btnAprobar) {
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
+   // ✅ Contenedor limpio (sin Excel preview)
+const visor = document.getElementById("visorIframe");
+visor.innerHTML = `<div id="visorFotos"></div>`;
    document.getElementById("visorIframe").innerHTML = "";
 
    // ==============================
