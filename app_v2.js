@@ -447,15 +447,36 @@ visor.innerHTML = `
   <div id="visorFotos"></div>
 `;
 // ==============================
-// MICRO‑PASO C — Llenar datos visuales
+// MICRO‑PASO D — Leer datos puntuales del Excel
 // ==============================
-// Fecha sí viene correctamente del KV
-document.getElementById("infoFecha").innerText =
-  item.fecha ?? "—";
+try {
+  const wb = XLSX.read(data.excelBase64, { type: "base64" });
 
-// Estos se llenarán desde el Excel (por ahora los limpiamos)
-document.getElementById("infoTecnico").innerText = "—";
-document.getElementById("infoOT").innerText = "—";
+  // Técnico → Datos de quien repara el servicio → Nombres y apellidos
+  document.getElementById("infoTecnico").innerText =
+    leerCeldaExcel(wb, "E16");   // AJUSTAR si la celda real es otra
+
+  // Celular
+  document.getElementById("infoCelular").innerText =
+    leerCeldaExcel(wb, "E12");
+
+  // Departamento
+  document.getElementById("infoDepto").innerText =
+    leerCeldaExcel(wb, "E11");
+
+  // ID Beneficiario
+  document.getElementById("infoBeneficiario").innerText =
+    leerCeldaExcel(wb, "E13");
+
+  // IM / OT → N° de caso
+  document.getElementById("infoOT").innerText =
+    leerCeldaExcel(wb, "E9");
+
+} catch (e) {
+  console.warn("No se pudieron leer datos del Excel:", e);
+}
+
+   
 // Aún pendientes
 // ✅ Mapeo correcto desde el Excel
 
