@@ -434,17 +434,15 @@ const btnRechazarUI  = document.getElementById("visorRechazar");
 const btnDescargarUI = document.getElementById("visorDescargar");
    
 if (estado === "aprobado") {
-  // ✅ Solo lectura
-  btnAprobar.style.display = "none";
-  btnRechazar.style.display = "none";
-  btnDescargar.style.display = "none";
+  btnAprobarUI.style.display = "none";
+  btnRechazarUI.style.display = "none";
+  btnDescargarUI.style.display = "none";
 }
 
 if (estado === "rechazado") {
-  // ✅ Solo lectura
-  btnAprobar.style.display = "none";
-  btnRechazar.style.display = "none";
-  btnDescargar.style.display = "none";
+  btnAprobarUI.style.display = "none";
+  btnRechazarUI.style.display = "none";
+  btnDescargarUI.style.display = "none";
 }
 
 // Para pendientes / en revisión → no tocamos nada
