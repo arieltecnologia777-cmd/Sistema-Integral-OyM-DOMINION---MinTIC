@@ -387,6 +387,20 @@ async function obtenerJsonFotos(item) {
 
   return data.imgsJson;
 }
+
+/* =========================================================
+   LECTOR SEGURO DE CELDAS EXCEL (SIN RENDER)
+========================================================= */
+function leerCeldaExcel(workbook, ref) {
+  try {
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const celda = sheet?.[ref];
+    return celda ? String(celda.v).trim() : "—";
+  } catch (e) {
+    return "—";
+  }
+}
+
 /* ======================================================================
    13) VER ARCHIVO — Vista previa del Excel + Fotos (IGUAL A VERSIÓN VIEJA)
 ====================================================================== */
