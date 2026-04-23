@@ -432,7 +432,22 @@ visor.innerHTML = `
   </h3>
   <div id="visorFotos"></div>
 `;
+// ==============================
+// MICRO‑PASO C — Llenar datos visuales
+// ==============================
+document.getElementById("infoTecnico").innerText =
+  item.nombre ?? "—";
 
+document.getElementById("infoOT").innerText =
+  item.nombre?.match(/\d+/)?.[0] ?? "—";
+
+document.getElementById("infoFecha").innerText =
+  item.fecha ?? "—";
+
+// Aún pendientes
+document.getElementById("infoCelular").innerText = "—";
+document.getElementById("infoDepto").innerText = "—";
+document.getElementById("infoBeneficiario").innerText = "—";
    
    // ==============================
 // PASO 1 — Modal dinámico por estado
