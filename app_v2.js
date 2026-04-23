@@ -406,6 +406,8 @@ function leerCeldaExcel(workbook, ref) {
 ====================================================================== */
 async function verArchivo(item) {
   window.__archivoActual = item;
+   // Evita reconstruir el visor más de una vez por apertura
+let visorConstruido = false;
 
    // ==============================
 // PASO 1 — Fuente única de verdad del informe
