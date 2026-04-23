@@ -446,59 +446,10 @@ visor.innerHTML = `
   </h3>
   <div id="visorFotos"></div>
 `;
-// ==============================
-// MICRO‑PASO D — Leer datos puntuales del Excel
-// ==============================
-try {
-  const wb = XLSX.read(data.excelBase64, { type: "base64" });
 
-  // Técnico → Datos de quien repara el servicio → Nombres y apellidos
-  document.getElementById("infoTecnico").innerText =
-    leerCeldaExcel(wb, "E16");   // AJUSTAR si la celda real es otra
-
-  // Celular
-  document.getElementById("infoCelular").innerText =
-    leerCeldaExcel(wb, "E12");
-
-  // Departamento
-  document.getElementById("infoDepto").innerText =
-    leerCeldaExcel(wb, "E11");
-
-  // ID Beneficiario
-  document.getElementById("infoBeneficiario").innerText =
-    leerCeldaExcel(wb, "E13");
-
-  // IM / OT → N° de caso
-  document.getElementById("infoOT").innerText =
-    leerCeldaExcel(wb, "E9");
-
-} catch (e) {
-  console.warn("No se pudieron leer datos del Excel:", e);
-}
 
    
-// Aún pendientes
-// ✅ Mapeo correcto desde el Excel
 
-// Técnico → Datos de quien repara el servicio → Nombres y apellidos
-document.getElementById("infoTecnico").innerText =
-  leerCeldaExcel(wb, "E16"); // ⬅ AJUSTA la celda si es otra
-
-// Celular
-document.getElementById("infoCelular").innerText =
-  leerCeldaExcel(wb, "E12");
-
-// Departamento
-document.getElementById("infoDepto").innerText =
-  leerCeldaExcel(wb, "E11");
-
-// ID Beneficiario
-document.getElementById("infoBeneficiario").innerText =
-  leerCeldaExcel(wb, "E13");
-
-// IM / OT → N° de caso
-document.getElementById("infoOT").innerText =
-  leerCeldaExcel(wb, "E9"); // ⬅ celda típica de N° de caso
    
    // ==============================
 // PASO 1 — Modal dinámico por estado
@@ -551,6 +502,31 @@ console.log("excelWebUrl recibido:", data.excelWebUrl);
 
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
 
+   // ==============================
+// MICRO‑PASO D — Leer datos puntuales del Excel
+// ==============================
+try {
+  const wb = XLSX.read(data.excelBase64, { type: "base64" });
+
+  document.getElementById("infoTecnico").innerText =
+    leerCeldaExcel(wb, "E16");
+
+  document.getElementById("infoCelular").innerText =
+    leerCeldaExcel(wb, "E12");
+
+  document.getElementById("infoDepto").innerText =
+    leerCeldaExcel(wb, "E11");
+
+  document.getElementById("infoBeneficiario").innerText =
+    leerCeldaExcel(wb, "E13");
+
+  document.getElementById("infoOT").innerText =
+    leerCeldaExcel(wb, "E9");
+
+} catch (e) {
+  console.warn("No se pudieron leer datos del Excel:", e);
+}
+   
   // === CARGA DE FOTOS (NO TOCADO) ===
   const jsonFotos = await obtenerJsonFotos(item);
   item.fotosPreview = jsonFotos;
