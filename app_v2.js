@@ -551,10 +551,16 @@ visor.innerHTML = `
 // ==============================
    
    // ==============================
-// PASO 1 — Modal dinámico por estado
+// PASO 1 — Modal dinámico por estado (CON RESET)
 // ==============================
 const btnDescargarUI = document.getElementById("visorDescargar");
-   
+
+// ✅ RESET SIEMPRE (MUY IMPORTANTE)
+if (btnAprobarUI)   btnAprobarUI.style.display = "inline-block";
+if (btnRechazarUI)  btnRechazarUI.style.display = "inline-block";
+if (btnDescargarUI) btnDescargarUI.style.display = "inline-block";
+
+// ✅ APLICAR REGLAS SEGÚN ESTADO
 if (estado === "aprobado") {
   btnAprobarUI.style.display = "none";
   btnRechazarUI.style.display = "none";
@@ -567,7 +573,7 @@ if (estado === "rechazado") {
   btnDescargarUI.style.display = "none";
 }
 
-// Para pendientes / en revisión → no tocamos nada
+// ✅ Para pendientes / en revisión → se mantienen visibles
    
    // 🔒 Forzar Aprobar DESACTIVADO una vez el modal ya está visib
 
