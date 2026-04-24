@@ -49,7 +49,20 @@ window.estadoInformes = {};
 window.__archivoActual = null;
 window.__mciIdActual = null;
 window.__excelAbierto = false;
+/* =========================================================
+   UTILIDAD — USUARIO LOGUEADO (AUDITOR)
+========================================================= */
+function obtenerUsuarioAuditor() {
+  try {
+    const user = usuarioActual();
+    if (!user || !user.username) return null;
 
+    // Extrae solo la parte antes del @
+    return user.username.split("@")[0];
+  } catch (e) {
+    return null;
+  }
+}
 /* ======================================================================
    3) GUARDAR / CARGAR ESTADO LOCAL
 ====================================================================== */
