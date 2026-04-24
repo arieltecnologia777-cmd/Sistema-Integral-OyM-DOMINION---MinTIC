@@ -814,7 +814,7 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
   await cargarDatosModulo();
 });
 /* =========================================================
-   ABRIR EXCEL EN LÍNEA — HABILITA APROBAR INMEDIATAMENTE
+   ABRIR EXCEL EN LÍNEA — HABILITA APROBAR DEFINITIVAMENTE
 ========================================================= */
 const btnAbrirExcel = document.getElementById("visorAbrirExcel");
 
@@ -827,19 +827,18 @@ if (btnAbrirExcel) {
       return;
     }
 
-    // ✅ Abrir Excel en línea
+    // Abrir Excel
     window.open(url, "_blank");
-
-    // ✅ Marcar Excel como abierto
     window.__excelAbierto = true;
 
-    // ✅ Habilitar INMEDIATAMENTE el botón Aprobar visible
-    const modal = document.getElementById("modalVisor");
-    if (modal) {
-      const btnAprobar = modal.querySelector("#visorAprobar");
-      if (btnAprobar) {
-        btnAprobar.removeAttribute("disabled");
-      }
+    // ✅ FORZAR habilitación visual y funcional del botón APROBAR
+    const btnAprobar = document.querySelector("#visorAprobar");
+    if (btnAprobar) {
+      btnAprobar.disabled = false;
+      btnAprobar.style.pointerEvents = "auto";
+      btnAprobar.style.opacity = "1";
+      btnAprobar.style.filter = "none";
+      btnAprobar.style.cursor = "pointer";
     }
   });
 }
