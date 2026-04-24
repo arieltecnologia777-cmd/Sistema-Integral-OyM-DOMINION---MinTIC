@@ -496,7 +496,7 @@ visor.innerHTML = `
     margin-bottom:16px;
   ">
     <div style="font-weight:700; margin-bottom:8px;">
-      Información del informe
+      Datos del informe
     </div>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:14px;">
