@@ -548,6 +548,8 @@ visor.innerHTML = `
       <div><strong>IM / OT:</strong> <span id="infoOT">—</span></div>
       <div><strong>Fecha reporte:</strong> <span id="infoFecha">—</span></div>
       <div><strong>Coordenadas:</strong> <span id="infoCoords">—</span></div>
+      <div><strong>Aprobado por:</strong> <span id="infoAprobadoPor">—</span></div>
+<div><strong>Rechazado por:</strong> <span id="infoRechazadoPor">—</span></div>
     </div>
   </div>
 
