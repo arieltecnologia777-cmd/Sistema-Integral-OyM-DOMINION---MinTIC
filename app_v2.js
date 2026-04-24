@@ -751,40 +751,33 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
   const mciId = item?.mciId || null;
   if (!mciId) return;
 
-  // ==============================
-  // GUARDAR METADATA (TÉCNICO + BENEFICIARIO + COORDENADAS) EN KV
-  // ==============================
-  try {
-    const payloadGeo = {
-  tecnico: window.__infoInforme.tecnico,
-  idBeneficiario: window.__infoInforme.beneficiario,
-  lat: window.__infoInforme.lat,
-  lng: window.__infoInforme.lng
-};
+  // ✅ GUARDAR EN KV SOLO LO REQUERIDO
+  // Departamento, IM / OT, ID Beneficiario y Coordenadas
+  const payloadMetadata = {
+    departamento: window.__infoInforme.depto,
+    ot: window.__infoInforme.ot,
+    idBeneficiario: window.__infoInforme.beneficiario,
+    lat: window.__infoInforme.lat,
+    lng: window.__infoInforme.lng
+  };
 
-    await fetch(
-      `https://cloudflare-index.modulo-de-exclusiones.workers.dev/guardar-coordenadas/${mciId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloadGeo)
-      }
-    );
-  } catch (e) {
-    console.warn("No se pudieron guardar las coordenadas en KV:", e);
-    // ⚠️ NO bloquea la aprobación
-  }
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/guardar-metadata/${mciId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadMetadata)
+    }
+  );
 
-  // ==============================
-  // APROBAR INFORME (FLUJO EXISTENTE)
-  // ==============================
+  // ✅ APROBAR INFORME (FLUJO EXISTENTE)
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
     { method: "PUT" }
   );
 
+  // ✅ ACTUALIZAR UI
   await cargarDatosModulo();
-
   document.getElementById("modalVisor").style.display = "none";
   document.getElementById("contenedor-modulo").style.display = "block";
 });
