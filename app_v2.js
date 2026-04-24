@@ -831,10 +831,10 @@ if (btnAbrirExcel) {
   });
 }
 /* =========================================================
-   ZOOM DINÁMICO EN FOTOS (SE MUEVE CON EL MOUSE)
+   ZOOM DINÁMICO EN FOTOS (SIGUE EL MOUSE)
 ========================================================= */
 
-// Aplica zoom siguiendo el cursor dentro de la imagen
+// Cuando el mouse se mueve dentro de una foto, aplica zoom dinámico
 document.addEventListener("mousemove", (e) => {
   const card = e.target.closest(".foto-card");
   if (!card) return;
@@ -851,20 +851,15 @@ document.addEventListener("mousemove", (e) => {
 
   img.style.transformOrigin = `${percentX}% ${percentY}%`;
   img.style.transform = "scale(1.5)";
-});
+}, true);
 
-// Cuando el mouse sale de la tarjeta, vuelve a normal
-document.addEventListener(
-  "mouseleave",
-  (e) => {
-    const card = e.target.closest(".foto-card");
-    if (!card) return;
+// Cuando el mouse sale de la tarjeta, vuelve la imagen a normal
+document.addEventListener("mouseleave", (e) => {
+  const card = e.target.closest(".foto-card");
+  if (!card) return;
 
-    const img = card.querySelector("img");
-    if (!img) return;
+  const img = card.querySelector("img");
+  if (!img) return;
 
-    img.style.transform = "scale(1)";
-  },
-  true
-);
-
+  img.style.transform = "scale(1)";
+}, true);
