@@ -669,7 +669,6 @@ if (data.excelBase64) {
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
 
 // ✅ Flow respondió → habilitar Abrir Excel
-const btnAbrirExcelUI = document.getElementById("visorAbrirExcel");
 
 if (btnAbrirExcelUI && window.__archivoActual?.excelWebUrl) {
   btnAbrirExcelUI.disabled = false;
