@@ -543,11 +543,7 @@ if (estado === "rechazado") {
 
 // Para pendientes / en revisión → no tocamos nada
    
-   // 🔒 Forzar Aprobar DESACTIVADO una vez el modal ya está visible
-setTimeout(() => {
-  const btnAprobar = document.getElementById("visorAprobar");
-  if (btnAprobar) btnAprobar.disabled = true;
-}, 0);
+   // 🔒 Forzar Aprobar DESACTIVADO una vez el modal ya está visib
 
    console.log("ENVIANDO AL FLOW (Excel):", {
   fileIdentifierExcel: item.fileIdentifierExcel
