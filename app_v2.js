@@ -484,6 +484,16 @@ window.__excelAbierto = false;
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
+   
+   // 🔄 Estado inicial del botón Abrir Excel (mientras llega la URL)// 🔄 Estado inicial del botón Abrir Excel (mientras llega la URL (btnAbrirExcelUI) {
+  btnAbrirExcelUI.disabled = true;
+  btnAbrirExcelUI.innerText = "⏳ Cargando datos…";
+  btnAbrirExcelUI.style.opacity = "0.6";
+  btnAbrirExcelUI.style.cursor = "wait";
+}
+const btnAbrirExcelUI = document.getElementById("visorAbrirExcel");
+
+
 
    // 🔒 Estado inicial de botones del modal (VISIBLE PERO DESHABILITADO)
 const btnAprobarUI  = document.getElementById("visorAprobar");
@@ -658,6 +668,16 @@ if (data.excelBase64) {
 // ✅ Guardar URL del Excel para abrir en línea
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
 
+// ✅ Flow respondió → habilitar Abrir Excel
+const btnAbrirExcelUI = document.getElementById("visorAbrirExcel");
+
+if (btnAbrirExcelUI && window.__archivoActual?.excelWebUrl) {
+  btnAbrirExcelUI.disabled = false;
+  btnAbrirExcelUI.innerText = "📊 Abrir Excel en línea";
+  btnAbrirExcelUI.style.opacity = "1";
+  btnAbrirExcelUI.style.cursor = "pointer";
+}
+
    // ==============================
 // NORMALIZAR CAMPOS NO DILIGENCIADOS
 // ==============================
@@ -831,15 +851,16 @@ if (btnAbrirExcel) {
     const url = window.__archivoActual?.excelWebUrl;
 
     if (!url) {
-      alert("El enlace al Excel aún no está disponible.");
+      // Seguridad: no debería pasar
+      alert("El Excel aún no está listo.");
       return;
     }
 
-    // ✅ Abrir Excel
+    // Abrir Excel
     window.open(url, "_blank");
     window.__excelAbierto = true;
 
-    // ✅ HABILITAR APROBAR
+    // ✅ Habilitar Aprobar
     const btnAprobar = document.getElementById("visorAprobar");
     if (btnAprobar) {
       btnAprobar.disabled = false;
@@ -848,7 +869,7 @@ if (btnAbrirExcel) {
       btnAprobar.style.pointerEvents = "auto";
     }
 
-    // ✅ HABILITAR RECHAZAR (MISMO COMPORTAMIENTO)
+    // ✅ Habilitar Rechazar
     const btnRechazar = document.getElementById("visorRechazar");
     if (btnRechazar) {
       btnRechazar.disabled = false;
@@ -858,6 +879,7 @@ if (btnAbrirExcel) {
     }
   });
 }
+
 /* =========================================================
    ZOOM DINÁMICO REAL (FUNCIONA)
 ========================================================= */
