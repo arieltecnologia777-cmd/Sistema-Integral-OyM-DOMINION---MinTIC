@@ -485,6 +485,24 @@ window.__excelAbierto = false;
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
+   // 🔒 Estado inicial de botones del modal (VISIBLE PERO DESHABILITADO)
+const btnAprobarUI  = document.getElementById("visorAprobar");
+const btnRechazarUI = document.getElementById("visorRechazar");
+
+if (btnAprobarUI) {
+  btnAprobarUI.disabled = true;
+  btnAprobarUI.style.opacity = "0.4";
+  btnAprobarUI.style.cursor = "not-allowed";
+  btnAprobarUI.style.pointerEvents = "auto";
+}
+
+if (btnRechazarUI) {
+  btnRechazarUI.disabled = true;
+  btnRechazarUI.style.opacity = "0.4";
+  btnRechazarUI.style.cursor = "not-allowed";
+  btnRechazarUI.style.pointerEvents = "auto";
+}
+
    // ✅ Crear contenedor de fotos (OBLIGATORIO)
 const visor = document.getElementById("visorIframe");
 visor.innerHTML = `
@@ -835,13 +853,13 @@ if (btnAbrirExcel) {
   });
 }
 
-// ✅ FORZAR habilitación visual y funcional del botón RECHAZAR
+// ✅ HABILITAR VISUALMENTE RECHAZAR (IGUAL QUE APROBAR)
 const btnRechazar = document.querySelector("#visorRechazar");
 if (btnRechazar) {
   btnRechazar.disabled = false;
-  btnRechazar.style.pointerEvents = "auto";
   btnRechazar.style.opacity = "1";
   btnRechazar.style.cursor = "pointer";
+  btnRechazar.style.pointerEvents = "auto";
 }
 /* =========================================================
    ZOOM DINÁMICO REAL (FUNCIONA)
