@@ -484,16 +484,16 @@ window.__excelAbierto = false;
   // Ocultar tabla y mostrar modal
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
-   
-   // 🔄 Estado inicial del botón Abrir Excel (mientras llega la URL)// 🔄 Estado inicial del botón Abrir Excel (mientras llega la URL (btnAbrirExcelUI) {
+
+   // 🔄 Estado inicial del botón Abrir Excel (mientras llega la URL)
+const btnAbrirExcelUI = document.getElementById("visorAbrirExcel");
+
+if (btnAbrirExcelUI) {
   btnAbrirExcelUI.disabled = true;
   btnAbrirExcelUI.innerText = "⏳ Cargando datos…";
   btnAbrirExcelUI.style.opacity = "0.6";
   btnAbrirExcelUI.style.cursor = "wait";
 }
-const btnAbrirExcelUI = document.getElementById("visorAbrirExcel");
-
-
 
    // 🔒 Estado inicial de botones del modal (VISIBLE PERO DESHABILITADO)
 const btnAprobarUI  = document.getElementById("visorAprobar");
