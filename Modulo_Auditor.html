@@ -368,30 +368,32 @@ tbody td {
   .fotos-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 18px;
 }
 
 .foto-card {
   border: 1px solid #dce3f5;
-  border-radius: 10px;
-  overflow: hidden;           /* IMPORTANTE para el zoom */
+  border-radius: 12px;
+  overflow: hidden;
   background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
   cursor: pointer;
+  min-height: 260px;          /* ✅ tarjeta más grande */
 }
 
 .foto-card img {
   width: 100%;
-  height: 180px;
-  object-fit: contain;        /* NO recorta */
+  height: 240px;              /* ✅ imagen más grande */
+  object-fit: contain;        /* ✅ sin recorte */
   background: #f4f6f8;
-  transition: transform 0.35s ease;  /* animación suave */
+  transition: transform 0.35s ease;
 }
 
-/* ✅ ZOOM AL PASAR EL MOUSE */
+/* ✅ ZOOM MÁS POTENTE */
 .foto-card:hover img {
-  transform: scale(1.25);
+  transform: scale(1.45);
 }
+``
 
 
 
