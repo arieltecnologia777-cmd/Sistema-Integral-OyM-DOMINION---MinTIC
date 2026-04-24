@@ -49,6 +49,18 @@ window.estadoInformes = {};
 window.__archivoActual = null;
 window.__mciIdActual = null;
 window.__excelAbierto = false;
+
+// ✅ Función auxiliar: convertir correo en nombre legible
+function nombreBonitoDesdeEmail(email) {
+  if (!email || !email.includes("@")) return "Desconocido";
+
+  const base = email.split("@")[0]; // juanito.perez
+  return base
+    .split(".")
+    .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+    .join(" ");
+}
+
 /* =========================================================
    UTILIDAD — USUARIO LOGUEADO (AUDITOR)
 ========================================================= */
@@ -806,6 +818,17 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
     return;
   }
 
+   // ✅ Obtener usuario y construir nombre legible
+const usuario = usuarioActual();
+const emailUsuario = usuario?.username || usuario?.email || "";
+const nombreUsuario = nombreBonitoDesdeEmail(emailUsuario);
+
+// ✅ Mostrar "Aprobado por" en el modal
+const spanAprobadoPor = document.getElementById("infoAprobadoPor");
+if (spanAprobadoPor) {
+  spanAprobadoPor.innerText = nombreUsuario;
+}
+   
   const item = window.__archivoActual;
   const mciId = item?.mciId || null;
   if (!mciId) return;
