@@ -485,6 +485,12 @@ window.__excelAbierto = false;
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
+   // ✅ Estado inicial del botón Aprobar
+const btnAprobar = document.getElementById("visorAprobar");
+if (btnAprobar) {
+  btnAprobar.disabled = !window.__excelAbierto;
+}
+
    // ✅ Crear contenedor de fotos (OBLIGATORIO)
 const visor = document.getElementById("visorIframe");
 visor.innerHTML = `
@@ -814,25 +820,30 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
   await cargarDatosModulo();
 });
 /* =========================================================
-   ABRIR EXCEL EN LÍNEA — MARCA EXCEL ABIERTO Y HABILITA APROBAR
+   ABRIR EXCEL EN LÍNEA — HABILITA APROBAR
 ========================================================= */
 const btnAbrirExcel = document.getElementById("visorAbrirExcel");
+
 if (btnAbrirExcel) {
   btnAbrirExcel.addEventListener("click", () => {
     const url = window.__archivoActual?.excelWebUrl;
+
     if (!url) {
       alert("El enlace al Excel aún no está disponible.");
       return;
     }
 
-    // ✅ Abrir Excel
     window.open(url, "_blank");
 
     // ✅ Marcar Excel como abierto
     window.__excelAbierto = true;
 
-    // ✅ Habilitar botón Aprobar
+    // ✅ Habilitar botón Aprobar (REAL y visual)
     const btnAprobar = document.getElementById("visorAprobar");
-    if (btnAprobar) btnAprobar.disabled = false;
+    if (btnAprobar) {
+      btnAprobar.disabled = false;
+      btnAprobar.classList.remove("disabled");
+      btnAprobar.classList.remove("btn-disabled");
+    }
   });
 }
