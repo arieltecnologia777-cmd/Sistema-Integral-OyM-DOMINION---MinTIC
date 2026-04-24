@@ -485,7 +485,6 @@ window.__excelAbierto = false;
   document.getElementById("contenedor-modulo").style.display = "none";
   document.getElementById("modalVisor").style.display = "block";
 
-
    // ✅ Crear contenedor de fotos (OBLIGATORIO)
 const visor = document.getElementById("visorIframe");
 visor.innerHTML = `
