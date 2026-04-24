@@ -683,7 +683,6 @@ if (jsonFotos) {
 function renderizarFotos(item) {
   const fotos = item.fotosPreview;
   const galeria = document.getElementById("visorFotos");
-
   galeria.innerHTML = "";
 
   if (!fotos) {
@@ -706,26 +705,24 @@ function renderizarFotos(item) {
     const base64 = fotos[f.key];
     if (!base64) return;
 
-    const cont = document.createElement("div");
-    cont.style.border = "1px solid #dce3f5";
-    cont.style.borderRadius = "10px";
-    cont.style.overflow = "hidden";
-    cont.style.background = "#fff";
-    cont.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-    cont.style.cursor = "pointer";
-    cont.style.display = "flex";
-    cont.style.flexDirection = "column";
+    const titulo = document.createElement("h4");
+    titulo.textContent = f.titulo;
+    titulo.style.margin = "16px 0 8px";
+    titulo.style.fontWeight = "700";
 
-    cont.innerHTML = `
-      <div style="padding:6px 10px; font-weight:700; font-size:14px; border-bottom:1px solid #eee;">
-        ${f.titulo}
-      </div>
-      <img src="${base64}" style="width:100%; height:180px; object-fit:cover;">
-    `;
+    const grid = document.createElement("div");
+    grid.className = "fotos-grid";
 
-    cont.onclick = () => window.open(base64, "_blank");
+    const card = document.createElement("div");
+    card.className = "foto-card";
+    card.innerHTML = `<img src="${base64}" />`;
 
-    galeria.appendChild(cont);
+    card.onclick = () => window.open(base64, "_blank");
+
+    grid.appendChild(card);
+
+    galeria.appendChild(titulo);
+    galeria.appendChild(grid);
   });
 }
 /* ======================================================================
