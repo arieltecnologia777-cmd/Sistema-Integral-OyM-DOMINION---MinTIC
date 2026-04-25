@@ -5340,7 +5340,7 @@ document.addEventListener("click", async (e) => {
   }
 });
 const photoInputs = [
-  "inp-firma-tec",
+  "img-firma-tec",
   "img-gps-geo",
   "img-ap-int",
   "img-ap-ext1",
@@ -6257,7 +6257,7 @@ if (!tecnicoActual) {
 
     // === Firma tecnico ===
     let firmaActaDataUrl = '';
-    const firmaInput = document.getElementById('inp-firma-tec');
+    const firmaInput = document.getElementById('img-firma-tec');
     if (firmaInput?.files?.[0]) {
         firmaActaDataUrl = await fileToDataURL(firmaInput.files[0]);
     }
