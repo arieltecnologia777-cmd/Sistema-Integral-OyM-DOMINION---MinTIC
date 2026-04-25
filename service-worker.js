@@ -2,7 +2,7 @@ const CACHE_NAME = "mci-cache-v1";
 
 const ASSETS = [
   "./",
-  "digitalización_MCI (7).html",
+  "digitalizacion_MCI.html",
   "manifest.json"
 ];
 
