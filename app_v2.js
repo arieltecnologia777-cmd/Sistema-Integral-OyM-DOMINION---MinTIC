@@ -818,26 +818,32 @@ document.getElementById("visorAprobar").addEventListener("click", async () => {
     return;
   }
 
-   // ✅ Obtener usuario y construir nombre legible
-const usuario = usuarioActual();
-const emailUsuario = usuario?.username || usuario?.email || "";
-const nombreUsuario = nombreBonitoDesdeEmail(emailUsuario);
+  const item = window.__archivoActual "PUT",  const item = window.__archivoActual;
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadMetadata)
+    }
+  );
 
-// ✅ Mostrar "Aprobado por" en el modal
-const spanAprobadoPor = document.getElementById("infoAprobadoPor");
-if (spanAprobadoPor) {
-  spanAprobadoPor.innerText = nombreUsuario;
-}
-   
-  const item = window.__archivoActual;
+  // ✅ Aprobar informe
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
+    { method: "PUT" }
+  );
+
+  // ✅ Cerrar modal y refrescar tabla
+  await cargarDatosModulo();
+  document.getElementById("modalVisor").style.display = "none";
+  document.getElementById("contenedor-modulo").style.display = "block";
+});
   const mciId = item?.mciId || null;
   if (!mciId) return;
 
-  // ✅ Obtener usuario logueado
+  // ✅ Obtener usuario y construir nombre legible
   const usuario = usuarioActual();
-  const nombreUsuario = usuario?.username || usuario?.email || "desconocido";
+  const emailUsuario = usuario?.username || usuario?.email || "";
+  const nombreUsuario = nombreBonitoDesdeEmail(emailUsuario);
 
-  // ✅ Mostrar quién aprobó (EN EL MODAL)
+  // ✅ Mostrar "Aprobado por" en el modal
   const spanAprobadoPor = document.getElementById("infoAprobadoPor");
   if (spanAprobadoPor) {
     spanAprobadoPor.innerText = nombreUsuario;
@@ -855,23 +861,7 @@ if (spanAprobadoPor) {
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/guardar-metadata/${mciId}`,
     {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payloadMetadata)
-    }
-  );
 
-  // ✅ Aprobar informe
-  await fetch(
-    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/aprobar/${mciId}`,
-    { method: "PUT" }
-  );
-
-  // ✅ Cerrar modal y refrescar tabla
-  await cargarDatosModulo();
-  document.getElementById("modalVisor").style.display = "none";
-  document.getElementById("contenedor-modulo").style.display = "block";
-});
 
 /* ======================================================================
    17) RECHAZAR (OPCIONAL)
