@@ -276,30 +276,33 @@ async function cargarDatosModulo() {
   window.datosActuales = listaKV.map(reg => {
     const fechaTexto = reg.fechaGenerado || "";
 
-    return {
-      // ✅ Columnas visibles
-      nombre: reg.fileName,
-      fecha: fechaTexto
-        ? new Date(fechaTexto).toLocaleString("es-CO", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit"
-          })
-        : "",
-      tamano: reg.sizeBytes
-        ? (reg.sizeBytes / 1024 / 1024).toFixed(2) + " MB"
-        : "",
+   return {
+  // ✅ Columnas visibles
+  nombre: reg.fileName,
+  fecha: fechaTexto
+    ? new Date(fechaTexto).toLocaleString("es-CO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      })
+    : "",
+  tamano: reg.sizeBytes
+    ? (reg.sizeBytes / 1024 / 1024).toFixed(2) + " MB"
+    : "",
 
-      // ✅ Datos internos
-      fechaReal: fechaTexto,
-      mciId: reg.mciId,
-      estadoKV: reg.estado,
-      fileIdentifierExcel: reg.fileIdentifierExcel,
-      jsonFileId: reg.jsonFileId
-    };
-  });
+  // ✅ Datos internos
+  fechaReal: fechaTexto,
+  mciId: reg.mciId,
+  estadoKV: reg.estado,
+  fileIdentifierExcel: reg.fileIdentifierExcel,
+  jsonFileId: reg.jsonFileId,
+
+  // ✅ NUEVO (para que no se pierda al refrescar)
+  aprobadoPor: reg.aprobadoPor,
+  rechazadoPor: reg.rechazadoPor
+};
 
   // ✅ 4) Ordenar por fecha descendente
   window.datosActuales.sort((a, b) => {
