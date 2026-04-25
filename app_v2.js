@@ -303,7 +303,7 @@ async function cargarDatosModulo() {
   aprobadoPor: reg.aprobadoPor,
   rechazadoPor: reg.rechazadoPor
 };
-
+});
   // ✅ 4) Ordenar por fecha descendente
   window.datosActuales.sort((a, b) => {
     const fa = Date.parse(b.fechaReal || "") || 0;
