@@ -50,8 +50,17 @@ window.__archivoActual = null;
 window.__mciIdActual = null;
 window.__excelAbierto = false;
 
-// ✅ Convierte correo en nombre legible
-function nombreBonitoDesdeEmail, "");function nombreBonitoDesdeEmail(email) {
+// ✅ Convierte correo en nombre legible (VERSIÓN CORRECTA)
+function nombreBonitoDesdeEmail(email) {
+  if (!email || !email.includes("@")) {
+    return "Desconocido";
+  }
+
+  // Parte antes del @ (ej: juanito.perez-ext)
+  let base = email.split("@")[0];
+
+  // ✅ Eliminar sufijos tipo -ext, -etx, -external
+  base = base.replace(/-(ext|etx|external)$/i, "");
 
   // ✅ Construir nombre "Juanito Perez"
   return base
@@ -61,15 +70,6 @@ function nombreBonitoDesdeEmail, "");function nombreBonitoDesdeEmail(email) {
     })
     .join(" ");
 }
-  if (!email || !email.includes("@")) {
-    return "Desconocido";
-  }
-
-  // Parte antes del @
-  let base = email.split("@")[0]; // ej: juanito.perez-ext
-
-  // ✅ Eliminar sufijos tipo -ext, -etx, -external
-
 
 /* =========================================================
    UTILIDAD — USUARIO LOGUEADO (AUDITOR)
