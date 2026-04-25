@@ -50,16 +50,21 @@ window.__archivoActual = null;
 window.__mciIdActual = null;
 window.__excelAbierto = false;
 
-// ✅ Función auxiliar: convertir correo en nombre legible
 function nombreBonitoDesdeEmail(email) {
-  if (!email || !email.includes("@")) return "Desconocido";
-
-  const base = email.split("@")[0]; // juanito.perez
+  if ( Construir nombre "Juanito Perez"  if (!email || !email.includes("@")) return "Desconocido";
   return base
     .split(".")
     .map(p => p.charAt(0).toUpperCase() + p.slice(1))
     .join(" ");
 }
+
+  // Parte antes del @
+  let base = email.split("@")[0]; // ej: juanito.perez-ext
+
+  // ✅ Eliminar sufijos tipo -ext, -etx, -external
+  base = base.replace(/-(ext|etx|external)$/i, "");
+
+
 
 /* =========================================================
    UTILIDAD — USUARIO LOGUEADO (AUDITOR)
