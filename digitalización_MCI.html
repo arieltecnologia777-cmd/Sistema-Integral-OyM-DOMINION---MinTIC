@@ -6713,17 +6713,16 @@ window.__fileNameActual = null;
 
 // ✅ EVENTO DE LOGIN
 document.getElementById("loginBtn").onclick = () => {
-  const u = loginUser.value.trim().toLowerCase();
-  const p = loginPass.value.trim();
+  const cedula = loginUser.value.trim();
+const password = loginPass.value.trim();
 
   if (TECNICOS[u] && TECNICOS[u] === p) {
 
-    localStorage.setItem("tecnicoActual", u);
-    tecnicoActual = u;
+   localStorage.setItem("tecnicoActual", nombreTecnico);
+tecnicoActual = nombreTecnico;
 
-    // ✅ Guardar sesión del técnico (control 24h)
 localStorage.setItem("tecnicoSesion", JSON.stringify({
-  usuario: u,
+  usuario: nombreTecnico,
   loginTime: Date.now()
 }));
     
