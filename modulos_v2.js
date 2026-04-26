@@ -24,7 +24,7 @@ export const MODULOS = {
   { id: "tecnico", label: "Técnico" },
   { id: "nombre", label: "Nombre archivo" },
   { id: "fecha", label: "Fecha" }
-]
+],
         pendientes: FOLDER_PATH,
         aprobados: null
     }
