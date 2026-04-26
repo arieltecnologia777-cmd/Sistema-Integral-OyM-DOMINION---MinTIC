@@ -914,11 +914,25 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
   const emailUsuario = usuario?.username || usuario?.email || "";
   const nombreUsuario = nombreBonitoDesdeEmail(emailUsuario);
 
-  const spanRechazadoPor = document.getElementById("infoRechazadoPor");
-  if (spanRechazadoPor) {
-    spanRechazadoPor.innerText = nombreUsuario;
-  }
+  // ✅ GUARDAR METADATA (IGUAL QUE APROBAR)
+  const payloadMetadata = {
+    departamento: window.__infoInforme.depto,
+    ot: window.__infoInforme.ot,
+    idBeneficiario: window.__infoInforme.beneficiario,
+    lat: window.__infoInforme.lat,
+    lng: window.__infoInforme.lng
+  };
 
+  await fetch(
+    `https://cloudflare-index.modulo-de-exclusiones.workers.dev/guardar-metadata/${mciId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payloadMetadata)
+    }
+  );
+
+  // ✅ RECHAZAR
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
     {
