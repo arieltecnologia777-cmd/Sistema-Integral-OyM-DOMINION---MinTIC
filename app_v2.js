@@ -905,34 +905,27 @@ document.getElementById("visorRechazar").addEventListener("click", async () => {
 
   const item = window.__archivoActual;
   const mciId = item?.mciId ?? null;
-  if (!mciId) {
-    alert("No se pudo identificar el informe a rechazar.");
-    return;
-  }
+  if (!mciId) return;
 
   const usuario = usuarioActual();
   const emailUsuario = usuario?.username || usuario?.email || "";
   const nombreUsuario = nombreBonitoDesdeEmail(emailUsuario);
 
-  // ✅ GUARDAR METADATA (IGUAL QUE APROBAR)
-  const payloadMetadata = {
-    departamento: window.__infoInforme.depto,
-    ot: window.__infoInforme.ot,
-    idBeneficiario: window.__infoInforme.beneficiario,
-    lat: window.__infoInforme.lat,
-    lng: window.__infoInforme.lng
-  };
-
+  // ✅ 1) GUARDAR METADATA (MISMO QUE APROBAR)
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/guardar-metadata/${mciId}`,
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payloadMetadata)
+      body: JSON.stringify({
+        idBeneficiario: window.__infoInforme.beneficiario,
+        lat: window.__infoInforme.lat,
+        lng: window.__infoInforme.lng
+      })
     }
   );
 
-  // ✅ RECHAZAR
+  // ✅ 2) RECHAZAR
   await fetch(
     `https://cloudflare-index.modulo-de-exclusiones.workers.dev/rechazar/${mciId}`,
     {
