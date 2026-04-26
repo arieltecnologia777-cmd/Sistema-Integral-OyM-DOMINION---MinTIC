@@ -6698,55 +6698,57 @@ if ("serviceWorker" in navigator) {
 </script>
 
 <script type="module">
-  import { TECNICOS, PASSWORD_GLOBAL } from "./tecnicos.js";
+import { TECNICOS, PASSWORD_GLOBAL } from "./tecnicos.js";
+
 // ================================
-// LOGIN PARA TÉCNICOS (CORREGIDO)
+// LOGIN PARA TÉCNICOS (FINAL)
 // ================================
 
-
-// ✅ VARIABLE GLOBAL NECESARIA PARA EXPORTAR MCI + CLOUDFLARE
+// variable global usada por el resto de la app
 let tecnicoActual = localStorage.getItem("tecnicoActual") || null;
 
-// ✅ Variables globales para verificar aprobación y descarga (RAM)
-window.__mciIdActual = null;
-window.__fileNameActual = null;
-
-// ✅ EVENTO DE LOGIN
+// evento del botón Ingresar
 document.getElementById("loginBtn").onclick = () => {
+
+  // leer lo que escribió la persona
   const cedula = loginUser.value.trim();
-const password = loginPass.value.trim();
+  const password = loginPass.value.trim();
 
-  if (TECNICOS[u] && TECNICOS[u] === p) {
+  // validar contraseña única
+  if (password !== PASSWORD_GLOBAL) {
+    alert("Contraseña incorrecta");
+    return;
+  }
 
-   localStorage.setItem("tecnicoActual", nombreTecnico);
-tecnicoActual = nombreTecnico;
+  // buscar técnico por cédula
+  const nombreTecnico = TECNICOS[cedula];
+  if (!nombreTecnico) {
+    alert("Técnico no registrado");
+    return;
+  }
 
-localStorage.setItem("tecnicoSesion", JSON.stringify({
-  usuario: nombreTecnico,
-  loginTime: Date.now()
-}));
-    
-    mostrarApp();
+  // guardar sesión con el NOMBRE COMPLETO
+  localStorage.setItem("tecnicoActual", nombreTecnico);
+  tecnicoActual = nombreTecnico;
 
-// ✅ Mostrar sección de informes
-mostrarMisInformes();
+  localStorage.setItem("tecnicoSesion", JSON.stringify({
+    usuario: nombreTecnico,
+    loginTime: Date.now()
+  }));
 
-// ✅ Cargar informes del técnico en la tabla
-cargarInformesEnTabla();
+  // continuar como siempre
+  mostrarApp();
+  mostrarMisInformes();
+  cargarInformesEnTabla();
 
+  // lógica que ya tenías
+  setTimeout(async () => {
+    const informe = await verificarEstadoPorTecnico();
+    const btn = document.getElementById("downloadBtn");
+    if (!btn) return;
+  }, 1500);
+};
 
-    
-// ✅ Revisar aprobación al iniciar sesión (login manual)
-setTimeout(async () => {
-
-  const informe = await verificarEstadoPorTecnico();
-  const btn = document.getElementById("downloadBtn");
-  if (!btn) return;
-
-  // 🔒 Lógica de selección se moverá al listado por fila (Opción A)
-  // registro global desactivado intencionalmente
-
-}, 1500);
 
 
 
