@@ -6070,15 +6070,17 @@ async function registrarEnKV({
 }) {
   try {
 
-    // 🔥 NUEVO — detectar si está en modo subsanar
-    const estadoFinal = localStorage.getItem("modoSubsanar") === "true"
+    // 🔥 Detectar modo subsanar
+    const modoSubsanar = localStorage.getItem("modoSubsanar") === "true";
+
+    const estadoFinal = modoSubsanar
       ? "subsanado"
       : "pendiente";
 
     const payload = {
       mciId,
       tecnico,
-      estado: estadoFinal, // ✅ AQUÍ EL CAMBIO REAL
+      estado: estadoFinal, // ✅ estado dinámico
       fileName,
       fileIdentifierExcel,
       jsonFileId
@@ -6095,6 +6097,12 @@ async function registrarEnKV({
       return false;
     }
 
+    // 🔥 ✅ LIMPIAR MODO SUBSANAR SOLO SI ERA SUBSANACIÓN
+    if (modoSubsanar) {
+      localStorage.removeItem("modoSubsanar");
+      localStorage.removeItem("mciSubsanar");
+    }
+
     return true;
 
   } catch (err) {
@@ -6102,6 +6110,7 @@ async function registrarEnKV({
     return false;
   }
 }
+    
     
     // ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
 async function getFoto(id, maxPx = 1600, quality = 0.85) {
