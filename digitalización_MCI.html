@@ -5644,12 +5644,15 @@ function makeRow() {
             const act = e.target.closest('.chip')?.dataset.act;
             if (!act) return;
             if (act==='change') input.click();
-            if (act==='remove'){
-              const img = cell.querySelector('img'); if (img) img.remove();
-              cell.classList.remove('has-image');
-              placeholder.style.display='';
-              input.value = '';
-            }
+           if (act==='remove'){
+  const img = cell.querySelector('img'); if (img) img.remove();
+  cell.classList.remove('has-image');
+  placeholder.style.display='';
+  input.value = '';
+
+  // 🔥 ESTA LÍNEA ARREGLA TODO
+  dbSavePhoto(input.id, null);
+}
           });
         };
 
