@@ -7070,7 +7070,21 @@ document.querySelectorAll(".remove-btn").forEach(btn => {
 
   });
 });
+
+    // 🔥 RESET MODO SUBSANAR AL ABRIR LA APP
+localStorage.removeItem("modoSubsanar");
+localStorage.removeItem("mciSubsanar");
+
+// ocultar botón subsanar
+const subsanarBtn = document.getElementById("subsanarBtn");
+if (subsanarBtn) subsanarBtn.style.display = "none";
+
+// habilitar botón cargar informe
+const exportBtn = document.getElementById("exportBtn");
+if (exportBtn) {
+  exportBtn.disabled = false;
+  exportBtn.style.opacity = "1";
+}
 </script>
-  
 </body>
 </html>
