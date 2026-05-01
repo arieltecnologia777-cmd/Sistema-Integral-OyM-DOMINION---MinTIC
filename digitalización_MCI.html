@@ -5733,7 +5733,9 @@ function makeRow() {
 
         const index = cell._files.indexOf(file);
         if (index !== -1) cell._files.splice(index, 1);
+        dbSavePhoto(input.id, null);
 
+        
         if (gallery.children.length === 0) {
           cell.classList.remove('has-image');
           placeholder.style.display = '';
