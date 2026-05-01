@@ -6060,7 +6060,7 @@ function toDDMMYYYY(dateInput) {
   }
 }
 
-// ✅ registrarEnKV — VERSIÓN CORRECTA PARA ONE DRIVE + AUDITOR
+// ✅ registrarEnKV — CON SOPORTE SUBSANADO
 async function registrarEnKV({
   mciId,
   tecnico,
@@ -6069,10 +6069,16 @@ async function registrarEnKV({
   jsonFileId
 }) {
   try {
+
+    // 🔥 NUEVO — detectar si está en modo subsanar
+    const estadoFinal = localStorage.getItem("modoSubsanar") === "true"
+      ? "subsanado"
+      : "pendiente";
+
     const payload = {
       mciId,
       tecnico,
-      estado: "pendiente",
+      estado: estadoFinal, // ✅ AQUÍ EL CAMBIO REAL
       fileName,
       fileIdentifierExcel,
       jsonFileId
@@ -6090,12 +6096,13 @@ async function registrarEnKV({
     }
 
     return true;
+
   } catch (err) {
     console.error("❌ Error KV:", err);
     return false;
   }
 }
-
+    
     // ✅ Obtiene foto desde input file o desde IndexedDB si fue restaurada
 async function getFoto(id, maxPx = 1600, quality = 0.85) {
     const input = document.getElementById(id);
