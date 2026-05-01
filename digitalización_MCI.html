@@ -6395,6 +6395,7 @@ if (!resp.ok) {
   throw new Error(`Error HTTP ${resp.status} al generar el informe`);
 }
 
+if (currentFlowUrl === FLOW_SUBSANAR_URL) await fetch(`https://cloudflare-index.modulo-de-exclusiones.workers.dev/subsanar/${numeroCaso}`, { method: "PUT" });      
       
 setStatus("✅ Informe enviado para revisión del auditor", "ok");
 alert("El informe fue enviado correctamente. El auditor lo revisará y aprobará.");
