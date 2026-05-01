@@ -6997,5 +6997,20 @@ if (logoutBtn) {
 
   </div>
 </div>
+
+  <script>
+document.querySelectorAll(".remove-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    await saveDraft();
+  });
+});
+
+document.querySelectorAll('input[type="file"]').forEach(input => {
+  input.addEventListener('change', () => {
+    saveDraft();
+  });
+});
+</script>
+  
 </body>
 </html>
