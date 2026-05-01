@@ -6838,6 +6838,28 @@ async function cargarInformesEnTabla() {
     `;
 
     tbody.appendChild(tr);
+    
+    // 🔥 ACTIVAR CORREGIR (CIERRA MODAL + MODO SUBSANAR)
+tr.querySelector(".btnSubsanar")?.addEventListener("click", () => {
+
+  const mciId = tr.querySelector(".btnSubsanar").dataset.mciid;
+
+  // guardar modo subsanar
+  localStorage.setItem("modoSubsanar", "true");
+  localStorage.setItem("mciSubsanar", mciId);
+
+  // cerrar modal
+  document.getElementById("misInformesModal").style.display = "none";
+
+  // mostrar botón subsanar del sidebar
+  document.getElementById("subsanarBtn").style.display = "block";
+
+  // bloquear cargar informe
+  const exportBtn = document.getElementById("exportBtn");
+  exportBtn.disabled = true;
+  exportBtn.style.opacity = "0.5";
+
+});
   }
 }
 
