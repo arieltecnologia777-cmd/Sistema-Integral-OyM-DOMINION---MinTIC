@@ -263,7 +263,7 @@ async function seleccionarModulo(mod) {
         ">
 
           <img 
-            src="img/auditor-dashboard.png"
+            src="auditor-dashboard.png"
             style="
               width:320px;
               max-width:100%;
