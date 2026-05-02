@@ -168,7 +168,7 @@ async function seleccionarModulo(mod) {
 
 
       <!-- IZQUIERDA -->
-      <div style="max-width:520px; position:relative; z-index:10;">
+      <div style="max-width:520px; position:relative; z-index:2;">
 
         <!-- ❌ QUITAMOS 'Panel Auditor' -->
         <!-- ✅ SOLO TEXTO -->
@@ -205,7 +205,7 @@ async function seleccionarModulo(mod) {
   width:480px;
 
   position:relative;
-  z-index:5; /* ✅ EL CARD QUEDA ENCIMA */
+  z-index:1; 
 ">
 
           <div style="
@@ -257,11 +257,12 @@ async function seleccionarModulo(mod) {
   ">
 
     <img
-  src="./auditor-dashboard.png"
+  src="./auditor-dashboard.png" 
   style="
     width:360px;
     position:relative;
-    z-index:1; /* ✅ MENOR QUE EL CARD */
+    z-index:10; /* ✅ IMAGEN MÁXIMA PRIORIDAD */
+    transform: translateX(20px); /* ✅ la hace sobresalir */
   "
 />
 
