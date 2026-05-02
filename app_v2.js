@@ -172,7 +172,8 @@ async function seleccionarModulo(mod) {
   cont.innerHTML = generarTablaHTML(window.moduloActivo);
 
   prepararEventosTabla();
-  await cargarDatosModulo();
+activarFiltroEstado();
+actualizarContadores(); ✅
 }
 /* ======================================================================
    7) GENERAR TABLA HTML
@@ -429,6 +430,10 @@ function actualizarContadores() {
    ACTIVAR FILTROS ESTADO
 ====================================================================== */
 
+/* ======================================================================
+   ACTIVAR FILTROS ESTADO
+====================================================================== */
+
 function activarFiltroEstado() {
 
   const botones = document.querySelectorAll("#filtroEstados button");
@@ -438,6 +443,12 @@ function activarFiltroEstado() {
     btn.onclick = () => {
 
       const filtro = btn.dataset.filtro;
+
+      // 🔥 Quitar selección anterior
+      botones.forEach(b => b.classList.remove("active"));
+
+      // ✅ Activar botón actual
+      btn.classList.add("active");
 
       const filas = document.querySelectorAll("#tbodyDatos tr");
 
