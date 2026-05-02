@@ -384,6 +384,7 @@ function renderTabla() {
 
 prepararEventosTabla();
 activarFiltroEstado();
+actualizarContadores();
 }
 
 function actualizarContadores() {
