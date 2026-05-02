@@ -173,7 +173,7 @@ async function seleccionarModulo(mod) {
 
   prepararEventosTabla();
 activarFiltroEstado();
-actualizarContadores(); ✅
+actualizarContadores();
 }
 /* ======================================================================
    7) GENERAR TABLA HTML
