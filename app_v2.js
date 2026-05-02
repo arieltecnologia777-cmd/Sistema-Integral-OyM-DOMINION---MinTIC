@@ -196,14 +196,17 @@ async function seleccionarModulo(mod) {
 
         <!-- ✅ CARD SOBREPOSICION -->
         <div style="
-          margin-top:20px;
-          background:#ffffff;
-          padding:22px;
-          border-radius:16px;
-          border:1px solid #e3e8f5;
-          box-shadow:0 12px 24px rgba(0,0,0,0.06);
-          width:480px;
-        ">
+  margin-top:20px;
+  background:#ffffff;
+  padding:22px;
+  border-radius:16px;
+  border:1px solid #e3e8f5;
+  box-shadow:0 12px 24px rgba(0,0,0,0.06);
+  width:480px;
+
+  position:relative;
+  z-index:5; /* ✅ EL CARD QUEDA ENCIMA */
+">
 
           <div style="
             display:flex;
