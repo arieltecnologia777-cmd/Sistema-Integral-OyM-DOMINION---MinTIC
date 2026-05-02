@@ -256,12 +256,14 @@ async function seleccionarModulo(mod) {
     align-items:center;
   ">
 
-    <img 
-      src="./auditor-dashboard.png" 
-      style="
-        width:300px;
-      " 
-    />
+    <img
+  src="./auditor-dashboard.png"
+  style="
+    width:360px;
+    position:relative;
+    z-index:1; /* ✅ MENOR QUE EL CARD */
+  "
+/>
 
   </div>
 
