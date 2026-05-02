@@ -206,8 +206,8 @@ function generarTablaHTML(modulo) {
 
   <!-- 🔍 BUSCADOR -->
   <div style="margin-bottom:10px;">
-    <input 
-      id="buscadorInformes"
+    <input
+  id="buscadorTecnico"
       type="text"
       placeholder="🔍 Buscar por técnico o archivo..."
       style="
