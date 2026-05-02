@@ -192,13 +192,13 @@ function generarTablaHTML(modulo) {
   }).join("");
 
  return `
-  <div id="filtroEstados" style="margin-bottom:10px;">
-    <button data-filtro="todos">Todos</button>
-    <button data-filtro="pendiente">Pendiente</button>
-    <button data-filtro="subsanado">🔧 Corregido</button>
-    <button data-filtro="aprobado">Aprobado</button>
-    <button data-filtro="rechazado">Rechazado</button>
-  </div>
+  <div id="filtroEstados" class="tabs-estado">
+  <button data-filtro="todos" class="active">Todos</button>
+  <button data-filtro="pendiente">⏳ Pendiente</button>
+  <button data-filtro="subsanado">🔧 Corregido</button>
+  <button data-filtro="aprobado">✅ Aprobado</button>
+  <button data-filtro="rechazado">⛔ Rechazado</button>
+</div>
 
   <div class="tabla-box">
     <table class="tabla">
@@ -381,6 +381,49 @@ function renderTabla() {
 prepararEventosTabla();
 activarFiltroEstado();
 }
+
+function actualizarContadores() {
+
+  const estados = {
+    todos: window.datosActuales.length,
+    pendiente: 0,
+    subsanado: 0,
+    aprobado: 0,
+    rechazado: 0
+  };
+
+  window.datosActuales.forEach(item => {
+    const estado = item.estadoKV ?? "pendiente";
+
+    if (estado in estados) {
+      estados[estado]++;
+    }
+  });
+
+  const botones = document.querySelectorAll("#filtroEstados button");
+
+  botones.forEach(btn => {
+    const filtro = btn.dataset.filtro;
+
+    if (filtro === "todos") {
+      btn.innerHTML = `Todos (${estados.todos})`;
+    }
+    else if (filtro === "pendiente") {
+      btn.innerHTML = `⏳ Pendiente (${estados.pendiente})`;
+    }
+    else if (filtro === "subsanado") {
+      btn.innerHTML = `🔧 Corregido (${estados.subsanado})`;
+    }
+    else if (filtro === "aprobado") {
+      btn.innerHTML = `✅ Aprobado (${estados.aprobado})`;
+    }
+    else if (filtro === "rechazado") {
+      btn.innerHTML = `⛔ Rechazado (${estados.rechazado})`;
+    }
+  });
+
+}
+
 
 /* ======================================================================
    ACTIVAR FILTROS ESTADO
