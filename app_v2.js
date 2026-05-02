@@ -378,8 +378,51 @@ function renderTabla() {
 
   });
 
-  prepararEventosTabla();
+prepararEventosTabla();
+activarFiltroEstado();
 }
+
+/* ======================================================================
+   ACTIVAR FILTROS ESTADO
+====================================================================== */
+
+function activarFiltroEstado() {
+
+  const botones = document.querySelectorAll("#filtroEstados button");
+
+  botones.forEach(btn => {
+
+    btn.onclick = () => {
+
+      const filtro = btn.dataset.filtro;
+
+      const filas = document.querySelectorAll("#tbodyDatos tr");
+
+      filas.forEach(fila => {
+
+        const texto = fila.innerText.toLowerCase();
+
+        if (filtro === "todos") {
+          fila.style.display = "";
+        } 
+        else if (filtro === "subsanado" && texto.includes("corregido")) {
+          fila.style.display = "";
+        } 
+        else if (texto.includes(filtro)) {
+          fila.style.display = "";
+        } 
+        else {
+          fila.style.display = "none";
+        }
+
+      });
+
+    };
+
+  });
+
+}
+
 
 /* ======================================================================
    10) ORDENAR POR FECHA
