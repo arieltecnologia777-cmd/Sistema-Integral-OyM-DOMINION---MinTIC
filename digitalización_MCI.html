@@ -7100,7 +7100,9 @@ document.querySelectorAll(".remove-btn").forEach(btn => {
 
     // 🔥 BORRAR DE INDEXEDDB (LA CLAVE DEL PROBLEMA)
     if (window.dbSavePhoto) {
-      await dbSavePhoto(id, null);
+      const tx = db.transaction("photos", "readwrite");
+      tx.objectStore("photos").delete(id);
+
     }
 
   });
