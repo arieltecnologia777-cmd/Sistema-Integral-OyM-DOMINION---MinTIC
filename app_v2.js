@@ -323,6 +323,37 @@ async function cargarDatosModulo() {
   renderTabla();
   setTimeout(() => activarOrdenamientoFecha(), 0);
 }
+
+/* ======================================================================
+   FUNCIÓN BSUCAR TÉCNICO
+====================================================================== */
+function activarBuscadorTecnico() {
+
+  const input = document.getElementById("buscadorTecnico");
+
+  if (!input) return;
+
+  input.addEventListener("input", () => {
+
+    const valor = input.value.toLowerCase();
+
+    const filas = document.querySelectorAll("#tbodyDatos tr");
+
+    filas.forEach(fila => {
+
+      const texto = fila.innerText.toLowerCase();
+
+      if (texto.includes(valor)) {
+        fila.style.display = "";
+      } else {
+        fila.style.display = "none";
+      }
+
+    });
+
+  });
+
+}
 /* ======================================================================
    9) RENDER TABLA
 ====================================================================== */
