@@ -202,7 +202,7 @@ async function seleccionarModulo(mod) {
   border-radius:16px;
   border:1px solid #e3e8f5;
   box-shadow:0 12px 24px rgba(0,0,0,0.06);
-  width:650px;
+  width:530px;
 
   position:relative;
   z-index:1; 
