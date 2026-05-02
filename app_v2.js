@@ -158,13 +158,14 @@ async function seleccionarModulo(mod) {
 
   cont.innerHTML = `
     <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:40px;
-      padding:20px;
-      position:relative;
-    ">
+  display:flex;
+  justify-content:flex-start;
+  align-items:flex-start;
+  gap:0px;
+  padding:20px;
+  position:relative;
+">
+
 
       <!-- IZQUIERDA -->
       <div style="max-width:520px; z-index:2;">
