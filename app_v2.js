@@ -197,12 +197,28 @@ function generarTablaHTML(modulo) {
 
  return `
   <div id="filtroEstados" class="tabs-estado">
-  <button data-filtro="todos" class="active">Todos</button>
-  <button data-filtro="pendiente">⏳ Pendiente</button>
-  <button data-filtro="subsanado">🔧 Corregido</button>
-  <button data-filtro="aprobado">✅ Aprobado</button>
-  <button data-filtro="rechazado">⛔ Rechazado</button>
-</div>
+    <button data-filtro="todos" class="active">Todos</button>
+    <button data-filtro="pendiente">⏳ Pendiente</button>
+    <button data-filtro="subsanado">🔧 Corregido</button>
+    <button data-filtro="aprobado">✅ Aprobado</button>
+    <button data-filtro="rechazado">⛔ Rechazado</button>
+  </div>
+
+  <!-- 🔍 BUSCADOR -->
+  <div style="margin-bottom:10px;">
+    <input 
+      id="buscadorInformes"
+      type="text"
+      placeholder="🔍 Buscar por técnico o archivo..."
+      style="
+        width: 300px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+      "
+    />
+  </div>
 
   <div class="tabla-box">
     <table class="tabla">
@@ -416,7 +432,7 @@ function renderTabla() {
 prepararEventosTabla();
 activarFiltroEstado();
 actualizarContadores();
-activarBuscadorTecnico();
+activarBuscador();
 }
 
 function actualizarContadores() {
