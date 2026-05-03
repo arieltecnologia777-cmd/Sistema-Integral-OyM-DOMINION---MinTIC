@@ -242,7 +242,7 @@ async function seleccionarModulo(mod) {
   display:flex;
   align-items:center;
   justify-content:center;
- margin-left:-150px;
+ margin-left:-130px;
 ">
 
   <div style="
@@ -259,7 +259,7 @@ async function seleccionarModulo(mod) {
     <img
   src="./auditor-dashboard.png" 
   style="
-    width:210px;
+    width:170px;
     position:relative;
     z-index:10; /* ✅ IMAGEN MÁXIMA PRIORIDAD */
     transform: translateX(20px); /* ✅ la hace sobresalir */
