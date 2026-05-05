@@ -461,29 +461,46 @@ async function cargarDatosModulo() {
 function activarBuscadorTecnico() {
 
   const input = document.getElementById("buscadorTecnico");
+  const fecha = document.getElementById("filtroFecha");
 
-  if (!input) return;
+  if (!input || !fecha) return;
 
-  input.addEventListener("input", () => {
+  function filtrar() {
 
-    const valor = input.value.toLowerCase();
+    const texto = input.value.toLowerCase();
+    const fechaSeleccionada = fecha.value;
 
     const filas = document.querySelectorAll("#tbodyDatos tr");
 
-    filas.forEach(fila => {
+    filas.forEach((fila, index) => {
 
-      const texto = fila.innerText.toLowerCase();
+      const item = window.datosActuales[index];
+      if (!item) return;
 
-      if (texto.includes(valor)) {
-        fila.style.display = "";
-      } else {
-        fila.style.display = "none";
+      const contenido = fila.innerText.toLowerCase();
+
+      const fechaItem = item.fechaReal
+        ? new Date(item.fechaReal).toISOString().slice(0,10)
+        : "";
+
+      let visible = true;
+
+      // 🔎 filtro texto
+      if (texto && !contenido.includes(texto)) {
+        visible = false;
       }
 
+      // 📅 filtro fecha exacta
+      if (fechaSeleccionada && fechaItem !== fechaSeleccionada) {
+        visible = false;
+      }
+
+      fila.style.display = visible ? "" : "none";
     });
+  }
 
-  });
-
+  input.addEventListener("input", filtrar);
+  fecha.addEventListener("change", filtrar);
 }
 /* ======================================================================
    9) RENDER TABLA
