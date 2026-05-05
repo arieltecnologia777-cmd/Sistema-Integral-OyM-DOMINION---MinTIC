@@ -515,7 +515,7 @@ function activarBuscadorTecnico() {
 
     const filas = document.querySelectorAll("#tbodyDatos tr");
 
-    // ✅ FILAS REALES QUE USA EL RENDER (CLAVE)
+    // ✅ DATOS EXACTOS QUE SE RENDERIZAN
     const filasDatos = window.datosActuales.filter(item =>
       item.nombre &&
       item.nombre.endsWith(".xlsx") &&
@@ -532,19 +532,19 @@ function activarBuscadorTecnico() {
       const f = item.fechaReal ? new Date(item.fechaReal) : null;
 
       const fechaItem = f
-        ? `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`
+        ? `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}`
         : "";
 
       let visible = true;
 
-      // 🔎 FILTRO POR TEXTO
+      // 🔎 TEXTO (no afecta)
       if (texto && !contenido.includes(texto)) {
         visible = false;
       }
 
-      // 📅 FILTRO POR FECHA (TOLERANTE)
+      // ✅ ✅ ESTE ES EL FILTRO DE FECHA REAL
       if (fechaSeleccionada) {
-        if (!fechaItem || !fechaItem.includes(fechaSeleccionada)) {
+        if (fechaItem !== fechaSeleccionada) {
           visible = false;
         }
       }
