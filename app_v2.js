@@ -901,6 +901,7 @@ const resp = await fetch(FLOW_FOTOS, {
 });
 
 const data = await resp.json();
+console.log("DATA FLOW:", data);
 
 // ✅ guardar URL que viene del flow
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
