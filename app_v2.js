@@ -983,7 +983,7 @@ function renderizarFotos(item) {
   galeria.appendChild(grid);
 }
 /* ======================================================================
-   15) VOLVER
+   15) VOLVER + DESCARGAR
 ====================================================================== */
 document.getElementById("visorVolver").addEventListener("click", () => {
   document.getElementById("modalVisor").style.display = "none";
@@ -991,26 +991,37 @@ document.getElementById("visorVolver").addEventListener("click", () => {
   renderTabla();
 });
 
+// 🔥 BOTÓN DESCARGAR (CORREGIDO)
 const btn = document.getElementById("visorDescargar");
 
 btn.addEventListener("click", async () => {
-  btn.disabled = true;
-  btn.innerText = "⏳ Descargando...";
 
+  // ✅ Validar existencia
   const item = window.__archivoActual;
-
   if (!item || !item.mciId) {
     alert("No hay informe para descargar.");
-    btn.disabled = false;
-    btn.innerText = "Descargar";
     return;
   }
 
-  await descargarInforme(item.mciId);
+  // ✅ UI: estado cargando
+  btn.disabled = true;
+  const textoOriginal = btn.innerText;
+  btn.innerText = "⏳ Descargando...";
 
+  try {
+    // ✅ Descargar
+    await descargarInforme(item.mciId);
+
+  } catch (err) {
+    console.error("Error al descargar:", err);
+    alert("Error en la descarga.");
+  }
+
+  // ✅ Restaurar botón
   btn.disabled = false;
-  btn.innerText = "Descargar";
+  btn.innerText = textoOriginal;
 });
+
  /* ======================================================================
    16) APROBAR
 ====================================================================== */
