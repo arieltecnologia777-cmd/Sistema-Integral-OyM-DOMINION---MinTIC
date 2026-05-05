@@ -904,19 +904,14 @@ const data = await resp.json();
 
 // ✅ guardar URL que viene del flow
 window.__archivoActual.excelWebUrl = data.excelWebUrl;
-   
-// ✅ Guardar URL del Excel para abrir en línea
-window.__archivoActual.excelWebUrl = data.excelWebUrl;
 
-// ✅ Flow respondió → habilitar Abrir Excel
-
+// ✅ habilitar botón
 if (btnAbrirExcelUI && window.__archivoActual?.excelWebUrl) {
   btnAbrirExcelUI.disabled = false;
   btnAbrirExcelUI.innerText = "📊 Abrir Excel en línea";
   btnAbrirExcelUI.style.opacity = "1";
   btnAbrirExcelUI.style.cursor = "pointer";
 }
-
    // ==============================
 // NORMALIZAR CAMPOS NO DILIGENCIADOS
 // ==============================
