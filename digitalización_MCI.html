@@ -7120,13 +7120,7 @@ function filtrar() {
   const filas = document.querySelectorAll("#tbody-equipos tr");
 
   filas.forEach(fila => {
-    const texto = fila.innerText;
-
-    if (!fecha || texto.includes(fecha)) {
-      fila.style.display = "";
-    } else {
-      fila.style.display = "none";
-    }
+    fila.style.display = fecha ? "none" : "";
   });
 }
 </script>
