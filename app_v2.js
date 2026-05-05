@@ -336,8 +336,7 @@ function generarTablaHTML(modulo) {
     "
   />
 
-  <!-- FECHA -->
-<div style="position:relative; display:inline-block;">
+  <!-- FECHA --><!-- FE="position:relative; display:flex; align-items:center;">
 
   <span style="
     position:absolute;
@@ -366,7 +365,8 @@ function generarTablaHTML(modulo) {
     "
   />
 
-</div>
+</span>
+
 
   <div class="tabla-box">
     <table class="tabla">
