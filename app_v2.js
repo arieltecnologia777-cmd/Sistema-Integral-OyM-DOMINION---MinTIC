@@ -337,6 +337,10 @@ function generarTablaHTML(modulo) {
   />
 
   <!-- FECHA -->
+  <span style="display:flex; align-items:center; gap:6px;">
+  <span style="font-size:14px;">📅</span>
+  <span style="font-size:13px; color:#374151;">Filtrar</span>
+
   <input
     id="filtroFecha"
     type="date"
@@ -348,6 +352,7 @@ function generarTablaHTML(modulo) {
       cursor: pointer;
     "
   />
+</span>
 
 </div>
 
