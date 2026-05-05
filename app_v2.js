@@ -522,9 +522,8 @@ function activarBuscadorTecnico() {
 
       const contenido = fila.innerText.toLowerCase();
 
-      const fechaItem = item.fechaReal
-        ? new Date(item.fechaReal).toISOString().slice(0,10)
-        : "";
+      const f = item.fechaReal ? new Date(item.fechaReal) : null;
+const fechaItem = f ? `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}` : "";
 
       let visible = true;
 
