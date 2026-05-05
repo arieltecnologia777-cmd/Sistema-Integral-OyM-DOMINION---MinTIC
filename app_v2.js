@@ -991,15 +991,25 @@ document.getElementById("visorVolver").addEventListener("click", () => {
   renderTabla();
 });
 
-document.getElementById("visorDescargar").addEventListener("click", async () => {
+const btn = document.getElementById("visorDescargar");
+
+btn.addEventListener("click", async () => {
+  btn.disabled = true;
+  btn.innerText = "⏳ Descargando...";
+
   const item = window.__archivoActual;
 
   if (!item || !item.mciId) {
     alert("No hay informe para descargar.");
+    btn.disabled = false;
+    btn.innerText = "Descargar";
     return;
   }
 
   await descargarInforme(item.mciId);
+
+  btn.disabled = false;
+  btn.innerText = "Descargar";
 });
  /* ======================================================================
    16) APROBAR
