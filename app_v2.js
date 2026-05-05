@@ -840,7 +840,7 @@ visor.innerHTML = `
   </div>
 
   <h3 style="font-weight:800; margin-bottom:10px;">
-    Fotos del informe
+    Observaciones de aprobación / rechazo
   </h3>
   <div id="visorFotos"></div>
 `;
