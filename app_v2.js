@@ -992,7 +992,7 @@ document.getElementById("visorVolver").addEventListener("click", () => {
 });
 
 // ✅ USA TU FLOW REAL (REEMPLAZA CON EL TUYO)
-const FLOW_DESCARGAR_MCI = "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bd9e2227be594ecdb47c0da4a898d474/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=j3SlbYcxilxwhnHJfL95lpTA-Y2RzAtiNrmug_D01eQ";
+const FLOW_DESCARGAR_MCI = "https://defaulte4e1bc33e2834312bb3789010224b7.fe.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/fa10841ef2464362b4086b4e4703ed7d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=xp3YMw97IscNOCutrf34lWcx7XCfnKDhNNHOHXlN2s4";
 
 // 🔥 BOTÓN DESCARGAR FINAL
 const btn = document.getElementById("visorDescargar");
