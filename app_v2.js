@@ -499,7 +499,7 @@ async function cargarDatosModulo() {
 }
 
 /* ======================================================================
-   FUNCIÓN BUSCAR TÉCNICO
+   FUNCIÓN BSUCAR TÉCNICO
 ====================================================================== */
 function activarBuscadorTecnico() {
 
@@ -515,36 +515,27 @@ function activarBuscadorTecnico() {
 
     const filas = document.querySelectorAll("#tbodyDatos tr");
 
-    // ✅ DATOS EXACTOS QUE SE RENDERIZAN
-    const filasDatos = window.datosActuales.filter(item =>
-      item.nombre &&
-      item.nombre.endsWith(".xlsx") &&
-      !item.nombre.includes("PreviewFotos")
-    );
-
     filas.forEach((fila, index) => {
 
-      const item = filasDatos[index];
+      const item = window.datosActuales[index];
       if (!item) return;
 
       const contenido = fila.innerText.toLowerCase();
 
       const fechaItem = item.fechaReal
-  ? item.fechaReal.split("T")[0]
-  : "";
+        ? new Date(item.fechaReal).toISOString().slice(0,10)
+        : "";
 
       let visible = true;
 
-      // 🔎 TEXTO (no afecta)
+      // 🔎 filtro texto
       if (texto && !contenido.includes(texto)) {
         visible = false;
       }
 
-      // ✅ ✅ ESTE ES EL FILTRO DE FECHA REAL
-      if (fechaSeleccionada) {
-        if (fechaItem !== fechaSeleccionada) {
-          visible = false;
-        }
+      // 📅 filtro fecha exacta
+      if (fechaSeleccionada && fechaItem !== fechaSeleccionada) {
+        visible = false;
       }
 
       fila.style.display = visible ? "" : "none";
@@ -660,6 +651,11 @@ function actualizarContadores() {
   });
 
 }
+
+
+/* ======================================================================
+   ACTIVAR FILTROS ESTADO
+====================================================================== */
 
 /* ======================================================================
    ACTIVAR FILTROS ESTADO
