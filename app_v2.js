@@ -806,8 +806,8 @@ let visorConstruido = false;
 // ==============================
 const infoInforme = {
   tecnico: item.tecnico ?? "No informado",
-  celular: "No informado", // no existe en KV
-  depto: "No informado", // no existe en KV
+  celular: item.celular ?? "No informado",
+  depto: item.departamento ?? "No informado",
   beneficiario: item.idBeneficiario ?? "No informado",
   ot: item.mciId ?? "No informado",
   fecha: item.fecha ?? "—",
