@@ -817,11 +817,6 @@ window.__infoInforme = infoInforme;
    // ==============================
 // PASO 2 — Estado inicial (cargando datos)
 // ==============================
-infoInforme.tecnico = "Cargando datos…";
-infoInforme.celular = "Cargando datos…";
-infoInforme.depto = "Cargando datos…";
-infoInforme.beneficiario = "Cargando datos…";
-infoInforme.ot = "Cargando datos…";
 infoInforme.fecha = item.fecha ?? "—"; // la fecha sí puede mostrarse
 
 
