@@ -797,14 +797,14 @@ let visorConstruido = false;
 // (NO toca el DOM, NO renderiza)
 // ==============================
 const infoInforme = {
-  tecnico: "Cargando datos…",
-  celular: "Cargando datos…",
-  depto: "Cargando datos…",
-  beneficiario: "Cargando datos…",
-  ot: "Cargando datos…",
+  tecnico: item.tecnico ?? "No informado",
+  celular: item.celular ?? "No informado",
+  depto: item.departamento ?? "No informado",
+  beneficiario: item.beneficiario ?? "No informado",
+  ot: item.ot ?? "No informado",
   fecha: item.fecha ?? "—",
-  lat: "Cargando datos…",
-  lng: "Cargando datos…"
+  lat: item.lat ?? "No informado",
+  lng: item.lng ?? "No informado"
 };
 window.__infoInforme = infoInforme;
    // ==============================
