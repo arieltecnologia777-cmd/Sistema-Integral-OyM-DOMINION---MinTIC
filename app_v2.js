@@ -320,57 +320,57 @@ function generarTablaHTML(modulo) {
   </div>
 
   <!-- 🔍 BUSCADOR + 📅 FECHA -->
-
 <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px; flex-wrap: nowrap;">
 
-
   <!-- BUSCADOR -->
-<input
-  id="buscadorTecnico"
-  type="text"
-  placeholder="🔍 Buscar por técnico o archivo..."
-  style="
-    width: 220px;
-    flex-shrink:0;
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
-    font-size: 14px;
-  "
-/>
-
-  <!-- FECHA -->
-<span style="position:relative; display:inline-block;">
-
-  <input
-    id="filtroFecha"
-    type="date"
+  <input 
+    id="buscadorTecnico" 
+    type="text" 
+    placeholder="🔍 Buscar por técnico o archivo..." 
     style="
-      padding: 8px 10px 8px 90px;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      font-size: 14px;
-      cursor: pointer;
+      width: 220px; 
+      flex-shrink:0; 
+      padding: 8px 12px; 
+      border-radius: 10px; 
+      border: 1px solid #d1d5db; 
+      font-size: 14px; 
     "
   />
 
-  <span style="
-    position:absolute;
-    left:10px;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:13px;
-    color:#374151;
-    pointer-events:none;
-    white-space:nowrap;
-  ">
-    📅 Filtrar
+  <!-- FECHA -->
+  <span style="position:relative; display:inline-block;">
+
+    <input
+      id="filtroFecha"
+      type="date"
+      style="
+        padding: 8px 10px 8px 90px;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+        cursor: pointer;
+      "
+    />
+
+    <span style="
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:13px;
+      color:#374151;
+      pointer-events:none;
+      white-space:nowrap;
+    ">
+      📅 Filtrar
+    </span>
+
   </span>
 
-</span>
+</div>  <!-- ✅ ESTE CIERRE ES CLAVE -->
 
-
-  <div class="tabla-box">
+<!-- TABLA -->
+<div class="tabla-box">
     <table class="tabla">
       <thead><tr>${ths}<th>Acciones</th></tr></thead>
       <tbody id="tbodyDatos">
