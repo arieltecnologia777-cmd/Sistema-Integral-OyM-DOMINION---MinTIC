@@ -320,7 +320,15 @@ function generarTablaHTML(modulo) {
   </div>
 
   <!-- 🔍 BUSCADOR + 📅 FECHA -->
-<div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+
+div style="
+  display:flex; 
+  gap:10px; 
+  align-items:center; 
+  margin-bottom:10px;
+  flex-wrap: nowrap;
+">
+
 
   <!-- BUSCADOR -->
   <input
