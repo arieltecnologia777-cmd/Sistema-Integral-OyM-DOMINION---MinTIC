@@ -6595,6 +6595,12 @@ document.addEventListener("change", function(e) {
     }
 });
 
+document.getElementById("inp-firma-tec").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    await guardarFotoOffline("firma_tecnico", file);
+});
 
 
 
